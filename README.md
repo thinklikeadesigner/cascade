@@ -111,21 +111,48 @@ This keeps you in control while letting Claude handle the detail work.
 git clone https://github.com/thinklikeadesigner/cascade.git
 cd cascade
 
-# Copy templates to your data directory
-cp templates/year-goals.md data/2026-goals.md
-cp templates/tracker.csv data/tracker.csv
-
 # Open in Claude Code
-claude data/
+claude .
+
+# Run the interactive setup
+> quickstart
 ```
 
-See **[QUICKSTART.md](QUICKSTART.md)** for detailed setup instructions.
+The `quickstart` command will:
+- Guide you through defining your goal with SMART criteria
+- Research realistic timelines and approaches (using WebSearch if needed)
+- Validate your plan is achievable given your constraints
+- Generate all planning files (year, quarter, month, week)
+- Set up your tracker with the right metrics
+
+See **[QUICKSTART.md](QUICKSTART.md)** for detailed setup instructions or manual setup.
 
 ---
 
 ## Commands Reference
 
 ### Core Commands
+
+#### `quickstart`
+**Interactive onboarding for new users.** Guides you through:
+- Defining a SMART goal (Specific, Measurable, Achievable, Relevant, Time-bound)
+- Researching realistic approaches and timelines
+- Validating your plan against your available time
+- Generating all initial planning files
+
+**Usage:**
+```
+> quickstart
+
+Welcome to Cascade! Let's break down your yearly goal into actionable tasks.
+
+What's your main goal for this year?
+> [Your goal here]
+```
+
+Use this **once during initial setup**. For ongoing planning, use the commands below.
+
+---
 
 #### `next week`
 Generate next week's planning file based on current progress and monthly targets.
