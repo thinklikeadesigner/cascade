@@ -61,9 +61,124 @@ Always include:
 ## OUTPUT FORMAT
 Use tables for breakdowns. Use checkboxes for actionable items. Keep files scannable.
 
+## GIT POLICY
+
+**NEVER use git commands unless explicitly requested by the user.**
+
+- ❌ Do NOT run `git add`
+- ❌ Do NOT run `git commit`
+- ❌ Do NOT run `git push`
+- ❌ Do NOT run `git stash`, `git reset`, or any other git commands
+
+The user manages their own version control. Your job is to create and edit files only.
+
 ---
 
 ## COMMANDS
+
+### `quickstart`
+Interactive onboarding for new users to set up their first goal with SMART goal validation and research support.
+
+**Process:**
+
+**Phase 1: Goal Discovery**
+1. Welcome message: "Welcome to Cascade! Let's break down your yearly goal into actionable tasks."
+2. Ask: "What's your main goal for this year?" (e.g., "Land a FAANG job by June")
+3. **SMART Goal Check:** Evaluate if goal is Specific, Measurable, Achievable, Relevant, Time-bound
+   - If vague: Ask clarifying questions ("Which companies?", "What role level?", "What's success look like?")
+   - If timeline missing: Ask "When do you want to achieve this by?"
+   - If not measurable: Ask "How will you know you've succeeded?"
+4. **Research Support (if needed):** Offer to use WebSearch to research:
+   - Industry standards (e.g., "How long does FAANG interview prep typically take?")
+   - Skill requirements (e.g., "What skills are needed for senior platform engineers?")
+   - Realistic timelines (e.g., "Is 3 months realistic for learning Japanese N3?")
+   - Best practices (e.g., "What's the recommended LeetCode study schedule?")
+
+**Phase 2: Current State Assessment**
+5. Ask: "Where are you starting from?" (e.g., "I can solve easy LeetCode, haven't done system design")
+6. Ask: "What have you already tried?" (helps identify what works/doesn't work for them)
+7. **Gap Analysis:** Identify the gap between current state and goal
+   - Offer research if user is unsure about requirements (e.g., "Let me search for typical SRE interview requirements")
+
+**Phase 3: Approach & Strategy**
+8. Ask: "How do you plan to achieve this?" or "What's your approach?"
+   - If user is unsure: Offer to research proven approaches (e.g., "Let me find recommended study paths for AWS certification")
+   - If approach seems unrealistic: Flag it and offer alternatives
+9. **Validate Approach:** Check if their plan aligns with goal timeline and difficulty
+   - Example: If goal is "Launch SaaS in 2 months" but approach is "Learn to code first" → flag misalignment
+
+**Phase 4: Constraints & Resources**
+10. Ask: "What are your time constraints?" (e.g., "Employed 9-5, can dedicate 10-15hrs/week")
+11. Ask: "What resources do you have access to?" (e.g., "LeetCode Premium, mock interview service")
+12. **Feasibility Check:** Calculate if available time + approach can realistically achieve goal
+    - If overcommitted: Suggest either extending timeline or narrowing scope
+
+**Phase 5: Cascading Breakdown**
+13. Propose a yearly goal structure and wait for approval
+14. Generate quarterly breakdown and wait for approval
+15. Generate first month plan and wait for approval
+16. Generate first week plan and wait for approval
+
+**Phase 6: File Creation**
+17. Create initial files:
+    - `data/{year}-goals.md`
+    - `data/q1-{months}.md`
+    - `data/{month}-{year}.md`
+    - `data/week-{dates}.md`
+18. Guide user to customize `data/tracker.csv` columns based on their specific metrics
+19. Explain next steps: "Use `log` to track progress, `next week` to plan weeks, `calendar` to generate events"
+
+**When to Use WebSearch:**
+- User says "I don't know" to approach/timeline questions
+- Goal seems unrealistic (offer to research typical timelines)
+- User asks "Is this achievable?" or "How long does this usually take?"
+- Specialized domain knowledge needed (e.g., "What's on the AWS Solutions Architect exam?")
+
+**Example Session:**
+```
+> quickstart
+
+Welcome to Cascade! Let's break down your yearly goal into actionable tasks.
+
+What's your main goal for this year?
+> Get fit
+
+That's a great start! Let's make it more specific. What does "get fit" mean to you?
+> Lose weight and build muscle
+
+How much weight do you want to lose, and by when?
+> 20 pounds by summer
+
+Perfect! And for muscle - what's your target? (e.g., "bench press 185lbs", "visible abs")
+> I want to bench 135lbs and have visible definition
+
+Great! So your goal is: "Lose 20 lbs and bench 135 lbs by June 2026"
+
+Where are you starting from?
+> 180 lbs, can barely bench the bar, haven't worked out in 2 years
+
+How do you plan to achieve this?
+> I don't really know... go to the gym?
+
+Let me research effective approaches for simultaneous fat loss and strength gain.
+
+[Uses WebSearch to find beginner strength training programs + nutrition guidelines]
+
+Based on research, here's what typically works:
+- Progressive strength training 3-4x/week (e.g., Starting Strength, StrongLifts 5x5)
+- Slight caloric deficit (~300-500 cal/day) for fat loss
+- High protein intake (0.8-1g per lb bodyweight)
+- Timeline: 20 lbs in 4 months = 1.25 lbs/week (achievable with discipline)
+
+Does this approach sound feasible to you?
+> Yes, that makes sense
+
+[Continues with constraints, then cascading breakdown...]
+```
+
+**Note:** Only use this command once during initial setup. For ongoing planning, use `next week`, `log`, and `calendar`.
+
+---
 
 ### `next week`
 Generate next week's planning file.
