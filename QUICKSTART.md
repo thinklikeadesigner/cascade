@@ -319,7 +319,7 @@ Once you're comfortable with the basic workflow:
 
 1. **Explore customization:** Add custom commands, modify templates, create your own rituals
 2. **Share your setup:** Submit a PR with your example persona (with personal data removed)
-3. **Join the community:** [GitHub Discussions](https://github.com/thinklikeadesigner/goal-planning-engine/discussions)
+3. **Join the community:** [GitHub Discussions](https://github.com/thinklikeadesigner/cascade/discussions)
 
 ---
 
