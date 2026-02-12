@@ -1,0 +1,14 @@
+# User data (never commit personal information)
+data/
+
+# OS files
+.DS_Store
+*.swp
+*~
+
+# Editor files
+.vscode/
+.idea/
+
+# Calendar exports
+calendar/
