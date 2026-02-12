@@ -21,7 +21,7 @@ Before you begin, make sure you have:
 
 ```bash
 # Clone the repo to your local machine
-git clone https://github.com/yourusername/cascade.git
+git clone https://github.com/thinklikeadesigner/cascade.git
 
 # Navigate into the directory
 cd cascade
@@ -319,7 +319,7 @@ Once you're comfortable with the basic workflow:
 
 1. **Explore customization:** Add custom commands, modify templates, create your own rituals
 2. **Share your setup:** Submit a PR with your example persona (with personal data removed)
-3. **Join the community:** [GitHub Discussions](https://github.com/yourusername/goal-planning-engine/discussions)
+3. **Join the community:** [GitHub Discussions](https://github.com/thinklikeadesigner/goal-planning-engine/discussions)
 
 ---
 
@@ -327,7 +327,7 @@ Once you're comfortable with the basic workflow:
 
 Start your first planning session with Claude and let the cascading breakdown begin.
 
-**Questions?** Check the [FAQ in README.md](README.md#faq) or open an issue on [GitHub](https://github.com/yourusername/cascade/issues).
+**Questions?** Check the [FAQ in README.md](README.md#faq) or open an issue on [GitHub](https://github.com/thinklikeadesigner/cascade/issues).
 
 ---
 

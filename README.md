@@ -108,7 +108,7 @@ This keeps you in control while letting Claude handle the detail work.
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/cascade.git
+git clone https://github.com/thinklikeadesigner/cascade.git
 cd cascade
 
 # Copy templates to your data directory
@@ -342,9 +342,9 @@ Inspired by:
 
 ## Support
 
-- **Issues:** [GitHub Issues](https://github.com/yourusername/cascade/issues)
-- **Discussions:** [GitHub Discussions](https://github.com/yourusername/cascade/discussions)
-- **Twitter:** [@yourusername](https://twitter.com/yourusername)
+- **Issues:** [GitHub Issues](https://github.com/thinklikeadesigner/cascade/issues)
+- **Discussions:** [GitHub Discussions](https://github.com/thinklikeadesigner/cascade/discussions)
+- **Twitter:** [@thinkLikeADev](https://twitter.com/thinkLikeADev)
 
 ---
 
