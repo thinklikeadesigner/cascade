@@ -1,380 +1,189 @@
 # Cascade
 
-> Turn yearly ambitions into daily action.
-
-A Claude-powered planning system that breaks down ambitious goals through cascading time horizons—from year to quarter to month to week to day to hour.
+> Plans are cheap. Everyone has one on January 1st. Cascade is the system that makes them survive February.
 
 ---
 
 ## What is Cascade?
 
-Cascade is a **structured planning system** for ambitious engineers who want to achieve big goals. It uses Claude AI to help you:
+Cascade is a goal-execution methodology that uses Claude AI to break yearly goals into daily structure — and then **adapts based on what actually happens**.
 
-- Break down overwhelming yearly goals into manageable daily tasks
-- Maintain consistency through weekly planning and progress tracking
-- Adapt your plan dynamically based on real progress
-- Balance ambition with sustainability (Core vs Flex hours)
-- Never lose sight of your end goal while staying grounded in daily action
+Most planning tools assume you'll execute perfectly. Cascade assumes you won't. It tracks your real velocity, learns your patterns, and adjusts your plan to match reality instead of pretending reality will match your plan.
 
-**Think of it as:** Your personal planning coach that cascades "I want to land a job at Google by June" down to "Today I will solve 3 graph problems."
+### Three principles:
+
+**Gravity** — Plans cascade down (year → week → day). Reality flows up. Last week's actuals reshape next week's targets. The original plan is a starting point, not a contract.
+
+**Core/Flex** — Your plan must succeed on Core hours alone. Flex hours are bonus when energy allows. If you need Flex to hit targets, the targets are wrong.
+
+**Checkpoints** — Human approval at every level. Not because AI might be wrong — because approving makes the plan yours.
+
+---
+
+## Why not just use ChatGPT?
+
+ChatGPT can make you a plan. So can a notebook. The plan isn't the hard part.
+
+| | ChatGPT | Cascade |
+|---|---------|---------|
+| **Memory** | Forgets everything between sessions | Tracks your velocity, patterns, and rest debt across weeks |
+| **Opinions** | "Sure, I can plan 4 goals in 10 hrs/week!" | "Your data says 8 hrs. I believe your data." |
+| **Adaptation** | Generates plans in a vacuum | Plans from your actual completion rate, not your intentions |
+| **Patterns** | Can't observe behavior over time | "You skip Fridays. I moved those tasks to Saturday." |
+| **Honesty** | "Great job!" for 40% completion | "40% this week. Bad week or scope too high?" |
 
 ---
 
 ## Who is this for?
 
-Anyone with **ambitious multi-month goals** who struggles with:
-
-- Breaking big goals into actionable steps
-- Staying consistent week-to-week
-- Adjusting plans when life happens
-- Balancing multiple goals without burnout
-- Knowing if you're on track or falling behind
+Builders with ambitious multi-month goals who need structure, not motivation. You already know what you want — you need a system that keeps you honest about whether you're actually getting there.
 
 **Common use cases:**
-
-- 🎯 **Job search:** Track applications, interviews, networking, skill development
-- 📚 **Skill building:** LeetCode grind, course completion, certifications, portfolio projects
-- 💪 **Fitness:** Weight loss, strength building, race training
-- 🚀 **Side projects:** Launch a product, build an audience, hit revenue milestones
-- 🎓 **Learning:** Master a new language, domain, or technology stack
-
----
-
-## Why use this instead of a todo list?
-
-**Traditional todo lists fail at:**
-- Connecting daily tasks to long-term goals
-- Adapting when you fall behind
-- Balancing multiple priorities
-- Preventing burnout
-
-**Cascade succeeds by:**
-- **Cascading time horizons:** Year → Quarter → Month → Week → Day → Hour (each level informs the next)
-- **Human-in-the-loop checkpoints:** Claude presents a plan, you approve or adjust
-- **Dynamic adaptation:** `next week` command auto-calculates remaining work and distributes it across weeks
-- **Built-in sustainability:** Core vs Flex hours, mandatory rest day, weekly review ritual
-- **Progress tracking:** `log` command parses your notes and updates tracker.csv
-- **Calendar integration:** `calendar` command generates .ics files for seamless Google Calendar import
-
----
-
-## Core Concepts
-
-### Cascading Time Horizons
-
-Break goals down through each level with approval at each step:
-
-1. **Year** → Define success criteria (e.g., "Land FAANG job by June")
-2. **Quarterly** → Major milestones (e.g., "Q1: Master DSA, Q2: System Design + Interviews")
-3. **Monthly** → Concrete targets (e.g., "February: Complete all 114 Structy problems")
-4. **Weekly** → Task breakdown (e.g., "Week of Feb 9-15: 18 DP problems, 1 mock interview")
-5. **Daily** → Schedule integration (e.g., "Monday 5:30-7:30pm: 3 graph problems")
-6. **Hourly** → Time-blocked templates (e.g., "Monday template: 2hr Core + 1hr Flex")
-
-### Core vs Flex Hours
-
-**Core hours:** Non-negotiable, committed work toward your goal (e.g., 10 hrs/week)
-
-**Flex hours:** Bonus hours when energy is high (e.g., additional 5-10 hrs/week)
-
-This distinction prevents burnout and gives you permission to scale back when life happens.
-
-### Weekly Rhythm
-
-- **Monday:** Weekly Kickoff (10 min) — Review targets, commit to #1 priority
-- **Daily:** Work on goals, log progress in tracker.csv
-- **Sunday:** Weekly Review (15-30 min) — Reflect, adjust, plan next week
-
-### Human-in-the-Loop Approval
-
-Claude presents plans at each level. You:
-- ✅ Approve → Continue to next level
-- ✏️ Give feedback → Claude incorporates and re-presents
-- ❓ Ask questions → Claude answers and re-presents
-
-This keeps you in control while letting Claude handle the detail work.
+- **Side projects:** Ship features, acquire users, hit revenue milestones
+- **Job search:** Applications, interviews, networking, skill building
+- **Fitness:** Weight, strength, nutrition, consistency
+- **Learning:** Courses, certifications, practice hours
+- **Business:** Outreach, deals, revenue targets
 
 ---
 
 ## Quick Start
 
-### Prerequisites
-
-- **Claude Code CLI** or **Claude API access** (requires Claude Pro or API credits)
-- Basic familiarity with markdown files
-- A yearly goal you're serious about achieving
-
-### Installation
-
 ```bash
-# Clone the repository
 git clone https://github.com/thinklikeadesigner/cascade.git
 cd cascade
-
-# Open in Claude Code
 claude .
-
-# Run the interactive setup
-> quickstart
 ```
 
-The `quickstart` command will:
-- Guide you through defining your goal with SMART criteria
-- Research realistic timelines and approaches (using WebSearch if needed)
-- Validate your plan is achievable given your constraints
-- Generate all planning files (year, quarter, month, week)
-- Set up your tracker with the right metrics
+Then run `cascade` in the Claude Code conversation. It will:
+1. Help you define a specific, measurable goal
+2. Break it down through each time horizon (year → quarter → month → week) with your approval at each level
+3. Set your Core and Flex hours based on your actual available time
+4. Generate all planning files and a custom tracker for your goal type
 
-See **[QUICKSTART.md](QUICKSTART.md)** for detailed setup instructions or manual setup.
+Setup takes about 30 minutes of focused conversation.
 
 ---
 
-## Commands Reference
+## Commands
 
-### Core Commands
+| Command | What it does |
+|---------|-------------|
+| `cascade` | Initial setup — define your goal, generate all files |
+| `plan` | Generate next week's plan based on actual progress |
+| `status` | Quick pulse — velocity, forecast, rest debt, honest assessment |
+| `review` | Weekly reflection — planned vs actual, pattern detection |
+| `adapt` | Surface what Cascade has learned about you over time |
+| `log` | Parse your progress notes into tracker.csv |
+| `sync` | Generate .ics calendar file for the week |
 
-#### `quickstart`
-**Interactive onboarding for new users.** Guides you through:
-- Defining a SMART goal (Specific, Measurable, Achievable, Relevant, Time-bound)
-- Researching realistic approaches and timelines
-- Validating your plan against your available time
-- Generating all initial planning files
+### The adaptive loop
 
-**Usage:**
+This is what makes Cascade a system, not a prompt:
+
 ```
-> quickstart
-
-Welcome to Cascade! Let's break down your yearly goal into actionable tasks.
-
-What's your main goal for this year?
-> [Your goal here]
+cascade (setup) → log (track daily) → review (weekly reflection)
+    ↓                                        ↓
+  plan (next week) ← ← ← ← ← ← adapt (learn patterns)
 ```
 
-Use this **once during initial setup**. For ongoing planning, use the commands below.
+Each week, Cascade has more data. Your plans get more realistic. The system learns that you don't work Fridays, that your real velocity is 8 hours not 12, that you need a rest day every 6 days. It stops planning for who you wish you were and starts planning for who you actually are.
 
 ---
 
-#### `next week`
-Generate next week's planning file based on current progress and monthly targets.
+## Core Concepts
 
-**What it does:**
-1. Reads `data/tracker.csv` for latest progress
-2. Reads current `data/week-*.md` for context
-3. Reads monthly file for targets
-4. Calculates remaining work and distributes across weeks
-5. Generates `data/week-{dates}.md` with daily breakdown
+### Core vs Flex Hours
 
-**Example:**
-```
-> next week
+**Core** is the plan. If you complete only Core tasks, you're on track. Core is not the minimum — it's the sustainable output that keeps you moving every week.
 
-Reading tracker.csv... Last entry: Feb 8, 28/114 problems
-Reading feb-2026.md... Monthly target: 114 problems
+**Flex** is acceleration. Reach for it when energy is high. But if your monthly targets depend on Flex hours, Cascade will tell you: the targets are too high.
 
-Remaining: 86 problems, 3 weeks left
-Weekly target: ~29 problems
+This gives you explicit permission to have bad weeks without derailing the system. "Core only this week" is always a valid plan.
 
-[Presents week-feb-9-15.md for approval]
-```
+### Gravity
 
----
+Most planning tools set targets once and judge you against them forever. Cascade doesn't. If you planned 15 hours but completed 8, next week's plan starts from 8. The system adjusts to reality — your job is to show up, not to be perfect.
 
-#### `log`
-Parse your daily notes and update tracker.csv automatically.
+### Adaptations
 
-**What it does:**
-1. You paste freeform notes (e.g., from Telegram, Notes app, etc.)
-2. Claude parses dates, metrics, activities
-3. Shows you what it understood
-4. Updates tracker.csv with new rows
+After a few weeks, Cascade starts noticing patterns. These get stored in `data/adaptations.md` and automatically shape future plans:
 
-**Example:**
-```
-> log
+- "You skip Fridays → moved Friday tasks to Saturday"
+- "Average velocity is 8 hrs, not 12 → adjusted Core to 8"
+- "Low energy Wednesdays → lighter Wednesday schedules"
+- "Completion rate improved after scope reduction → keeping reduced scope"
 
-Feb 10 - finished 12 problems, gym
-Feb 11 - 8 more problems, skipped run
+Run `adapt` anytime to see what Cascade has learned about you.
 
 ---
 
-Parsed:
-- Feb 10: problems +12 (total: 40), activity: gym
-- Feb 11: problems +8 (total: 48), activity: skipped run
+## File Structure
 
-Update tracker.csv? [y/n]
+```
+cascade/
+├── CLAUDE.md              # The methodology (this is the product)
+├── README.md
+├── templates/             # Scaffolding for generated files
+│   ├── week.md
+│   ├── month.md
+│   ├── quarter.md
+│   ├── year-goals.md
+│   ├── adaptations.md
+│   ├── tracker.csv
+│   └── daily/             # Day-specific schedule templates
+├── data/                  # Your data (gitignored, private)
+│   ├── 2026-goals.md
+│   ├── q1-jan-feb-mar.md
+│   ├── feb-2026.md
+│   ├── week-feb14-20.md
+│   ├── tracker.csv
+│   └── adaptations.md
+└── calendar/              # Generated .ics files (gitignored)
 ```
 
----
-
-#### `calendar`
-Generate .ics file for the current week's schedule to import into Google Calendar.
-
-**What it does:**
-1. Reads current `data/week-*.md` and day templates
-2. Generates calendar events for:
-   - Core and Flex work blocks
-   - Recurring activities (exercise, meetings, etc.)
-   - Weekly Kickoff (Monday)
-   - Weekly Review (Sunday)
-3. Saves to `calendar/week-{dates}.ics`
-
-**Example:**
-```
-> calendar
-
-Created calendar/week-feb-9-15.ics with 18 events
-Import: Open file or drag into Google Calendar
-```
-
----
-
-## Customization
-
-### Adapt to Your Goals
-
-**The system is domain-agnostic.** Customize `data/tracker.csv` columns to match your goals:
-
-**Job Search:**
-```csv
-date,applications,phone_screens,onsites,networking,notes
-```
-
-**Coding Practice:**
-```csv
-date,problems_done,problems_total,chapter,mocks_done,notes
-```
-
-**Fitness:**
-```csv
-date,weight,workout_type,duration_min,calories,notes
-```
-
-**Side Project:**
-```csv
-date,features_shipped,users,revenue,marketing_hours,notes
-```
-
-### Modify Daily Templates
-
-Edit `templates/daily/*.md` to match your schedule:
-
-- Morning person? Put Core hours at 6-8am
-- Night owl? Put Core hours at 10pm-12am
-- Commute patterns? Adjust for office vs WFH days
-- Workout schedule? Block out gym time
-
-The `calendar` command will read these templates and generate events accordingly.
+The `data/` directory is **gitignored** — your goals, progress, and notes are never committed. You can fork this repo without exposing personal data.
 
 ---
 
 ## FAQ
 
-### Do I need Claude Pro?
+**Do I need Claude Pro?**
+Yes, or API credits. Cascade runs inside Claude Code and uses Claude's reasoning and tool capabilities.
 
-**Yes**, or API access with credits. The system relies on Claude's reasoning capabilities to:
-- Parse your goals and break them down intelligently
-- Calculate remaining work and redistribute across weeks
-- Parse freeform log entries into structured data
+**Can I use this for any goal?**
+Yes. The tracker columns, weekly structure, and coaching focus are all shaped by your goals during `cascade` setup. The system is domain-agnostic.
 
-### Can I use this for non-job-search goals?
+**What if I fall behind?**
+That's where Cascade is different. Run `status` for an honest assessment. Run `plan` and Cascade will redistribute remaining work based on your actual velocity — not the original plan. You'll get realistic targets, not guilt.
 
-**Absolutely.** The system is fully customizable. Just modify:
-- `data/tracker.csv` columns for your metrics
-- Template files for your goal type
-- CLAUDE.md instructions if you want custom commands
-
-### How do I protect my personal data?
-
-**The `data/` directory is gitignored.** This means:
-- Your personal goals, progress, and notes never get committed to git
-- You can fork/clone the repo without exposing your data
-- Keep your planning private while benefiting from the system
-
-### Can I use this with ChatGPT or other LLMs?
-
-The system is **optimized for Claude** (structured reasoning, long context, instruction following), but you could adapt the CLAUDE.md prompt for other models. Note that:
-- Commands rely on Claude's tool use capabilities
-- Parsing quality may vary with other models
-- No guarantees for non-Claude LLMs
-
-### What if I fall behind on my goals?
-
-**This is where the system shines.** Use the `next week` command, and Claude will:
-1. Calculate how far behind you are
-2. Redistribute remaining work across remaining weeks
-3. Flag if you're overcommitted
-4. Suggest scaling back Flex hours or adjusting targets
-
-You'll get an honest assessment and adaptive plan, not guilt.
-
-### How much time does this system require?
-
-**Setup:** 1-2 hours (customize templates, define yearly goals)
-
-**Weekly:**
-- Sunday review: 15-30 min
-- Monday kickoff: 10 min
-- Daily logging: 2-5 min
-- `next week` command: 5-10 min
-
-**Total overhead:** ~1 hour/week for planning and tracking
-
-The ROI is **massive** if you're working toward a goal that matters.
-
----
-
-## Examples in the Wild
-
-Want to see how others are using Cascade?
-
-- **Job search:** [Example link - coming soon]
-- **LeetCode grind:** [Example link - coming soon]
-- **Fitness journey:** [Example link - coming soon]
-- **Side project launch:** [Example link - coming soon]
-
-(Submit a PR to add your own!)
+**How much time overhead?**
+Setup: ~30 minutes. Weekly: ~45 minutes (15-min review + 10-min plan + daily logging). The system saves you time by eliminating the "what should I work on today?" question.
 
 ---
 
 ## Contributing
 
-Contributions welcome! Areas of interest:
-
-- **New templates:** Example personas for different goal types
-- **Custom commands:** Domain-specific commands (e.g., `rehearse` for interview prep)
-- **Integrations:** Export to Notion, Obsidian, etc.
-- **Documentation:** Video walkthroughs, blog posts, tutorials
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Contributions welcome:
+- New templates for different goal domains
+- Custom commands for specific use cases
+- Integrations (Notion, Obsidian, etc.)
+- Documentation and walkthroughs
 
 ---
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) for details.
-
----
-
-## Acknowledgments
+MIT — see [LICENSE](LICENSE).
 
 Built with [Claude AI](https://claude.ai) by Anthropic.
 
-Inspired by:
-- GTD (Getting Things Done) by David Allen
-- Atomic Habits by James Clear
-- Deep Work by Cal Newport
-- The cascading goals framework from OKRs
-
 ---
 
-## Support
+**Ready?**
 
-- **Issues:** [GitHub Issues](https://github.com/thinklikeadesigner/cascade/issues)
-- **Discussions:** [GitHub Discussions](https://github.com/thinklikeadesigner/cascade/discussions)
-- **Twitter:** [@thinkLikeADev](https://twitter.com/thinkLikeADev)
+```bash
+git clone https://github.com/thinklikeadesigner/cascade.git && cd cascade && claude .
+```
 
----
-
-**Ready to turn your yearly goals into daily action?**
-
-👉 **[Get Started with the Quick Start Guide](QUICKSTART.md)**
+Then type `cascade` and be honest about your goal.

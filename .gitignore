@@ -12,3 +12,13 @@ data/
 
 # Calendar exports
 calendar/
+
+# Dependencies
+node_modules/
+
+# Build artifacts
+outputs/
+*.pptx
+
+# Environment
+.env
