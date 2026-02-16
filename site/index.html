@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cascade — Big goals become inevitable.</title>
+  <meta name="description" content="Cascade is a goal execution system for founders. Break yearly ambitions into daily actions that actually get done.">
+  <meta property="og:title" content="Cascade — Big goals become inevitable.">
+  <meta property="og:description" content="A goal execution system that turns yearly ambitions into daily structure. Built for founders who execute.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://cascade.dev">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Cascade — Big goals become inevitable.">
+  <meta name="twitter:description" content="A goal execution system that turns yearly ambitions into daily structure.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #0D0B0E;
+      --surface: #1A1215;
+      --surface-light: #241A1E;
+      --accent: #EF4444;
+      --glow: #F87171;
+      --glow-soft: rgba(248, 113, 113, 0.2);
+      --text: #F8FAFC;
+      --text-secondary: #94A3B8;
+      --text-muted: #64748B;
+      --border: #2A1F22;
+      --mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+      --sans: 'Outfit', system-ui, -apple-system, sans-serif;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-weight: 400;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    section {
+      padding: 100px 0;
+    }
+
+    /* Fade-in on scroll */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Staggered fade for children */
+    .stagger-in > * {
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .stagger-in.visible > *:nth-child(1) { transition-delay: 0s; }
+    .stagger-in.visible > *:nth-child(2) { transition-delay: 0.08s; }
+    .stagger-in.visible > *:nth-child(3) { transition-delay: 0.16s; }
+    .stagger-in.visible > *:nth-child(4) { transition-delay: 0.24s; }
+    .stagger-in.visible > *:nth-child(5) { transition-delay: 0.32s; }
+    .stagger-in.visible > *:nth-child(6) { transition-delay: 0.40s; }
+    .stagger-in.visible > *:nth-child(7) { transition-delay: 0.48s; }
+    .stagger-in.visible > *:nth-child(8) { transition-delay: 0.56s; }
+    .stagger-in.visible > *:nth-child(9) { transition-delay: 0.64s; }
+    .stagger-in.visible > *:nth-child(10) { transition-delay: 0.72s; }
+    .stagger-in.visible > *:nth-child(11) { transition-delay: 0.80s; }
+    .stagger-in.visible > * {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    /* Only apply transitions when parent is visible */
+    .stagger-in:not(.visible) > * {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+
+    /* ===== HERO ===== */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 80px 0 60px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-dot-grid {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
+    .hero-logo {
+      width: 120px;
+      height: 144px;
+      margin: 0 auto 24px;
+      position: relative;
+    }
+
+    .hero-logo path,
+    .hero-logo circle {
+      opacity: 0;
+      transition: opacity 0.8s ease;
+    }
+    .hero.loaded .hero-logo path:nth-child(1) { opacity: 1; transition-delay: 0.3s; }
+    .hero.loaded .hero-logo path:nth-child(2) { opacity: 0.75; transition-delay: 0.45s; }
+    .hero.loaded .hero-logo path:nth-child(3) { opacity: 0.55; transition-delay: 0.6s; }
+    .hero.loaded .hero-logo path:nth-child(4) { opacity: 0.38; transition-delay: 0.75s; }
+    .hero.loaded .hero-logo path:nth-child(5) { opacity: 0.22; transition-delay: 0.9s; }
+    .hero.loaded .hero-logo circle:nth-of-type(1) { opacity: 0.6; transition-delay: 1.1s; }
+    .hero.loaded .hero-logo circle:nth-of-type(2) { opacity: 0.08; transition-delay: 1.1s; }
+
+    .hero-wordmark {
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 48px;
+      opacity: 0;
+      transition: opacity 1s ease 1.4s;
+    }
+    .hero.loaded .hero-wordmark {
+      opacity: 1;
+    }
+
+    .hero h1 {
+      font-family: var(--mono);
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 24px;
+      max-width: 680px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hero h1 .accent {
+      color: var(--accent);
+      text-shadow: 0 0 40px rgba(239, 68, 68, 0.3);
+    }
+
+    .hero-sub {
+      font-size: 1.15rem;
+      color: var(--text-secondary);
+      max-width: 520px;
+      margin: 0 auto 48px;
+      font-weight: 300;
+    }
+
+    .hero-proof {
+      margin-top: 20px;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      letter-spacing: 0.05em;
+    }
+
+    /* ===== FORM ===== */
+    .waitlist-form {
+      display: flex;
+      gap: 10px;
+      max-width: 440px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    @media (max-width: 480px) {
+      .waitlist-form {
+        flex-direction: column;
+      }
+    }
+
+    .waitlist-form input[type="email"] {
+      flex: 1;
+      padding: 14px 18px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .waitlist-form input[type="email"]::placeholder {
+      color: var(--text-muted);
+    }
+
+    .waitlist-form input[type="email"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+    }
+
+    .waitlist-form input[type="email"].error {
+      border-color: var(--accent);
+    }
+
+    .form-error {
+      position: absolute;
+      bottom: -26px;
+      left: 0;
+      font-size: 0.78rem;
+      color: var(--glow);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .form-error.show {
+      opacity: 1;
+    }
+
+    .btn {
+      padding: 14px 28px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+      box-shadow: 0 0 20px rgba(239, 68, 68, 0.25);
+    }
+
+    .btn:hover {
+      background: #DC2626;
+      box-shadow: 0 0 30px rgba(239, 68, 68, 0.4);
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn:focus-visible {
+      outline: 2px solid var(--glow);
+      outline-offset: 2px;
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-loading .btn-text { display: none; }
+    .btn-loading .btn-spinner { display: inline-block; }
+    .btn-spinner {
+      display: none;
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .success-msg {
+      text-align: center;
+      animation: fadeUp 0.4s ease;
+    }
+    .success-msg h3 {
+      font-family: var(--mono);
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+    .success-msg p {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== SECTION LABEL ===== */
+    .section-label {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 40px;
+    }
+
+    /* ===== PROBLEM ===== */
+    .problem {
+      border-top: 1px solid rgba(248, 113, 113, 0.08);
+    }
+
+    .pain-point {
+      font-size: clamp(1.15rem, 2.5vw, 1.4rem);
+      color: var(--text);
+      margin-bottom: 32px;
+      padding-left: 20px;
+      border-left: 2px solid rgba(239, 68, 68, 0.3);
+      font-weight: 300;
+      line-height: 1.5;
+    }
+
+    .pain-point:last-child {
+      margin-bottom: 0;
+    }
+
+    /* ===== BEFORE/AFTER ===== */
+    .before-after {
+      border-top: 1px solid rgba(248, 113, 113, 0.08);
+    }
+
+    .ba-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 640px) {
+      .ba-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .ba-panel {
+      border-radius: 16px;
+      padding: 28px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ba-before {
+      background: var(--surface);
+      border: 1px solid var(--border);
+    }
+
+    .ba-after {
+      background: var(--bg);
+      border: 1px solid rgba(239, 68, 68, 0.19);
+    }
+
+    .ba-after::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba(239, 68, 68, 0.04) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .ba-label {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    .ba-before .ba-label {
+      color: var(--text-muted);
+    }
+
+    .ba-after .ba-label {
+      color: var(--accent);
+    }
+
+    /* Scattered tasks */
+    .scattered-task {
+      position: relative;
+      display: inline-block;
+      background: #1E181B;
+      border: 1px solid #2A2025;
+      border-radius: 6px;
+      padding: 6px 12px;
+      margin-bottom: 8px;
+      font-family: var(--sans);
+      font-size: 0.69rem;
+      color: var(--text-muted);
+    }
+
+    .scattered-task.struck {
+      text-decoration: line-through;
+    }
+
+    .ba-punchline-bad {
+      margin-top: 16px;
+      font-size: 0.75rem;
+      color: var(--glow);
+      opacity: 0.7;
+    }
+
+    .ba-punchline-good {
+      margin-top: 12px;
+      font-size: 0.75rem;
+      color: var(--accent);
+    }
+
+    /* Structured cascade */
+    .structured-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .structured-label {
+      font-family: var(--mono);
+      font-size: 0.56rem;
+      color: var(--accent);
+      min-width: 56px;
+      text-align: right;
+    }
+
+    .structured-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .structured-dot.active {
+      box-shadow: 0 0 8px rgba(248, 113, 113, 0.38);
+    }
+
+    .structured-text {
+      font-size: 0.75rem;
+      color: var(--text);
+    }
+
+    /* ===== CASCADE MODEL ===== */
+    .model {
+      border-top: 1px solid rgba(248, 113, 113, 0.08);
+    }
+
+    .cascade-stack {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .cascade-connector {
+      display: flex;
+      justify-content: center;
+      padding: 4px 0;
+    }
+
+    .cascade-node {
+      padding: 14px 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 8px;
+      transition: border-color 0.3s;
+    }
+
+    .cascade-node:hover {
+      border-color: rgba(239, 68, 68, 0.2);
+    }
+
+    .cascade-node.active {
+      background: rgba(239, 68, 68, 0.06);
+      border-color: rgba(239, 68, 68, 0.25);
+      position: relative;
+    }
+
+    .cascade-node.active::after {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: 10px;
+      box-shadow: 0 0 24px rgba(239, 68, 68, 0.09), 0 0 48px rgba(239, 68, 68, 0.03);
+      pointer-events: none;
+    }
+
+    .cascade-node-label {
+      font-family: var(--mono);
+      font-size: 0.81rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .cascade-node.active .cascade-node-label {
+      color: var(--accent);
+    }
+
+    .cascade-node-example {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      font-style: italic;
+    }
+
+    /* ===== STATS ===== */
+    .stats {
+      border-top: 1px solid rgba(248, 113, 113, 0.08);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    @media (max-width: 560px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .stat-card {
+      text-align: center;
+      padding: 28px 16px;
+      background: var(--surface);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    .stat-number {
+      font-family: var(--mono);
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 8px;
+      text-shadow: 0 0 30px rgba(239, 68, 68, 0.19);
+    }
+
+    .stat-label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .stat-sub {
+      font-size: 0.69rem;
+      color: var(--text-muted);
+    }
+
+    /* ===== WHO ===== */
+    .who {
+      border-top: 1px solid rgba(248, 113, 113, 0.08);
+    }
+
+    .persona-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    @media (max-width: 560px) {
+      .persona-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .persona {
+      padding: 22px 20px;
+      background: var(--surface);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      transition: border-color 0.3s ease;
+    }
+
+    .persona:hover {
+      border-color: rgba(239, 68, 68, 0.2);
+    }
+
+    .persona-icon {
+      font-family: var(--mono);
+      font-size: 1.13rem;
+      color: var(--accent);
+      opacity: 0.8;
+      margin-bottom: 10px;
+    }
+
+    .persona h3 {
+      font-family: var(--sans);
+      font-size: 0.94rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .persona p {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      font-weight: 300;
+      line-height: 1.5;
+    }
+
+    /* ===== PHILOSOPHY ===== */
+    .philosophy {
+      border-top: 1px solid rgba(248, 113, 113, 0.08);
+      text-align: center;
+    }
+
+    .philosophy blockquote {
+      font-family: var(--mono);
+      font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+      font-weight: 500;
+      line-height: 1.5;
+      color: var(--text);
+      max-width: 600px;
+      margin: 0 auto 40px;
+    }
+
+    .philosophy blockquote .accent {
+      color: var(--accent);
+    }
+
+    .philosophy-points {
+      display: flex;
+      gap: 32px;
+      justify-content: center;
+      flex-wrap: wrap;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .philosophy-point {
+      flex: 1;
+      min-width: 160px;
+      text-align: center;
+    }
+
+    .philosophy-point h4 {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+    }
+
+    .philosophy-point p {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      font-weight: 300;
+    }
+
+    /* ===== FINAL CTA ===== */
+    .final-cta {
+      border-top: 1px solid rgba(248, 113, 113, 0.08);
+      text-align: center;
+      padding-bottom: 60px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .final-cta::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(239, 68, 68, 0.05) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .final-cta h2 {
+      font-family: var(--mono);
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      font-weight: 700;
+      margin-bottom: 12px;
+      position: relative;
+    }
+
+    .final-cta .sub {
+      color: var(--text-secondary);
+      margin-bottom: 40px;
+      font-size: 0.95rem;
+      font-weight: 300;
+      position: relative;
+    }
+
+    .final-cta .waitlist-form {
+      margin-bottom: 16px;
+      position: relative;
+    }
+
+    .early-access {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 20px;
+      letter-spacing: 0.03em;
+      position: relative;
+    }
+
+    /* ===== FOOTER ===== */
+    footer {
+      padding: 40px 0;
+      border-top: 1px solid rgba(248, 113, 113, 0.06);
+      text-align: center;
+    }
+
+    footer p {
+      font-family: var(--mono);
+      font-size: 0.69rem;
+      color: var(--text-muted);
+    }
+
+    footer a {
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    footer a:hover {
+      color: var(--accent);
+    }
+
+    /* Screen reader only */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      white-space: nowrap;
+      border: 0;
+    }
+  </style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <svg class="hero-dot-grid" aria-hidden="true">
+    <defs>
+      <pattern id="dotgrid" x="0" y="0" width="32" height="32" patternUnits="userSpaceOnUse">
+        <circle cx="1" cy="1" r="0.8" fill="#64748B" />
+      </pattern>
+      <radialGradient id="herofade" cx="50%" cy="45%" r="50%">
+        <stop offset="0%" stop-color="#EF4444" stop-opacity="0.08" />
+        <stop offset="100%" stop-color="#0D0B0E" stop-opacity="0" />
+      </radialGradient>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#dotgrid)" />
+    <rect width="100%" height="100%" fill="url(#herofade)" />
+  </svg>
+
+  <div class="container">
+    <div class="fade-in">
+      <svg class="hero-logo" viewBox="0 0 200 240" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Cascade logo">
+        <path d="M40 20 L100 50 L160 20" stroke="#EF4444" stroke-width="3.5" fill="none" stroke-linecap="round" style="filter: drop-shadow(0 0 8px rgba(248,113,113,0.2))" />
+        <path d="M52 65 L100 90 L148 65" stroke="#EF4444" stroke-width="3" fill="none" stroke-linecap="round" style="filter: drop-shadow(0 0 8px rgba(248,113,113,0.2))" />
+        <path d="M62 108 L100 128 L138 108" stroke="#EF4444" stroke-width="2.5" fill="none" stroke-linecap="round" style="filter: drop-shadow(0 0 8px rgba(248,113,113,0.2))" />
+        <path d="M72 148 L100 164 L128 148" stroke="#EF4444" stroke-width="2" fill="none" stroke-linecap="round" style="filter: drop-shadow(0 0 8px rgba(248,113,113,0.2))" />
+        <path d="M80 186 L100 198 L120 186" stroke="#EF4444" stroke-width="1.5" fill="none" stroke-linecap="round" style="filter: drop-shadow(0 0 8px rgba(248,113,113,0.2))" />
+        <circle cx="100" cy="225" r="4" fill="#F87171" />
+        <circle cx="100" cy="225" r="12" fill="#F87171" />
+      </svg>
+      <p class="hero-wordmark">Cascade</p>
+      <h1>Big goals become <span class="accent">inevitable.</span></h1>
+      <p class="hero-sub">Cascade turns your yearly ambition into daily structure. It tracks what you actually do, learns your patterns, and adapts your plan to match reality.</p>
+    </div>
+    <div class="fade-in" id="hero-form-wrapper">
+      <form class="waitlist-form" id="hero-form" aria-label="Join the waitlist">
+        <label for="hero-email" class="sr-only">Email address</label>
+        <input type="email" id="hero-email" name="email" placeholder="you@example.com" required autocomplete="email">
+        <button type="submit" class="btn" id="hero-btn">
+          <span class="btn-text">Join the waitlist</span>
+          <span class="btn-spinner" aria-hidden="true"></span>
+        </button>
+        <span class="form-error" id="hero-error" role="alert">Enter a valid email address.</span>
+      </form>
+      <p class="hero-proof">Built by a founder, for founders who execute.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section class="problem">
+  <div class="container">
+    <p class="section-label fade-in">The Problem</p>
+    <div class="fade-in">
+      <p class="pain-point">You set a yearly goal. You open a doc. You write three bullet points. By March, you forgot the doc existed.</p>
+    </div>
+    <div class="fade-in">
+      <p class="pain-point">You track habits but never connect them to the thing that actually matters. Checking boxes feels productive. It isn't.</p>
+    </div>
+    <div class="fade-in">
+      <p class="pain-point">You fall behind for two weeks and the whole plan feels broken. So you abandon it and start over in Q3. Again.</p>
+    </div>
+  </div>
+</section>
+
+<!-- BEFORE / AFTER -->
+<section class="before-after">
+  <div class="container">
+    <p class="section-label fade-in">The Difference</p>
+    <div class="ba-grid fade-in">
+      <!-- BEFORE -->
+      <div class="ba-panel ba-before">
+        <p class="ba-label">Without Cascade</p>
+        <div>
+          <div class="scattered-task" style="margin-left: 10%">Learn system design</div>
+          <div class="scattered-task" style="margin-left: 42%">Run 3x/week??</div>
+          <div class="scattered-task" style="margin-left: 5%">Ship MVP somehow</div>
+          <div class="scattered-task" style="margin-left: 48%">Read DDIA ch.5</div>
+          <div class="scattered-task" style="margin-left: 12%">Network more</div>
+          <div class="scattered-task" style="margin-left: 38%">Prep for interviews</div>
+          <div class="scattered-task struck" style="margin-left: 6%; opacity: 0.5">Fix that bug</div>
+        </div>
+        <p class="ba-punchline-bad">Scattered. Disconnected. Abandoned by March.</p>
+      </div>
+
+      <!-- AFTER -->
+      <div class="ba-panel ba-after">
+        <p class="ba-label">With Cascade</p>
+        <div>
+          <div class="structured-item" style="margin-left: 0px">
+            <span class="structured-label" style="opacity: 0.5">Vision</span>
+            <span class="structured-dot" style="opacity: 0.5"></span>
+            <span class="structured-text" style="opacity: 0.5">Senior platform engineer</span>
+          </div>
+          <div class="structured-item" style="margin-left: 8px">
+            <span class="structured-label" style="opacity: 0.6">Year</span>
+            <span class="structured-dot" style="opacity: 0.6"></span>
+            <span class="structured-text" style="opacity: 0.6">Land big tech role</span>
+          </div>
+          <div class="structured-item" style="margin-left: 16px">
+            <span class="structured-label" style="opacity: 0.7">Q1</span>
+            <span class="structured-dot" style="opacity: 0.7"></span>
+            <span class="structured-text" style="opacity: 0.7">DSA + system design mastery</span>
+          </div>
+          <div class="structured-item" style="margin-left: 24px">
+            <span class="structured-label" style="opacity: 0.8">Jan</span>
+            <span class="structured-dot" style="opacity: 0.8"></span>
+            <span class="structured-text" style="opacity: 0.8">Dynamic programming focus</span>
+          </div>
+          <div class="structured-item" style="margin-left: 32px">
+            <span class="structured-label" style="opacity: 0.9">This week</span>
+            <span class="structured-dot" style="opacity: 0.9"></span>
+            <span class="structured-text" style="opacity: 0.9">15 DP problems, 2 mocks</span>
+          </div>
+          <div class="structured-item" style="margin-left: 40px">
+            <span class="structured-label">Today</span>
+            <span class="structured-dot active"></span>
+            <span class="structured-text">3 Structy problems before lunch</span>
+          </div>
+        </div>
+        <p class="ba-punchline-good">Every action connected. Nothing wasted.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="model">
+  <div class="container">
+    <p class="section-label fade-in">How Cascade Works</p>
+    <div class="cascade-stack stagger-in">
+      <!-- Level 1 -->
+      <div style="width: 100%; max-width: 600px">
+        <div class="cascade-node" style="width: 100%">
+          <span class="cascade-node-label">Life Vision</span>
+          <span class="cascade-node-example">"Become a world-class engineer"</span>
+        </div>
+      </div>
+
+      <!-- Connector -->
+      <div class="cascade-connector">
+        <svg width="2" height="20"><line x1="1" y1="0" x2="1" y2="20" stroke="#EF4444" stroke-width="1" opacity="0.35" stroke-dasharray="3 3" /></svg>
+      </div>
+
+      <!-- Level 2 -->
+      <div style="width: 88%; max-width: 528px">
+        <div class="cascade-node" style="width: 100%">
+          <span class="cascade-node-label">Yearly Goal</span>
+          <span class="cascade-node-example">"Land a role at a top tech company"</span>
+        </div>
+      </div>
+
+      <div class="cascade-connector">
+        <svg width="2" height="20"><line x1="1" y1="0" x2="1" y2="20" stroke="#EF4444" stroke-width="1" opacity="0.3" stroke-dasharray="3 3" /></svg>
+      </div>
+
+      <!-- Level 3 -->
+      <div style="width: 76%; max-width: 456px">
+        <div class="cascade-node" style="width: 100%">
+          <span class="cascade-node-label">Quarterly Focus</span>
+          <span class="cascade-node-example">"Master system design + DSA"</span>
+        </div>
+      </div>
+
+      <div class="cascade-connector">
+        <svg width="2" height="20"><line x1="1" y1="0" x2="1" y2="20" stroke="#EF4444" stroke-width="1" opacity="0.25" stroke-dasharray="3 3" /></svg>
+      </div>
+
+      <!-- Level 4 -->
+      <div style="width: 64%; max-width: 384px">
+        <div class="cascade-node" style="width: 100%">
+          <span class="cascade-node-label">Monthly Theme</span>
+          <span class="cascade-node-example">"Dynamic programming deep dive"</span>
+        </div>
+      </div>
+
+      <div class="cascade-connector">
+        <svg width="2" height="20"><line x1="1" y1="0" x2="1" y2="20" stroke="#EF4444" stroke-width="1" opacity="0.2" stroke-dasharray="3 3" /></svg>
+      </div>
+
+      <!-- Level 5 -->
+      <div style="width: 52%; max-width: 312px">
+        <div class="cascade-node" style="width: 100%">
+          <span class="cascade-node-label">Weekly Plan</span>
+          <span class="cascade-node-example">"15 DP problems, 2 mock interviews"</span>
+        </div>
+      </div>
+
+      <div class="cascade-connector">
+        <svg width="2" height="20"><line x1="1" y1="0" x2="1" y2="20" stroke="#EF4444" stroke-width="1" opacity="0.15" stroke-dasharray="3 3" /></svg>
+      </div>
+
+      <!-- Level 6 (active) -->
+      <div style="width: 40%; max-width: 240px">
+        <div class="cascade-node active" style="width: 100%">
+          <span class="cascade-node-label">Daily Action</span>
+          <span class="cascade-node-example">"3 Structy problems before lunch"</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats">
+  <div class="container">
+    <p class="section-label fade-in">The Numbers</p>
+    <div class="stats-grid stagger-in">
+      <div class="stat-card">
+        <div class="stat-number">365</div>
+        <div class="stat-label">days of clarity</div>
+        <div class="stat-sub">not 365 days of guessing</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">1</div>
+        <div class="stat-label">system</div>
+        <div class="stat-sub">vision to daily action</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">0</div>
+        <div class="stat-label">goals forgotten</div>
+        <div class="stat-sub">everything traces back</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHO IT'S FOR -->
+<section class="who">
+  <div class="container">
+    <p class="section-label fade-in">Who This Is For</p>
+    <div class="persona-grid stagger-in">
+      <div class="persona">
+        <div class="persona-icon">&gt;_</div>
+        <h3>Engineers leveling up</h3>
+        <p>Preparing for career-defining interviews with structured daily practice.</p>
+      </div>
+      <div class="persona">
+        <div class="persona-icon">$</div>
+        <h3>Founders shipping product</h3>
+        <p>Turning side projects into revenue with weekly milestones that compound.</p>
+      </div>
+      <div class="persona">
+        <div class="persona-icon">//</div>
+        <h3>Athletes chasing PRs</h3>
+        <p>Connecting race-day goals to today's training session.</p>
+      </div>
+      <div class="persona">
+        <div class="persona-icon">**</div>
+        <h3>Ambitious humans</h3>
+        <p>Anyone tired of big plans that die quietly in a Notion doc.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PHILOSOPHY -->
+<section class="philosophy">
+  <div class="container">
+    <p class="section-label fade-in">What Makes This Different</p>
+    <blockquote class="fade-in">
+      Cascade is not a to-do list. It's not a vision board. It's the <span class="accent">system that connects the two</span>.
+    </blockquote>
+    <div class="philosophy-points fade-in">
+      <div class="philosophy-point">
+        <h4>Execution</h4>
+        <p>Not more planning. More doing. Every output is a concrete daily action.</p>
+      </div>
+      <div class="philosophy-point">
+        <h4>Honesty</h4>
+        <p>Cascade tells you when you're behind. No cheerleading. Just data and a better plan.</p>
+      </div>
+      <div class="philosophy-point">
+        <h4>Adaptation</h4>
+        <p>Your plan adjusts to reality. Not the other way around. Bad weeks are data, not failure.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta">
+  <div class="container">
+    <h2 class="fade-in">Stop planning. Start cascading.</h2>
+    <p class="sub fade-in">Early access launching soon. Get in first.</p>
+    <div class="fade-in" id="final-form-wrapper">
+      <form class="waitlist-form" id="final-form" aria-label="Join the waitlist">
+        <label for="final-email" class="sr-only">Email address</label>
+        <input type="email" id="final-email" name="email" placeholder="you@example.com" required autocomplete="email">
+        <button type="submit" class="btn" id="final-btn">
+          <span class="btn-text">Join the waitlist</span>
+          <span class="btn-spinner" aria-hidden="true"></span>
+        </button>
+        <span class="form-error" id="final-error" role="alert">Enter a valid email address.</span>
+      </form>
+      <p class="early-access">Built by a founder, for founders who execute.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <p>built by <a href="https://www.indiehackers.com/rebeccabuilds" target="_blank" rel="noopener noreferrer">rebeccabuilds</a></p>
+  </div>
+</footer>
+
+<script>
+  // Fade-in on scroll
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+
+  document.querySelectorAll('.fade-in, .stagger-in').forEach(el => observer.observe(el));
+
+  // Hero load animation
+  requestAnimationFrame(() => {
+    document.getElementById('hero').classList.add('loaded');
+  });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+  // Supabase waitlist
+  let sb;
+  try {
+    sb = window.supabase.createClient(
+      'https://gwqvkbxrrvswyczhqkdb.supabase.co',
+      'sb_publishable_-TbjuoH7I4z1jl3FOULdJQ_nioKng7r'
+    );
+  } catch (e) {
+    console.error('Supabase init failed:', e);
+  }
+
+  function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
+  async function addToWaitlist(email, source) {
+    if (!sb) throw new Error('Supabase not loaded');
+
+    const { data, error } = await sb
+      .from('waitlist')
+      .insert({ email, source });
+
+    if (error) {
+      if (error.code === '23505') {
+        return { duplicate: true };
+      }
+      throw new Error(error.message);
+    }
+
+    return { duplicate: false };
+  }
+
+  function showSuccess(wrapper, duplicate) {
+    wrapper.innerHTML = `
+      <div class="success-msg">
+        <h3>${duplicate ? "You're already on the list." : "You're on the list."}</h3>
+        <p>${duplicate ? "We've got your email. We'll reach out when it's time." : "We'll reach out when Cascade is ready. Talk soon."}</p>
+      </div>
+    `;
+  }
+
+  function setupForm(formId, inputId, btnId, errorId, wrapperId) {
+    const form = document.getElementById(formId);
+    const input = document.getElementById(inputId);
+    const btn = document.getElementById(btnId);
+    const error = document.getElementById(errorId);
+    const wrapper = document.getElementById(wrapperId);
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = input.value.trim();
+
+      if (!isValidEmail(email)) {
+        input.classList.add('error');
+        error.classList.add('show');
+        return;
+      }
+
+      input.classList.remove('error');
+      error.classList.remove('show');
+      btn.disabled = true;
+      btn.classList.add('btn-loading');
+
+      try {
+        const result = await addToWaitlist(email, 'landing');
+        showSuccess(wrapper, result.duplicate);
+
+        const otherId = wrapperId === 'hero-form-wrapper' ? 'final-form-wrapper' : 'hero-form-wrapper';
+        const otherWrapper = document.getElementById(otherId);
+        if (otherWrapper && !otherWrapper.querySelector('.success-msg')) {
+          showSuccess(otherWrapper, result.duplicate);
+        }
+      } catch (err) {
+        btn.disabled = false;
+        btn.classList.remove('btn-loading');
+        error.textContent = 'Something went wrong. Try again.';
+        error.classList.add('show');
+      }
+    });
+
+    input.addEventListener('input', () => {
+      input.classList.remove('error');
+      error.classList.remove('show');
+    });
+  }
+
+  setupForm('hero-form', 'hero-email', 'hero-btn', 'hero-error', 'hero-form-wrapper');
+  setupForm('final-form', 'final-email', 'final-btn', 'final-error', 'final-form-wrapper');
+</script>
+
+</body>
+</html>
