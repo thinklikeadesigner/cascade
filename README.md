@@ -2,6 +2,9 @@
 
 > Plans are cheap. Everyone has one on January 1st. Cascade is the system that makes them survive February.
 
+**[Join the waitlist](https://cascade-flame.vercel.app/)** to get early access.
+
+
 ---
 
 ## What is Cascade?
