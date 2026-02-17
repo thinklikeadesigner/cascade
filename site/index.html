@@ -3,15 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cascade — Your yearly goals die by March. Make them survive.</title>
-  <meta name="description" content="Cascade is a goal execution system for builders. It turns yearly ambitions into daily actions that actually get done — and adapts when they don't.">
-  <meta property="og:title" content="Cascade — Your yearly goals die by March. Make them survive.">
-  <meta property="og:description" content="A goal execution system that turns yearly ambitions into daily structure. Built for builders who execute.">
+  <title>Cascade | Your yearly goals die by March. Make them survive.</title>
+  <meta name="description" content="Cascade is a goal execution system for builders. It turns yearly ambitions into daily actions that actually get done and adapts when they don't.">
+  <meta property="og:title" content="Cascade | Your yearly goals die by March. Make them survive.">
+  <meta property="og:description" content="Cascade is a goal execution system for builders. It turns yearly ambitions into daily actions that actually get done and adapts when they don't.">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://cascade.dev">
+  <meta property="og:url" content="https://cascade-flame.vercel.app/">
+  <meta property="og:image" content="https://cascade-flame.vercel.app/cascade-og-image.png">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Cascade — Your yearly goals die by March. Make them survive.">
-  <meta name="twitter:description" content="A goal execution system that turns yearly ambitions into daily structure.">
+  <meta name="twitter:title" content="Cascade | Your yearly goals die by March. Make them survive.">
+  <meta name="twitter:description" content="Cascade is a goal execution system for builders. It turns yearly ambitions into daily actions that actually get done and adapts when they don't.">
+  <meta name="twitter:image" content="https://cascade-flame.vercel.app/cascade-twitter-card.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -672,7 +674,7 @@
       font-style: italic;
     }
 
-    /* Stats section removed — replaced by value-props */
+    /* Stats section removed - replaced by value-props */
 
     /* ===== WHO ===== */
     .who {
@@ -1055,7 +1057,7 @@
     }
 
     .faq-item.open .faq-a {
-      max-height: 200px;
+      max-height: 300px;
     }
 
     /* ===== SOCIAL PROOF ===== */
@@ -1428,6 +1430,7 @@
 
     .msg-prog-name {
       color: var(--text-secondary);
+      min-width: 140px;
     }
 
     .msg-prog-val {
@@ -1581,7 +1584,7 @@
           <circle cx="100" cy="225" r="12" fill="#F87171" />
         </svg>
         <h1>Your yearly goals die by March. Cascade makes them <span class="accent">survive.</span></h1>
-        <p class="hero-sub">Text your goal. Get today's action. Cascade tracks what you actually do, learns your patterns, and adapts your plan to match reality.</p>
+        <p class="hero-sub">Text your goal. Get today's action. Cascade watches what you actually do and rewrites next week's plan based on this week's results.</p>
         <div id="hero-form-wrapper">
           <form class="waitlist-form" id="hero-form" aria-label="Get early access">
             <label for="hero-email" class="sr-only">Email address</label>
@@ -1657,10 +1660,10 @@
   <div class="container">
     <p class="section-label fade-in">The Problem</p>
     <div class="fade-in">
-      <p class="pain-point">You set a yearly goal. You open a doc. You write three bullet points. By March, you forgot the doc existed.</p>
+      <p class="pain-point">Every January you open a doc and write three bullet points. By March the doc is buried and the goal is dead.</p>
     </div>
     <div class="fade-in">
-      <p class="pain-point">You track habits but never connect them to the thing that actually matters. Checking boxes feels productive. It isn't.</p>
+      <p class="pain-point">Habit trackers feel productive. But checking boxes doesn't get you closer to the goal you actually care about.</p>
     </div>
     <div class="fade-in">
       <p class="pain-point">You fall behind for two weeks and the whole plan feels broken. So you abandon it and start over in Q3. Again.</p>
@@ -1677,15 +1680,15 @@
       <div class="ba-panel ba-before">
         <p class="ba-label">Without Cascade</p>
         <div>
-          <div class="scattered-task" style="margin-left: 10%">Learn system design</div>
-          <div class="scattered-task" style="margin-left: 42%">Run 3x/week??</div>
-          <div class="scattered-task" style="margin-left: 5%">Ship MVP somehow</div>
-          <div class="scattered-task" style="margin-left: 48%">Read DDIA ch.5</div>
-          <div class="scattered-task" style="margin-left: 12%">Network more</div>
-          <div class="scattered-task" style="margin-left: 38%">Prep for interviews</div>
-          <div class="scattered-task struck" style="margin-left: 6%; opacity: 0.5">Fix that bug</div>
+          <div class="scattered-task" style="margin-left: 10%">Run more??</div>
+          <div class="scattered-task" style="margin-left: 42%">Swim 2x/week</div>
+          <div class="scattered-task" style="margin-left: 5%">Do a century ride somehow</div>
+          <div class="scattered-task" style="margin-left: 48%">Brick workout?</div>
+          <div class="scattered-task" style="margin-left: 12%">Fix nutrition</div>
+          <div class="scattered-task" style="margin-left: 38%">Sign up for a race</div>
+          <div class="scattered-task struck" style="margin-left: 6%; opacity: 0.5">Stretch more</div>
         </div>
-        <p class="ba-punchline-bad">Scattered. Disconnected. Abandoned by March.</p>
+        <p class="ba-punchline-bad">Scattered goals. Dead by March.</p>
       </div>
 
       <!-- AFTER -->
@@ -1695,35 +1698,35 @@
           <div class="structured-item" style="margin-left: 0px">
             <span class="structured-label" style="opacity: 0.5">Vision</span>
             <span class="structured-dot" style="opacity: 0.5"></span>
-            <span class="structured-text" style="opacity: 0.5">Senior platform engineer</span>
+            <span class="structured-text" style="opacity: 0.5">Finish an Ironman</span>
           </div>
           <div class="structured-item" style="margin-left: 8px">
             <span class="structured-label" style="opacity: 0.6">Year</span>
             <span class="structured-dot" style="opacity: 0.6"></span>
-            <span class="structured-text" style="opacity: 0.6">Land big tech role</span>
+            <span class="structured-text" style="opacity: 0.6">Ironman 70.3 in October</span>
           </div>
           <div class="structured-item" style="margin-left: 16px">
             <span class="structured-label" style="opacity: 0.7">Q1</span>
             <span class="structured-dot" style="opacity: 0.7"></span>
-            <span class="structured-text" style="opacity: 0.7">DSA + system design mastery</span>
+            <span class="structured-text" style="opacity: 0.7">Build aerobic base, swim technique</span>
           </div>
           <div class="structured-item" style="margin-left: 24px">
             <span class="structured-label" style="opacity: 0.8">Jan</span>
             <span class="structured-dot" style="opacity: 0.8"></span>
-            <span class="structured-text" style="opacity: 0.8">Dynamic programming focus</span>
+            <span class="structured-text" style="opacity: 0.8">3 swims/week, long ride Saturdays</span>
           </div>
           <div class="structured-item" style="margin-left: 32px">
             <span class="structured-label" style="opacity: 0.9">This week</span>
             <span class="structured-dot" style="opacity: 0.9"></span>
-            <span class="structured-text" style="opacity: 0.9">15 DP problems, 2 mocks</span>
+            <span class="structured-text" style="opacity: 0.9">Swim 3x, 40mi ride, 2 easy runs</span>
           </div>
           <div class="structured-item" style="margin-left: 40px">
             <span class="structured-label">Today</span>
             <span class="structured-dot active"></span>
-            <span class="structured-text">3 Structy problems before lunch</span>
+            <span class="structured-text">1500m swim + 20min brick run</span>
           </div>
         </div>
-        <p class="ba-punchline-good">Every action connected. Nothing wasted.</p>
+        <p class="ba-punchline-good">Today's work traces back to the yearly goal.</p>
       </div>
     </div>
   </div>
@@ -1737,17 +1740,17 @@
       <div class="step">
         <div class="step-num">1</div>
         <div class="step-title">Text your goal</div>
-        <div class="step-desc">Tell Cascade what you want to achieve and when. It builds your cascade — year to quarter to month to week to today.</div>
+        <div class="step-desc">Tell Cascade your goal and your deadline. It breaks that down into what you should do this week and today.</div>
       </div>
       <div class="step">
         <div class="step-num">2</div>
         <div class="step-title">Get daily actions</div>
-        <div class="step-desc">Every morning, Cascade texts you today's tasks. Each one traces back to your yearly goal. Nothing random.</div>
+        <div class="step-desc">Every morning you get a text with today's tasks. They all connect to your yearly goal, no busywork.</div>
       </div>
       <div class="step">
         <div class="step-num">3</div>
         <div class="step-title">Text back when done</div>
-        <div class="step-desc">Log progress by texting. Cascade tracks your velocity, learns your patterns, and adjusts next week's plan automatically.</div>
+        <div class="step-desc">Log progress by texting. Cascade sees what's working, what's not, and adjusts next week's plan.</div>
       </div>
     </div>
   </div>
@@ -1758,7 +1761,7 @@
   <div class="container">
     <div class="fade-in">
       <p class="anti-app-headline">No app. No dashboard. <span class="accent">No login.</span></p>
-      <p class="anti-app-body">You already have 14 tabs open and 6 productivity tools you don't use. Cascade lives in the app you check 100 times a day — your texts.</p>
+      <p class="anti-app-body">You already have 14 tabs open and 6 productivity tools you don't use. Cascade lives in the app you check 100 times a day. Your texts.</p>
       <div class="anti-app-stats">
         <div class="anti-app-stat">
           <div class="anti-app-stat-num">98%</div>
@@ -1786,7 +1789,7 @@
       <div style="width: 100%; max-width: 600px">
         <div class="cascade-node" style="width: 100%">
           <span class="cascade-node-label">Life Vision</span>
-          <span class="cascade-node-example">"Build a profitable business on my own terms"</span>
+          <span class="cascade-node-example">"Build AI products, not just prototypes"</span>
         </div>
       </div>
 
@@ -1799,7 +1802,7 @@
       <div style="width: 88%; max-width: 528px">
         <div class="cascade-node" style="width: 100%">
           <span class="cascade-node-label">Yearly Goal</span>
-          <span class="cascade-node-example">"Hit $5k MRR with my SaaS"</span>
+          <span class="cascade-node-example">"Ship 3 production AI features by December"</span>
         </div>
       </div>
 
@@ -1811,7 +1814,7 @@
       <div style="width: 76%; max-width: 456px">
         <div class="cascade-node" style="width: 100%">
           <span class="cascade-node-label">Quarterly Focus</span>
-          <span class="cascade-node-example">"Fix retention, find a channel"</span>
+          <span class="cascade-node-example">"RAG pipeline + eval framework"</span>
         </div>
       </div>
 
@@ -1823,7 +1826,7 @@
       <div style="width: 64%; max-width: 384px">
         <div class="cascade-node" style="width: 100%">
           <span class="cascade-node-label">Monthly Theme</span>
-          <span class="cascade-node-example">"Customer research + ship top feature"</span>
+          <span class="cascade-node-example">"Build retrieval layer + benchmark accuracy"</span>
         </div>
       </div>
 
@@ -1835,7 +1838,7 @@
       <div style="width: 52%; max-width: 312px">
         <div class="cascade-node" style="width: 100%">
           <span class="cascade-node-label">Weekly Plan</span>
-          <span class="cascade-node-example">"5 user interviews, ship calendar view"</span>
+          <span class="cascade-node-example">"Chunk strategy tests, deploy v1 to staging"</span>
         </div>
       </div>
 
@@ -1847,7 +1850,7 @@
       <div style="width: 40%; max-width: 240px">
         <div class="cascade-node active" style="width: 100%">
           <span class="cascade-node-label">Daily Action</span>
-          <span class="cascade-node-example">"Email 3 churned users, write 2 IH posts"</span>
+          <span class="cascade-node-example">"Test 3 chunk sizes, log recall scores"</span>
         </div>
       </div>
     </div>
@@ -1857,8 +1860,8 @@
 <!-- PRODUCT DEMO -->
 <section class="demo" id="demo">
   <div class="demo-inner">
-    <p class="section-label fade-in">See It In Action</p>
-    <p class="demo-sub fade-in">Daily execution and honest accountability — via text.</p>
+    <p class="section-label fade-in">A Day With Cascade</p>
+    <p class="demo-sub fade-in">Your goals, broken down to today's tasks. Delivered by text.</p>
     <div class="phones-grid fade-in">
 
       <!-- Phone 1: Morning Check-in -->
@@ -1900,9 +1903,9 @@
                 <div class="msg-sep">~2h 35m total · revenue actions first</div>
               </div>
             </div></div>
-            <div class="msg-c"><div>Customer interviews are the highest leverage thing on this list. Start there.</div></div>
+            <div class="msg-c"><div>Customer interviews matter most today. Start there.</div></div>
             <div class="msg-u"><div>emails sent. one already replied, wants to jump on a call tomorrow</div></div>
-            <div class="msg-c"><div>That's gold. Logged it. Book that call first thing.</div></div>
+            <div class="msg-c"><div>Nice. Logged it. Book that call first thing.</div></div>
             <div class="msg-c"><div>
               <div class="msg-box" style="gap:3px">
                 <div class="msg-task">
@@ -1952,11 +1955,11 @@
               <div class="msg-box">
                 <div class="msg-prio">PRIORITY CHECK</div>
                 <div class="msg-prog">
-                  <div class="msg-prog-head"><span class="msg-prog-name">Churn interviews completed</span><span class="msg-prog-val" style="color:#EF4444">6/10</span></div>
+                  <div class="msg-prog-head"><span class="msg-prog-name">Churn interviews</span><span class="msg-prog-val" style="color:#EF4444">6/10</span></div>
                   <div class="msg-prog-bar"><div class="msg-prog-fill" style="width:60%;background:#EF4444"></div></div>
                 </div>
                 <div class="msg-prog">
-                  <div class="msg-prog-head"><span class="msg-prog-name">Calendar view shipped</span><span class="msg-prog-val" style="color:#FACC15">70%</span></div>
+                  <div class="msg-prog-head"><span class="msg-prog-name">Calendar view</span><span class="msg-prog-val" style="color:#FACC15">70%</span></div>
                   <div class="msg-prog-bar"><div class="msg-prog-fill" style="width:70%;background:#FACC15"></div></div>
                 </div>
                 <div class="msg-prog">
@@ -1968,9 +1971,9 @@
             <div class="msg-c"><div>Landing page redesign isn't on your cascade right now. Your Q1 goal is retention and finding a channel. A prettier page doesn't fix churn.</div></div>
             <div class="msg-c"><div>Not saying the redesign was useless. But tomorrow, can we get back to what moves the $5k number?</div></div>
             <div class="msg-u"><div>you're right. i was avoiding the hard stuff</div></div>
-            <div class="msg-c"><div>That's honest. The hard stuff is where the revenue is. I'll queue tomorrow's tasks around the calendar view and that user call. Get some rest.</div></div>
+            <div class="msg-c"><div>Respect. I'll queue tomorrow around the calendar view and that user call. Get some rest.</div></div>
             <div class="msg-t">Friday 7:01 AM</div>
-            <div class="msg-c"><div>New day. Yesterday's gone. Here's what moves the needle today.</div></div>
+            <div class="msg-c"><div>New day. Here's what matters today.</div></div>
           </div>
           <div class="phone-input">
             <div class="phone-input-row">
@@ -1983,7 +1986,7 @@
       </div>
 
     </div>
-    <p class="demo-bottom fade-in">No app to download. No dashboard to check. Just text.</p>
+    <p class="demo-bottom fade-in">It's just text messages. No app, no dashboard.</p>
   </div>
 </section>
 
@@ -1995,12 +1998,12 @@
       <div class="value-card">
         <div class="value-number">6</div>
         <div class="value-label">connected levels</div>
-        <div class="value-sub">Vision to daily action in one system</div>
+        <div class="value-sub">Your yearly goal becomes today's checklist</div>
       </div>
       <div class="value-card">
         <div class="value-number">&infin;</div>
         <div class="value-label">adapts weekly</div>
-        <div class="value-sub">Plans match reality, not intentions</div>
+        <div class="value-sub">Next week's plan is built from this week's results</div>
       </div>
       <div class="value-card">
         <div class="value-number">&lt;/&gt;</div>
@@ -2017,24 +2020,24 @@
     <p class="section-label fade-in">Who This Is For</p>
     <div class="persona-grid stagger-in">
       <div class="persona">
-        <div class="persona-icon">&gt;_</div>
-        <h3>Builders leveling up</h3>
-        <p>Learning new skills with structured daily practice that compounds week over week.</p>
+        <div class="persona-icon">$</div>
+        <h3>Solo founders chasing revenue</h3>
+        <p>No co-founder, no board, no accountability. Cascade is the structure between your $200 MRR and your $5K goal.</p>
       </div>
       <div class="persona">
-        <div class="persona-icon">$</div>
-        <h3>Founders shipping product</h3>
-        <p>Turning side projects into revenue with weekly milestones that compound.</p>
+        <div class="persona-icon">&gt;_</div>
+        <h3>Engineers in career transition</h3>
+        <p>300 LeetCode problems, 10 applications/week, interview funnels. High-stakes goals with a deadline. Cascade tracks every step.</p>
       </div>
       <div class="persona">
         <div class="persona-icon">//</div>
-        <h3>Athletes chasing PRs</h3>
-        <p>Connecting race-day goals to today's training session.</p>
+        <h3>Athletes training for a race</h3>
+        <p>Race day is non-negotiable. Training plans cascade naturally. Today's workout traces back to your October finish line.</p>
       </div>
       <div class="persona">
-        <div class="persona-icon">**</div>
-        <h3>Ambitious humans</h3>
-        <p>Anyone tired of big plans that die quietly in a Notion doc.</p>
+        <div class="persona-icon">{}</div>
+        <h3>Builders shipping side projects</h3>
+        <p>You have the idea and the skills. You need the daily structure to actually ship it, week after week.</p>
       </div>
     </div>
   </div>
@@ -2053,20 +2056,20 @@
   <div class="container">
     <p class="section-label fade-in">What Makes This Different</p>
     <blockquote class="fade-in">
-      Cascade is not a to-do list. It's not a vision board. It's the <span class="accent">system that connects the two</span>.
+      Your to-do list doesn't know about your yearly goal. Your yearly goal doesn't know what you did today. Cascade is the <span class="accent">thing in between</span>.
     </blockquote>
     <div class="philosophy-points fade-in">
       <div class="philosophy-point">
         <h4>Execution</h4>
-        <p>Not more planning. More doing. Every output is a concrete daily action.</p>
+        <p>You don't need another plan. You need today's three tasks and a reason each one matters.</p>
       </div>
       <div class="philosophy-point">
         <h4>Honesty</h4>
-        <p>Cascade tells you when you're behind. No cheerleading. Just data and a better plan.</p>
+        <p>Cascade tells you when you're behind. It won't sugarcoat a 40% week.</p>
       </div>
       <div class="philosophy-point">
         <h4>Adaptation</h4>
-        <p>Your plan adjusts to reality. Not the other way around. Bad weeks are data, not failure.</p>
+        <p>Had a bad week? Cool, next week's plan accounts for it. The system bends so you don't break.</p>
       </div>
     </div>
   </div>
@@ -2083,7 +2086,7 @@
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
         </button>
         <div class="faq-a">
-          <p>Notion gives you a blank canvas. Cascade gives you a system. It automatically breaks yearly goals into daily tasks, tracks what you actually complete, and adjusts next week's plan based on this week's reality. No manual updating. No abandoned dashboards.</p>
+          <p>Notion gives you a blank page. You still have to decide what goes on it, update it yourself, and remember it exists. Cascade breaks your goal into today's tasks and rewrites next week when this week doesn't go as planned.</p>
         </div>
       </div>
       <div class="faq-item">
@@ -2092,7 +2095,16 @@
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
         </button>
         <div class="faq-a">
-          <p>Cascade is open source and free to self-host. We're building a hosted version with WhatsApp integration for people who want it to just work. Early access users will help shape pricing.</p>
+          <p>The CLI is open source and free. The hosted WhatsApp coaching agent will be $19/month — you bring your own Anthropic API key (typically $5-20/month in usage). That's 100x cheaper than a human executive coach ($234/hr average) for daily accountability that actually adapts to your results.</p>
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>What's an API key? Do I need one?</span>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+        <div class="faq-a">
+          <p>Cascade uses Claude (by Anthropic) under the hood. You get your own API key from Anthropic and pay them directly for usage — usually $5-20/month. This means your data stays yours, costs are transparent, and there's no markup on AI usage. If you already use Claude Code, you're set.</p>
         </div>
       </div>
       <div class="faq-item">
@@ -2101,7 +2113,7 @@
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
         </button>
         <div class="faq-a">
-          <p>No app. Cascade runs in your terminal (CLI) or via text messages. You check in by texting, and Cascade texts you back with your daily tasks, progress, and honest feedback. It meets you where you already are.</p>
+          <p>No. Cascade runs in your terminal or over text messages. You text what you did, it texts back tomorrow's tasks. That's it.</p>
         </div>
       </div>
       <div class="faq-item">
@@ -2110,7 +2122,7 @@
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
         </button>
         <div class="faq-a">
-          <p>Any goal that takes months of consistent effort. SaaS revenue targets, fitness goals, career transitions, learning projects. If you can measure progress and break it into weekly actions, Cascade can track it.</p>
+          <p>Anything that takes months and has a number attached. SaaS revenue targets, race finish times, job search funnels, side project launches. If you can measure it weekly, Cascade can track it. Works best if WhatsApp is your daily driver.</p>
         </div>
       </div>
     </div>
@@ -2121,7 +2133,7 @@
 <section class="final-cta" id="final-cta">
   <div class="container">
     <h2 class="fade-in">Your goals shouldn't die in a Google Doc.</h2>
-    <p class="sub fade-in">First 100 users shape the product. Get in first.</p>
+    <p class="sub fade-in">First 100 users shape what this becomes.</p>
     <div class="fade-in" id="final-form-wrapper">
       <form class="waitlist-form" id="final-form" aria-label="Join the waitlist">
         <label for="final-email" class="sr-only">Email address</label>
@@ -2170,7 +2182,7 @@
     document.getElementById('hero').classList.add('loaded');
   });
 
-  // Sticky nav — show after scrolling past hero
+  // Sticky nav - show after scrolling past hero
   const siteNav = document.getElementById('site-nav');
   const heroSection = document.getElementById('hero');
   const navObserver = new IntersectionObserver((entries) => {
