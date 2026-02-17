@@ -1,3 +1,5 @@
+<img width="1584" height="396" alt="linkedin-banner-final (1)" src="https://github.com/user-attachments/assets/139e02c8-25e0-4e26-863d-ce5dfe0ca13c" />
+
 # Cascade
 
 > Plans are cheap. Everyone has one on January 1st. Cascade is the system that makes them survive February.
