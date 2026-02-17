@@ -18,6 +18,9 @@ node_modules/
 
 # Build artifacts
 outputs/
+
+# Product research
+product-research/
 *.pptx
 
 # Environment

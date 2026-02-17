@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cascade — Big goals become inevitable.</title>
-  <meta name="description" content="Cascade is a goal execution system for founders. Break yearly ambitions into daily actions that actually get done.">
-  <meta property="og:title" content="Cascade — Big goals become inevitable.">
-  <meta property="og:description" content="A goal execution system that turns yearly ambitions into daily structure. Built for founders who execute.">
+  <title>Cascade — Your yearly goals die by March. Make them survive.</title>
+  <meta name="description" content="Cascade is a goal execution system for builders. It turns yearly ambitions into daily actions that actually get done — and adapts when they don't.">
+  <meta property="og:title" content="Cascade — Your yearly goals die by March. Make them survive.">
+  <meta property="og:description" content="A goal execution system that turns yearly ambitions into daily structure. Built for builders who execute.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://cascade.dev">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Cascade — Big goals become inevitable.">
+  <meta name="twitter:title" content="Cascade — Your yearly goals die by March. Make them survive.">
   <meta name="twitter:description" content="A goal execution system that turns yearly ambitions into daily structure.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -31,7 +31,7 @@
       --glow-soft: rgba(248, 113, 113, 0.2);
       --text: #F8FAFC;
       --text-secondary: #94A3B8;
-      --text-muted: #64748B;
+      --text-muted: #7C8DA2;
       --border: #2A1F22;
       --mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
       --sans: 'Outfit', system-ui, -apple-system, sans-serif;
@@ -105,7 +105,6 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      text-align: center;
       padding: 80px 0 60px;
       position: relative;
       overflow: hidden;
@@ -121,11 +120,66 @@
       pointer-events: none;
     }
 
+    .hero .container {
+      max-width: 1080px;
+    }
+
+    .hero-split {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 48px;
+      align-items: center;
+    }
+
+    .hero-copy {
+      text-align: left;
+    }
+
+    .hero-phone {
+      display: flex;
+      justify-content: center;
+    }
+
+    .hero-phone .phone-frame {
+      width: 270px;
+      height: 560px;
+    }
+
+    @media (max-width: 800px) {
+      .hero-split {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+      .hero-copy {
+        text-align: center;
+      }
+      .hero-phone {
+        order: -1;
+      }
+      .hero-phone .phone-frame {
+        width: 240px;
+        height: 500px;
+      }
+      .hero-copy .waitlist-form {
+        margin: 0 auto;
+      }
+      .hero-copy .social-proof {
+        justify-content: center;
+      }
+    }
+
     .hero-logo {
-      width: 120px;
-      height: 144px;
-      margin: 0 auto 24px;
+      width: 48px;
+      height: 58px;
+      margin-bottom: 20px;
       position: relative;
+    }
+
+    @media (max-width: 800px) {
+      .hero-logo {
+        margin-left: auto;
+        margin-right: auto;
+      }
     }
 
     .hero-logo path,
@@ -141,31 +195,13 @@
     .hero.loaded .hero-logo circle:nth-of-type(1) { opacity: 0.6; transition-delay: 1.1s; }
     .hero.loaded .hero-logo circle:nth-of-type(2) { opacity: 0.08; transition-delay: 1.1s; }
 
-    .hero-wordmark {
-      font-family: var(--mono);
-      font-size: 1rem;
-      font-weight: 500;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 48px;
-      opacity: 0;
-      transition: opacity 1s ease 1.4s;
-    }
-    .hero.loaded .hero-wordmark {
-      opacity: 1;
-    }
-
     .hero h1 {
       font-family: var(--mono);
-      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-size: clamp(1.6rem, 3.5vw, 2.4rem);
       font-weight: 700;
-      line-height: 1.15;
+      line-height: 1.2;
       letter-spacing: -0.02em;
-      margin-bottom: 24px;
-      max-width: 680px;
-      margin-left: auto;
-      margin-right: auto;
+      margin-bottom: 16px;
     }
 
     .hero h1 .accent {
@@ -174,18 +210,119 @@
     }
 
     .hero-sub {
-      font-size: 1.15rem;
+      font-size: 1.05rem;
       color: var(--text-secondary);
-      max-width: 520px;
-      margin: 0 auto 48px;
-      font-weight: 300;
+      margin-bottom: 32px;
+      font-weight: 400;
+      max-width: 480px;
     }
 
-    .hero-proof {
-      margin-top: 20px;
-      font-size: 0.8rem;
+    @media (max-width: 800px) {
+      .hero-sub {
+        margin-left: auto;
+        margin-right: auto;
+      }
+    }
+
+    /* ===== 3-STEP FLOW ===== */
+    .steps {
+      border-top: 1px solid rgba(248, 113, 113, 0.08);
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 640px) {
+      .steps-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+    }
+
+    .step {
+      text-align: center;
+    }
+
+    .step-num {
+      font-family: var(--mono);
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 12px;
+      text-shadow: 0 0 30px rgba(239, 68, 68, 0.19);
+    }
+
+    .step-title {
+      font-family: var(--mono);
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .step-desc {
+      font-size: 0.82rem;
       color: var(--text-secondary);
-      letter-spacing: 0.05em;
+      line-height: 1.5;
+      font-weight: 400;
+    }
+
+    /* ===== ANTI-APP ===== */
+    .anti-app {
+      border-top: 1px solid rgba(248, 113, 113, 0.08);
+      text-align: center;
+    }
+
+    .anti-app-headline {
+      font-family: var(--mono);
+      font-size: clamp(1.3rem, 3vw, 1.8rem);
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 16px;
+    }
+
+    .anti-app-headline .accent {
+      color: var(--accent);
+    }
+
+    .anti-app-body {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      max-width: 560px;
+      margin: 0 auto 32px;
+      line-height: 1.6;
+      font-weight: 400;
+    }
+
+    .anti-app-stats {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+
+    .anti-app-stat {
+      text-align: center;
+    }
+
+    .anti-app-stat-num {
+      font-family: var(--mono);
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+    }
+
+    .anti-app-stat-label {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 4px;
     }
 
     /* ===== FORM ===== */
@@ -243,13 +380,13 @@
     }
 
     .btn {
-      padding: 14px 28px;
+      padding: 16px 28px;
       background: var(--accent);
       color: #fff;
       border: none;
       border-radius: 8px;
       font-family: var(--mono);
-      font-size: 0.85rem;
+      font-size: 0.95rem;
       font-weight: 600;
       cursor: pointer;
       white-space: nowrap;
@@ -314,7 +451,7 @@
     /* ===== SECTION LABEL ===== */
     .section-label {
       font-family: var(--mono);
-      font-size: 0.7rem;
+      font-size: 0.8rem;
       font-weight: 500;
       letter-spacing: 0.15em;
       text-transform: uppercase;
@@ -333,11 +470,11 @@
       margin-bottom: 32px;
       padding-left: 20px;
       border-left: 2px solid rgba(239, 68, 68, 0.3);
-      font-weight: 300;
+      font-weight: 400;
       line-height: 1.5;
     }
 
-    .pain-point:last-child {
+    .problem .fade-in:last-child .pain-point {
       margin-bottom: 0;
     }
 
@@ -535,52 +672,7 @@
       font-style: italic;
     }
 
-    /* ===== STATS ===== */
-    .stats {
-      border-top: 1px solid rgba(248, 113, 113, 0.08);
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-    }
-
-    @media (max-width: 560px) {
-      .stats-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .stat-card {
-      text-align: center;
-      padding: 28px 16px;
-      background: var(--surface);
-      border-radius: 12px;
-      border: 1px solid var(--border);
-    }
-
-    .stat-number {
-      font-family: var(--mono);
-      font-size: 3rem;
-      font-weight: 700;
-      color: var(--accent);
-      line-height: 1;
-      margin-bottom: 8px;
-      text-shadow: 0 0 30px rgba(239, 68, 68, 0.19);
-    }
-
-    .stat-label {
-      font-size: 0.88rem;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 4px;
-    }
-
-    .stat-sub {
-      font-size: 0.69rem;
-      color: var(--text-muted);
-    }
+    /* Stats section removed — replaced by value-props */
 
     /* ===== WHO ===== */
     .who {
@@ -630,7 +722,7 @@
     .persona p {
       font-size: 0.75rem;
       color: var(--text-secondary);
-      font-weight: 300;
+      font-weight: 400;
       line-height: 1.5;
     }
 
@@ -682,7 +774,7 @@
     .philosophy-point p {
       font-size: 0.88rem;
       color: var(--text-secondary);
-      font-weight: 300;
+      font-weight: 400;
     }
 
     /* ===== FINAL CTA ===== */
@@ -718,7 +810,7 @@
       color: var(--text-secondary);
       margin-bottom: 40px;
       font-size: 0.95rem;
-      font-weight: 300;
+      font-weight: 400;
       position: relative;
     }
 
@@ -758,6 +850,248 @@
       color: var(--accent);
     }
 
+    /* ===== STICKY NAV ===== */
+    .site-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: rgba(13, 11, 14, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(248, 113, 113, 0.06);
+      padding: 0 24px;
+      transform: translateY(-100%);
+      transition: transform 0.3s ease;
+    }
+
+    .site-nav.visible {
+      transform: translateY(0);
+    }
+
+    .nav-inner {
+      max-width: 860px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 52px;
+    }
+
+    .nav-logo {
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--accent);
+      text-decoration: none;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .nav-links a {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      letter-spacing: 0.04em;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--text);
+    }
+
+    .nav-cta {
+      padding: 8px 16px !important;
+      background: var(--accent) !important;
+      color: #fff !important;
+      border-radius: 6px !important;
+      font-weight: 600 !important;
+      transition: background 0.2s !important;
+    }
+
+    .nav-cta:hover {
+      background: #DC2626 !important;
+      color: #fff !important;
+    }
+
+    @media (max-width: 640px) {
+      .nav-links a:not(.nav-cta) {
+        display: none;
+      }
+    }
+
+    /* ===== MID-PAGE CTA ===== */
+    .mid-cta {
+      text-align: center;
+      padding: 60px 0;
+      border-top: 1px solid rgba(248, 113, 113, 0.08);
+    }
+
+    .mid-cta p {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      margin-bottom: 24px;
+      font-weight: 400;
+    }
+
+    .mid-cta .btn {
+      display: inline-block;
+      text-decoration: none;
+    }
+
+    /* ===== VALUE PROPS (replaces stats) ===== */
+    .value-props {
+      border-top: 1px solid rgba(248, 113, 113, 0.08);
+    }
+
+    .value-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    @media (max-width: 560px) {
+      .value-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .value-card {
+      text-align: center;
+      padding: 28px 16px;
+      background: var(--surface);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    .value-number {
+      font-family: var(--mono);
+      font-size: 2.4rem;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 8px;
+      text-shadow: 0 0 30px rgba(239, 68, 68, 0.19);
+    }
+
+    .value-label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .value-sub {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* ===== FAQ ===== */
+    .faq {
+      border-top: 1px solid rgba(248, 113, 113, 0.08);
+    }
+
+    .faq-list {
+      max-width: 640px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .faq-item {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .faq-q {
+      width: 100%;
+      background: none;
+      border: none;
+      padding: 20px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .faq-q span {
+      font-family: var(--sans);
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .faq-q svg {
+      flex-shrink: 0;
+      transition: transform 0.3s ease;
+      color: var(--text-muted);
+    }
+
+    .faq-item.open .faq-q svg {
+      transform: rotate(45deg);
+    }
+
+    .faq-a {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+
+    .faq-a p {
+      padding: 0 0 20px;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      font-weight: 400;
+    }
+
+    .faq-item.open .faq-a {
+      max-height: 200px;
+    }
+
+    /* ===== SOCIAL PROOF ===== */
+    .social-proof {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    .proof-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      padding: 6px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .proof-badge:hover {
+      border-color: rgba(239, 68, 68, 0.3);
+      color: var(--text-secondary);
+    }
+
+    .proof-badge svg {
+      width: 14px;
+      height: 14px;
+    }
+
     /* Screen reader only */
     .sr-only {
       position: absolute;
@@ -771,6 +1105,373 @@
       border: 0;
     }
 
+    /* ===== PRODUCT DEMO ===== */
+    .demo {
+      border-top: 1px solid rgba(248, 113, 113, 0.08);
+    }
+
+    .demo-inner {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .demo .section-label {
+      text-align: center;
+    }
+
+    .demo-sub {
+      text-align: center;
+      font-size: 1rem;
+      color: var(--text-secondary);
+      font-weight: 400;
+      margin-bottom: 48px;
+    }
+
+    .phones-grid {
+      display: flex;
+      gap: 24px;
+      justify-content: center;
+    }
+
+    .phone-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .phone-frame {
+      width: 280px;
+      height: 580px;
+      background: #000;
+      border-radius: 36px;
+      border: 2.5px solid #2A2A2A;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 0 60px rgba(239, 68, 68, 0.05), 0 20px 60px rgba(0,0,0,0.5);
+    }
+
+    .phone-island {
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90px;
+      height: 24px;
+      background: #000;
+      border-radius: 14px;
+      z-index: 10;
+    }
+
+    .phone-statusbar {
+      padding: 10px 18px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 40px;
+      position: relative;
+      z-index: 5;
+    }
+
+    .phone-time {
+      font-family: system-ui, -apple-system, sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .phone-icons {
+      display: flex;
+      gap: 3px;
+      align-items: center;
+    }
+
+    .phone-header {
+      padding: 6px 12px 8px;
+      border-bottom: 0.5px solid #222;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .phone-avatar {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: rgba(239, 68, 68, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .phone-name {
+      font-family: system-ui, -apple-system, sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .phone-msgs {
+      padding: 10px 10px 70px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      overflow-y: auto;
+      height: calc(100% - 100px);
+    }
+
+    .phone-msgs::-webkit-scrollbar {
+      width: 0;
+    }
+
+    .phone-input {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 6px 10px 22px;
+      background: linear-gradient(transparent, #000 20%);
+    }
+
+    .phone-input-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #1A1A1E;
+      border-radius: 16px;
+      padding: 6px 10px;
+      border: 0.5px solid #333;
+    }
+
+    .phone-input-text {
+      font-size: 10px;
+      color: var(--text-muted);
+      flex: 1;
+    }
+
+    .phone-send {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .phone-label {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      color: var(--text-muted);
+      margin-top: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    /* Chat message types */
+    .msg-u {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 1px;
+    }
+
+    .msg-u > div {
+      max-width: 78%;
+      background: var(--accent);
+      border-radius: 14px 14px 3px 14px;
+      padding: 7px 11px;
+      font-size: 11px;
+      line-height: 1.4;
+      color: #fff;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    .msg-c {
+      display: flex;
+      justify-content: flex-start;
+      margin-bottom: 1px;
+    }
+
+    .msg-c > div {
+      max-width: 82%;
+      background: #1C1820;
+      border-radius: 14px 14px 14px 3px;
+      padding: 7px 11px;
+      font-size: 11px;
+      line-height: 1.4;
+      color: var(--text);
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    .msg-t {
+      text-align: center;
+      font-size: 9px;
+      color: var(--text-muted);
+      margin: 8px 0 4px;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    /* Structured content inside bubbles */
+    .msg-box {
+      background: #0D0B0E;
+      border-radius: 8px;
+      padding: 7px 9px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      border: 1px solid var(--border);
+      margin-top: 4px;
+    }
+
+    .msg-box-label {
+      font-size: 10px;
+      color: var(--text-secondary);
+      margin-bottom: 2px;
+    }
+
+    .msg-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 5px;
+    }
+
+    .msg-row-icon {
+      font-family: var(--mono);
+      font-size: 8px;
+      color: var(--accent);
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    .msg-row-text {
+      font-size: 10px;
+      line-height: 1.3;
+      color: var(--text);
+    }
+
+    .msg-row-text.dim {
+      color: var(--text-secondary);
+    }
+
+    /* Task items */
+    .msg-task {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .msg-chk {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      border: 1.5px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .msg-chk-done {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      background: rgba(34, 197, 94, 0.12);
+      border: 1.5px solid #22C55E;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .msg-task-label {
+      font-size: 10px;
+      color: var(--text);
+    }
+
+    .msg-task-label.struck {
+      color: var(--text-secondary);
+      text-decoration: line-through;
+    }
+
+    .msg-done-tag {
+      font-family: var(--mono);
+      font-size: 7px;
+      color: #22C55E;
+      margin-left: auto;
+    }
+
+    .msg-sep {
+      margin-top: 5px;
+      padding-top: 5px;
+      border-top: 1px solid var(--border);
+      font-family: var(--mono);
+      font-size: 8px;
+      color: var(--text-muted);
+    }
+
+    /* Priority check / progress bars */
+    .msg-prio {
+      font-family: var(--mono);
+      font-size: 9px;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+
+    .msg-prog {
+      margin-top: 4px;
+    }
+
+    .msg-prog-head {
+      display: flex;
+      justify-content: space-between;
+      font-size: 9.5px;
+    }
+
+    .msg-prog-name {
+      color: var(--text-secondary);
+    }
+
+    .msg-prog-val {
+      font-family: var(--mono);
+      font-size: 8.5px;
+    }
+
+    .msg-prog-bar {
+      height: 3px;
+      border-radius: 2px;
+      background: var(--surface);
+      overflow: hidden;
+      margin-top: 2px;
+    }
+
+    .msg-prog-fill {
+      height: 100%;
+      border-radius: 2px;
+    }
+
+    .demo-bottom {
+      text-align: center;
+      margin-top: 40px;
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    @media (max-width: 640px) {
+      .phones-grid {
+        overflow-x: auto;
+        justify-content: flex-start;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 16px;
+        margin: 0 -24px;
+        padding-left: 24px;
+        padding-right: 24px;
+      }
+      .phone-wrapper {
+        scroll-snap-align: center;
+      }
+    }
+
     /* ===== MOBILE ===== */
     @media (max-width: 480px) {
       section {
@@ -781,15 +1482,12 @@
         padding: 60px 0 40px;
       }
       .hero-logo {
-        width: 80px;
-        height: 96px;
+        width: 40px;
+        height: 48px;
         margin-bottom: 16px;
       }
-      .hero-wordmark {
-        margin-bottom: 32px;
-      }
       .hero-sub {
-        margin-bottom: 32px;
+        margin-bottom: 24px;
       }
 
       .form-error {
@@ -804,8 +1502,8 @@
         font-size: 0.65rem;
         min-width: 48px;
       }
-      .stat-sub {
-        font-size: 0.75rem;
+      .value-number {
+        font-size: 1.8rem;
       }
 
       .scattered-task {
@@ -827,17 +1525,31 @@
         padding: 12px 16px;
       }
 
-      .stat-number {
-        font-size: 2.2rem;
-      }
-
       .philosophy-points {
         gap: 24px;
+      }
+
+      .phone-frame {
+        width: 260px;
+        height: 540px;
       }
     }
   </style>
 </head>
 <body>
+
+<!-- STICKY NAV -->
+<nav class="site-nav" id="site-nav">
+  <div class="nav-inner">
+    <a href="#hero" class="nav-logo">Cascade</a>
+    <div class="nav-links">
+      <a href="#model">How it works</a>
+      <a href="#demo">Demo</a>
+      <a href="#who">Who it's for</a>
+      <a href="#final-cta" class="nav-cta">Get early access</a>
+    </div>
+  </div>
+</nav>
 
 <!-- HERO -->
 <section class="hero" id="hero">
@@ -856,31 +1568,86 @@
   </svg>
 
   <div class="container">
-    <div class="fade-in">
-      <svg class="hero-logo" viewBox="0 0 200 240" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Cascade logo">
-        <path d="M40 20 L100 50 L160 20" stroke="#EF4444" stroke-width="3.5" fill="none" stroke-linecap="round" style="filter: drop-shadow(0 0 8px rgba(248,113,113,0.2))" />
-        <path d="M52 65 L100 90 L148 65" stroke="#EF4444" stroke-width="3" fill="none" stroke-linecap="round" style="filter: drop-shadow(0 0 8px rgba(248,113,113,0.2))" />
-        <path d="M62 108 L100 128 L138 108" stroke="#EF4444" stroke-width="2.5" fill="none" stroke-linecap="round" style="filter: drop-shadow(0 0 8px rgba(248,113,113,0.2))" />
-        <path d="M72 148 L100 164 L128 148" stroke="#EF4444" stroke-width="2" fill="none" stroke-linecap="round" style="filter: drop-shadow(0 0 8px rgba(248,113,113,0.2))" />
-        <path d="M80 186 L100 198 L120 186" stroke="#EF4444" stroke-width="1.5" fill="none" stroke-linecap="round" style="filter: drop-shadow(0 0 8px rgba(248,113,113,0.2))" />
-        <circle cx="100" cy="225" r="4" fill="#F87171" />
-        <circle cx="100" cy="225" r="12" fill="#F87171" />
-      </svg>
-      <p class="hero-wordmark">Cascade</p>
-      <h1>Big goals become <span class="accent">inevitable.</span></h1>
-      <p class="hero-sub">Cascade turns your yearly ambition into daily structure. It tracks what you actually do, learns your patterns, and adapts your plan to match reality.</p>
-    </div>
-    <div class="fade-in" id="hero-form-wrapper">
-      <form class="waitlist-form" id="hero-form" aria-label="Join the waitlist">
-        <label for="hero-email" class="sr-only">Email address</label>
-        <input type="email" id="hero-email" name="email" placeholder="you@example.com" required autocomplete="email">
-        <button type="submit" class="btn" id="hero-btn">
-          <span class="btn-text">Join the waitlist</span>
-          <span class="btn-spinner" aria-hidden="true"></span>
-        </button>
-        <span class="form-error" id="hero-error" role="alert">Enter a valid email address.</span>
-      </form>
-      <p class="hero-proof">Built by a founder, for founders who execute.</p>
+    <div class="hero-split">
+      <!-- LEFT: Copy -->
+      <div class="hero-copy fade-in">
+        <svg class="hero-logo" viewBox="0 0 200 240" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Cascade logo">
+          <path d="M40 20 L100 50 L160 20" stroke="#EF4444" stroke-width="3.5" fill="none" stroke-linecap="round" style="filter: drop-shadow(0 0 8px rgba(248,113,113,0.2))" />
+          <path d="M52 65 L100 90 L148 65" stroke="#EF4444" stroke-width="3" fill="none" stroke-linecap="round" style="filter: drop-shadow(0 0 8px rgba(248,113,113,0.2))" />
+          <path d="M62 108 L100 128 L138 108" stroke="#EF4444" stroke-width="2.5" fill="none" stroke-linecap="round" style="filter: drop-shadow(0 0 8px rgba(248,113,113,0.2))" />
+          <path d="M72 148 L100 164 L128 148" stroke="#EF4444" stroke-width="2" fill="none" stroke-linecap="round" style="filter: drop-shadow(0 0 8px rgba(248,113,113,0.2))" />
+          <path d="M80 186 L100 198 L120 186" stroke="#EF4444" stroke-width="1.5" fill="none" stroke-linecap="round" style="filter: drop-shadow(0 0 8px rgba(248,113,113,0.2))" />
+          <circle cx="100" cy="225" r="4" fill="#F87171" />
+          <circle cx="100" cy="225" r="12" fill="#F87171" />
+        </svg>
+        <h1>Your yearly goals die by March. Cascade makes them <span class="accent">survive.</span></h1>
+        <p class="hero-sub">Text your goal. Get today's action. Cascade tracks what you actually do, learns your patterns, and adapts your plan to match reality.</p>
+        <div id="hero-form-wrapper">
+          <form class="waitlist-form" id="hero-form" aria-label="Get early access">
+            <label for="hero-email" class="sr-only">Email address</label>
+            <input type="email" id="hero-email" name="email" placeholder="you@example.com" required autocomplete="email">
+            <button type="submit" class="btn" id="hero-btn">
+              <span class="btn-text">Get early access</span>
+              <span class="btn-spinner" aria-hidden="true"></span>
+            </button>
+            <span class="form-error" id="hero-error" role="alert">Enter a valid email address.</span>
+          </form>
+          <div class="social-proof">
+            <a href="https://github.com/thinklikeadesigner/cascade" target="_blank" rel="noopener noreferrer" class="proof-badge">
+              <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+              Open source
+            </a>
+            <a href="https://www.indiehackers.com/rebeccabuilds" target="_blank" rel="noopener noreferrer" class="proof-badge">
+              Built by @rebeccabuilds
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Phone mockup -->
+      <div class="hero-phone fade-in">
+        <div class="phone-frame">
+          <div class="phone-island"></div>
+          <div class="phone-statusbar">
+            <span class="phone-time">9:41</span>
+            <div class="phone-icons">
+              <svg width="13" height="10" viewBox="0 0 16 12"><rect x="0" y="5" width="3" height="7" rx=".5" fill="#F8FAFC" opacity=".4"/><rect x="4.5" y="3" width="3" height="9" rx=".5" fill="#F8FAFC" opacity=".6"/><rect x="9" y="1" width="3" height="11" rx=".5" fill="#F8FAFC" opacity=".8"/><rect x="13" y="0" width="3" height="12" rx=".5" fill="#F8FAFC"/></svg>
+              <svg width="18" height="10" viewBox="0 0 22 12"><rect x="0" y="1" width="18" height="10" rx="2" stroke="#F8FAFC" stroke-width="1" fill="none"/><rect x="2" y="3" width="13" height="6" rx="1" fill="#22C55E"/><rect x="19" y="4" width="2" height="4" rx="1" fill="#F8FAFC" opacity=".4"/></svg>
+            </div>
+          </div>
+          <div class="phone-header">
+            <svg width="8" height="13" viewBox="0 0 10 16"><path d="M8 2L2 8L8 14" stroke="#EF4444" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+            <div class="phone-avatar">
+              <svg width="14" height="14" viewBox="0 0 280 280" fill="none"><path d="M90 65 L140 90 L190 65" stroke="#EF4444" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M104 115 L140 135 L176 115" stroke="#EF4444" stroke-width="4" fill="none" stroke-linecap="round" opacity=".6"/><path d="M116 160 L140 174 L164 160" stroke="#EF4444" stroke-width="3" fill="none" stroke-linecap="round" opacity=".3"/><circle cx="140" cy="210" r="6" fill="#F87171" opacity=".5"/></svg>
+            </div>
+            <span class="phone-name">Cascade</span>
+          </div>
+          <div class="phone-msgs">
+            <div class="msg-t">Sunday 8:15 PM</div>
+            <div class="msg-u"><div>i want to hit $5k MRR by end of year with my saas</div></div>
+            <div class="msg-c"><div>Good. What's the product, and where are you now?</div></div>
+            <div class="msg-u"><div>project management tool for freelancers. $200 MRR, 12 paying users</div></div>
+            <div class="msg-c"><div>$200 to $5k MRR. That's 25x in 10 months. Aggressive but doable.</div></div>
+            <div class="msg-c"><div>
+              <div class="msg-box-label">Your cascade:</div>
+              <div class="msg-box">
+                <div class="msg-row"><span class="msg-row-icon">◎</span><span class="msg-row-text">Build a profitable solo business</span></div>
+                <div class="msg-row" style="padding-left:10px"><span class="msg-row-icon" style="opacity:.9">◉</span><span class="msg-row-text" style="opacity:.9">2025: $5k MRR by December</span></div>
+                <div class="msg-row" style="padding-left:20px"><span class="msg-row-icon" style="opacity:.8">Q1</span><span class="msg-row-text" style="opacity:.8">Fix retention + find a channel</span></div>
+                <div class="msg-row" style="padding-left:20px"><span class="msg-row-icon" style="opacity:.7">Q2</span><span class="msg-row-text" style="opacity:.7">Double down. Hit $1k MRR</span></div>
+              </div>
+            </div></div>
+            <div class="msg-u"><div>yes do it</div></div>
+            <div class="msg-c"><div>Done. I'll text you every morning with today's tasks. Nothing random.</div></div>
+          </div>
+          <div class="phone-input">
+            <div class="phone-input-row">
+              <span class="phone-input-text">Text Cascade...</span>
+              <div class="phone-send"><svg width="11" height="11" viewBox="0 0 14 14"><path d="M2 12L12 7L2 2V5.5L8 7L2 8.5V12Z" fill="#fff"/></svg></div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -962,16 +1729,64 @@
   </div>
 </section>
 
-<!-- HOW IT WORKS -->
+<!-- HOW YOU USE IT -->
+<section class="steps" id="model">
+  <div class="container">
+    <p class="section-label fade-in">How It Works</p>
+    <div class="steps-grid stagger-in">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-title">Text your goal</div>
+        <div class="step-desc">Tell Cascade what you want to achieve and when. It builds your cascade — year to quarter to month to week to today.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-title">Get daily actions</div>
+        <div class="step-desc">Every morning, Cascade texts you today's tasks. Each one traces back to your yearly goal. Nothing random.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-title">Text back when done</div>
+        <div class="step-desc">Log progress by texting. Cascade tracks your velocity, learns your patterns, and adjusts next week's plan automatically.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ANTI-APP -->
+<section class="anti-app">
+  <div class="container">
+    <div class="fade-in">
+      <p class="anti-app-headline">No app. No dashboard. <span class="accent">No login.</span></p>
+      <p class="anti-app-body">You already have 14 tabs open and 6 productivity tools you don't use. Cascade lives in the app you check 100 times a day — your texts.</p>
+      <div class="anti-app-stats">
+        <div class="anti-app-stat">
+          <div class="anti-app-stat-num">98%</div>
+          <div class="anti-app-stat-label">text open rate</div>
+        </div>
+        <div class="anti-app-stat">
+          <div class="anti-app-stat-num">3 min</div>
+          <div class="anti-app-stat-label">avg response time</div>
+        </div>
+        <div class="anti-app-stat">
+          <div class="anti-app-stat-num">0</div>
+          <div class="anti-app-stat-label">apps to download</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- UNDER THE HOOD -->
 <section class="model">
   <div class="container">
-    <p class="section-label fade-in">How Cascade Works</p>
+    <p class="section-label fade-in">Under The Hood</p>
     <div class="cascade-stack stagger-in">
       <!-- Level 1 -->
       <div style="width: 100%; max-width: 600px">
         <div class="cascade-node" style="width: 100%">
           <span class="cascade-node-label">Life Vision</span>
-          <span class="cascade-node-example">"Become a world-class engineer"</span>
+          <span class="cascade-node-example">"Build a profitable business on my own terms"</span>
         </div>
       </div>
 
@@ -984,7 +1799,7 @@
       <div style="width: 88%; max-width: 528px">
         <div class="cascade-node" style="width: 100%">
           <span class="cascade-node-label">Yearly Goal</span>
-          <span class="cascade-node-example">"Land a role at a top tech company"</span>
+          <span class="cascade-node-example">"Hit $5k MRR with my SaaS"</span>
         </div>
       </div>
 
@@ -996,7 +1811,7 @@
       <div style="width: 76%; max-width: 456px">
         <div class="cascade-node" style="width: 100%">
           <span class="cascade-node-label">Quarterly Focus</span>
-          <span class="cascade-node-example">"Master system design + DSA"</span>
+          <span class="cascade-node-example">"Fix retention, find a channel"</span>
         </div>
       </div>
 
@@ -1008,7 +1823,7 @@
       <div style="width: 64%; max-width: 384px">
         <div class="cascade-node" style="width: 100%">
           <span class="cascade-node-label">Monthly Theme</span>
-          <span class="cascade-node-example">"Dynamic programming deep dive"</span>
+          <span class="cascade-node-example">"Customer research + ship top feature"</span>
         </div>
       </div>
 
@@ -1020,7 +1835,7 @@
       <div style="width: 52%; max-width: 312px">
         <div class="cascade-node" style="width: 100%">
           <span class="cascade-node-label">Weekly Plan</span>
-          <span class="cascade-node-example">"15 DP problems, 2 mock interviews"</span>
+          <span class="cascade-node-example">"5 user interviews, ship calendar view"</span>
         </div>
       </div>
 
@@ -1032,46 +1847,179 @@
       <div style="width: 40%; max-width: 240px">
         <div class="cascade-node active" style="width: 100%">
           <span class="cascade-node-label">Daily Action</span>
-          <span class="cascade-node-example">"3 Structy problems before lunch"</span>
+          <span class="cascade-node-example">"Email 3 churned users, write 2 IH posts"</span>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- STATS -->
-<section class="stats">
+<!-- PRODUCT DEMO -->
+<section class="demo" id="demo">
+  <div class="demo-inner">
+    <p class="section-label fade-in">See It In Action</p>
+    <p class="demo-sub fade-in">Daily execution and honest accountability — via text.</p>
+    <div class="phones-grid fade-in">
+
+      <!-- Phone 1: Morning Check-in -->
+      <div class="phone-wrapper">
+        <div class="phone-frame">
+          <div class="phone-island"></div>
+          <div class="phone-statusbar">
+            <span class="phone-time">9:41</span>
+            <div class="phone-icons">
+              <svg width="13" height="10" viewBox="0 0 16 12"><rect x="0" y="5" width="3" height="7" rx=".5" fill="#F8FAFC" opacity=".4"/><rect x="4.5" y="3" width="3" height="9" rx=".5" fill="#F8FAFC" opacity=".6"/><rect x="9" y="1" width="3" height="11" rx=".5" fill="#F8FAFC" opacity=".8"/><rect x="13" y="0" width="3" height="12" rx=".5" fill="#F8FAFC"/></svg>
+              <svg width="18" height="10" viewBox="0 0 22 12"><rect x="0" y="1" width="18" height="10" rx="2" stroke="#F8FAFC" stroke-width="1" fill="none"/><rect x="2" y="3" width="13" height="6" rx="1" fill="#22C55E"/><rect x="19" y="4" width="2" height="4" rx="1" fill="#F8FAFC" opacity=".4"/></svg>
+            </div>
+          </div>
+          <div class="phone-header">
+            <svg width="8" height="13" viewBox="0 0 10 16"><path d="M8 2L2 8L8 14" stroke="#EF4444" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+            <div class="phone-avatar">
+              <svg width="14" height="14" viewBox="0 0 280 280" fill="none"><path d="M90 65 L140 90 L190 65" stroke="#EF4444" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M104 115 L140 135 L176 115" stroke="#EF4444" stroke-width="4" fill="none" stroke-linecap="round" opacity=".6"/><path d="M116 160 L140 174 L164 160" stroke="#EF4444" stroke-width="3" fill="none" stroke-linecap="round" opacity=".3"/><circle cx="140" cy="210" r="6" fill="#F87171" opacity=".5"/></svg>
+            </div>
+            <span class="phone-name">Cascade</span>
+          </div>
+          <div class="phone-msgs">
+            <div class="msg-t">Today 7:02 AM</div>
+            <div class="msg-c"><div>Morning. Here's your cascade for today.</div></div>
+            <div class="msg-c"><div>
+              <div class="msg-box">
+                <div class="msg-row"><span class="msg-row-icon" style="opacity:.4">◎</span><span class="msg-row-text dim" style="opacity:.4">$5k MRR by December</span></div>
+                <div class="msg-row" style="padding-left:10px"><span class="msg-row-icon" style="opacity:.5">▸</span><span class="msg-row-text dim" style="opacity:.5">Q1: Fix retention + find a channel</span></div>
+                <div class="msg-row" style="padding-left:20px"><span class="msg-row-icon" style="opacity:.7">▸</span><span class="msg-row-text" style="opacity:.7">Feb: Customer research + ship top feature</span></div>
+                <div class="msg-row" style="padding-left:30px"><span class="msg-row-icon" style="color:#EF4444">▹</span><span class="msg-row-text" style="color:#EF4444">Week 2, Day 3</span></div>
+              </div>
+            </div></div>
+            <div class="msg-c"><div>
+              <div class="msg-box-label">Today's actions:</div>
+              <div class="msg-box" style="gap:3px">
+                <div class="msg-task"><div class="msg-chk"></div><span class="msg-task-label">Email 3 churned users for exit interviews (20m)</span></div>
+                <div class="msg-task"><div class="msg-chk"></div><span class="msg-task-label">Ship calendar view MVP to staging (90m)</span></div>
+                <div class="msg-task"><div class="msg-chk"></div><span class="msg-task-label">Write + schedule 2 posts for IH (30m)</span></div>
+                <div class="msg-task"><div class="msg-chk"></div><span class="msg-task-label">Reply to all open support tickets (15m)</span></div>
+                <div class="msg-sep">~2h 35m total · revenue actions first</div>
+              </div>
+            </div></div>
+            <div class="msg-c"><div>Customer interviews are the highest leverage thing on this list. Start there.</div></div>
+            <div class="msg-u"><div>emails sent. one already replied, wants to jump on a call tomorrow</div></div>
+            <div class="msg-c"><div>That's gold. Logged it. Book that call first thing.</div></div>
+            <div class="msg-c"><div>
+              <div class="msg-box" style="gap:3px">
+                <div class="msg-task">
+                  <div class="msg-chk-done"><svg width="7" height="7" viewBox="0 0 10 10"><path d="M2 5.5L4 7.5L8 3" stroke="#22C55E" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div>
+                  <span class="msg-task-label struck">Email 3 churned users</span>
+                  <span class="msg-done-tag">done</span>
+                </div>
+                <div class="msg-sep">3 remaining today · 6/10 user interviews this month</div>
+              </div>
+            </div></div>
+            <div class="msg-c"><div>Next: ship that calendar view. That's the feature 4 users asked for. Go build.</div></div>
+          </div>
+          <div class="phone-input">
+            <div class="phone-input-row">
+              <span class="phone-input-text">Text Cascade...</span>
+              <div class="phone-send"><svg width="11" height="11" viewBox="0 0 14 14"><path d="M2 12L12 7L2 2V5.5L8 7L2 8.5V12Z" fill="#fff"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <span class="phone-label">Daily execution</span>
+      </div>
+
+      <!-- Phone 3: Accountability Nudge -->
+      <div class="phone-wrapper">
+        <div class="phone-frame">
+          <div class="phone-island"></div>
+          <div class="phone-statusbar">
+            <span class="phone-time">9:41</span>
+            <div class="phone-icons">
+              <svg width="13" height="10" viewBox="0 0 16 12"><rect x="0" y="5" width="3" height="7" rx=".5" fill="#F8FAFC" opacity=".4"/><rect x="4.5" y="3" width="3" height="9" rx=".5" fill="#F8FAFC" opacity=".6"/><rect x="9" y="1" width="3" height="11" rx=".5" fill="#F8FAFC" opacity=".8"/><rect x="13" y="0" width="3" height="12" rx=".5" fill="#F8FAFC"/></svg>
+              <svg width="18" height="10" viewBox="0 0 22 12"><rect x="0" y="1" width="18" height="10" rx="2" stroke="#F8FAFC" stroke-width="1" fill="none"/><rect x="2" y="3" width="13" height="6" rx="1" fill="#22C55E"/><rect x="19" y="4" width="2" height="4" rx="1" fill="#F8FAFC" opacity=".4"/></svg>
+            </div>
+          </div>
+          <div class="phone-header">
+            <svg width="8" height="13" viewBox="0 0 10 16"><path d="M8 2L2 8L8 14" stroke="#EF4444" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+            <div class="phone-avatar">
+              <svg width="14" height="14" viewBox="0 0 280 280" fill="none"><path d="M90 65 L140 90 L190 65" stroke="#EF4444" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M104 115 L140 135 L176 115" stroke="#EF4444" stroke-width="4" fill="none" stroke-linecap="round" opacity=".6"/><path d="M116 160 L140 174 L164 160" stroke="#EF4444" stroke-width="3" fill="none" stroke-linecap="round" opacity=".3"/><circle cx="140" cy="210" r="6" fill="#F87171" opacity=".5"/></svg>
+            </div>
+            <span class="phone-name">Cascade</span>
+          </div>
+          <div class="phone-msgs">
+            <div class="msg-t">Thursday 6:48 PM</div>
+            <div class="msg-c"><div>Checking in. You had 4 tasks today. I'm seeing one completion. What happened?</div></div>
+            <div class="msg-u"><div>got sucked into redesigning the landing page all day. it looks way better though</div></div>
+            <div class="msg-c"><div>I hear you. But let's look at where that sits in your cascade.</div></div>
+            <div class="msg-c"><div>
+              <div class="msg-box">
+                <div class="msg-prio">PRIORITY CHECK</div>
+                <div class="msg-prog">
+                  <div class="msg-prog-head"><span class="msg-prog-name">Churn interviews completed</span><span class="msg-prog-val" style="color:#EF4444">6/10</span></div>
+                  <div class="msg-prog-bar"><div class="msg-prog-fill" style="width:60%;background:#EF4444"></div></div>
+                </div>
+                <div class="msg-prog">
+                  <div class="msg-prog-head"><span class="msg-prog-name">Calendar view shipped</span><span class="msg-prog-val" style="color:#FACC15">70%</span></div>
+                  <div class="msg-prog-bar"><div class="msg-prog-fill" style="width:70%;background:#FACC15"></div></div>
+                </div>
+                <div class="msg-prog">
+                  <div class="msg-prog-head"><span class="msg-prog-name">IH posts this week</span><span class="msg-prog-val" style="color:#EF4444">1/4</span></div>
+                  <div class="msg-prog-bar"><div class="msg-prog-fill" style="width:25%;background:#EF4444"></div></div>
+                </div>
+              </div>
+            </div></div>
+            <div class="msg-c"><div>Landing page redesign isn't on your cascade right now. Your Q1 goal is retention and finding a channel. A prettier page doesn't fix churn.</div></div>
+            <div class="msg-c"><div>Not saying the redesign was useless. But tomorrow, can we get back to what moves the $5k number?</div></div>
+            <div class="msg-u"><div>you're right. i was avoiding the hard stuff</div></div>
+            <div class="msg-c"><div>That's honest. The hard stuff is where the revenue is. I'll queue tomorrow's tasks around the calendar view and that user call. Get some rest.</div></div>
+            <div class="msg-t">Friday 7:01 AM</div>
+            <div class="msg-c"><div>New day. Yesterday's gone. Here's what moves the needle today.</div></div>
+          </div>
+          <div class="phone-input">
+            <div class="phone-input-row">
+              <span class="phone-input-text">Text Cascade...</span>
+              <div class="phone-send"><svg width="11" height="11" viewBox="0 0 14 14"><path d="M2 12L12 7L2 2V5.5L8 7L2 8.5V12Z" fill="#fff"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <span class="phone-label">Stay on track</span>
+      </div>
+
+    </div>
+    <p class="demo-bottom fade-in">No app to download. No dashboard to check. Just text.</p>
+  </div>
+</section>
+
+<!-- VALUE PROPS -->
+<section class="value-props">
   <div class="container">
-    <p class="section-label fade-in">The Numbers</p>
-    <div class="stats-grid stagger-in">
-      <div class="stat-card">
-        <div class="stat-number">365</div>
-        <div class="stat-label">days of clarity</div>
-        <div class="stat-sub">not 365 days of guessing</div>
+    <p class="section-label fade-in">Why It Works</p>
+    <div class="value-grid stagger-in">
+      <div class="value-card">
+        <div class="value-number">6</div>
+        <div class="value-label">connected levels</div>
+        <div class="value-sub">Vision to daily action in one system</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-number">1</div>
-        <div class="stat-label">system</div>
-        <div class="stat-sub">vision to daily action</div>
+      <div class="value-card">
+        <div class="value-number">&infin;</div>
+        <div class="value-label">adapts weekly</div>
+        <div class="value-sub">Plans match reality, not intentions</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-number">0</div>
-        <div class="stat-label">goals forgotten</div>
-        <div class="stat-sub">everything traces back</div>
+      <div class="value-card">
+        <div class="value-number">&lt;/&gt;</div>
+        <div class="value-label">open source</div>
+        <div class="value-sub">Inspect every line on GitHub</div>
       </div>
     </div>
   </div>
 </section>
 
 <!-- WHO IT'S FOR -->
-<section class="who">
+<section class="who" id="who">
   <div class="container">
     <p class="section-label fade-in">Who This Is For</p>
     <div class="persona-grid stagger-in">
       <div class="persona">
         <div class="persona-icon">&gt;_</div>
-        <h3>Engineers leveling up</h3>
-        <p>Preparing for career-defining interviews with structured daily practice.</p>
+        <h3>Builders leveling up</h3>
+        <p>Learning new skills with structured daily practice that compounds week over week.</p>
       </div>
       <div class="persona">
         <div class="persona-icon">$</div>
@@ -1089,6 +2037,14 @@
         <p>Anyone tired of big plans that die quietly in a Notion doc.</p>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- MID CTA 2 -->
+<section class="mid-cta">
+  <div class="container fade-in">
+    <p>First 100 users shape the product.</p>
+    <a href="#final-cta" class="btn">Get early access</a>
   </div>
 </section>
 
@@ -1116,22 +2072,75 @@
   </div>
 </section>
 
-<!-- FINAL CTA -->
-<section class="final-cta">
+<!-- FAQ -->
+<section class="faq">
   <div class="container">
-    <h2 class="fade-in">Stop planning. Start cascading.</h2>
-    <p class="sub fade-in">Early access launching soon. Get in first.</p>
+    <p class="section-label fade-in">Questions</p>
+    <div class="faq-list fade-in">
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>How is this different from Notion or a spreadsheet?</span>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+        <div class="faq-a">
+          <p>Notion gives you a blank canvas. Cascade gives you a system. It automatically breaks yearly goals into daily tasks, tracks what you actually complete, and adjusts next week's plan based on this week's reality. No manual updating. No abandoned dashboards.</p>
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>What does it cost?</span>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+        <div class="faq-a">
+          <p>Cascade is open source and free to self-host. We're building a hosted version with WhatsApp integration for people who want it to just work. Early access users will help shape pricing.</p>
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>Do I need to download an app?</span>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+        <div class="faq-a">
+          <p>No app. Cascade runs in your terminal (CLI) or via text messages. You check in by texting, and Cascade texts you back with your daily tasks, progress, and honest feedback. It meets you where you already are.</p>
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>What kinds of goals does it work for?</span>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+        <div class="faq-a">
+          <p>Any goal that takes months of consistent effort. SaaS revenue targets, fitness goals, career transitions, learning projects. If you can measure progress and break it into weekly actions, Cascade can track it.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta" id="final-cta">
+  <div class="container">
+    <h2 class="fade-in">Your goals shouldn't die in a Google Doc.</h2>
+    <p class="sub fade-in">First 100 users shape the product. Get in first.</p>
     <div class="fade-in" id="final-form-wrapper">
       <form class="waitlist-form" id="final-form" aria-label="Join the waitlist">
         <label for="final-email" class="sr-only">Email address</label>
         <input type="email" id="final-email" name="email" placeholder="you@example.com" required autocomplete="email">
         <button type="submit" class="btn" id="final-btn">
-          <span class="btn-text">Join the waitlist</span>
+          <span class="btn-text">Get early access</span>
           <span class="btn-spinner" aria-hidden="true"></span>
         </button>
         <span class="form-error" id="final-error" role="alert">Enter a valid email address.</span>
       </form>
-      <p class="early-access">Built by a founder, for founders who execute.</p>
+      <div class="social-proof" style="margin-top: 16px">
+        <a href="https://github.com/thinklikeadesigner/cascade" target="_blank" rel="noopener noreferrer" class="proof-badge">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          Open source
+        </a>
+        <a href="https://www.indiehackers.com/rebeccabuilds" target="_blank" rel="noopener noreferrer" class="proof-badge">
+          Built by @rebeccabuilds
+        </a>
+      </div>
     </div>
   </div>
 </section>
@@ -1159,6 +2168,31 @@
   // Hero load animation
   requestAnimationFrame(() => {
     document.getElementById('hero').classList.add('loaded');
+  });
+
+  // Sticky nav — show after scrolling past hero
+  const siteNav = document.getElementById('site-nav');
+  const heroSection = document.getElementById('hero');
+  const navObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) {
+        siteNav.classList.add('visible');
+      } else {
+        siteNav.classList.remove('visible');
+      }
+    });
+  }, { threshold: 0.1 });
+  navObserver.observe(heroSection);
+
+  // FAQ toggles
+  document.querySelectorAll('.faq-q').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.closest('.faq-item');
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+      btn.setAttribute('aria-expanded', !isOpen);
+    });
   });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
