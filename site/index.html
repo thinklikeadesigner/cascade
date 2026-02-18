@@ -683,34 +683,37 @@
 
     .persona-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
     }
 
-    @media (max-width: 560px) {
+    @media (max-width: 640px) {
       .persona-grid {
         grid-template-columns: 1fr;
+        gap: 12px;
       }
     }
 
     .persona {
-      padding: 22px 20px;
+      padding: 28px 22px;
       background: var(--surface);
       border-radius: 12px;
       border: 1px solid var(--border);
-      transition: border-color 0.3s ease;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      text-align: center;
     }
 
     .persona:hover {
       border-color: rgba(239, 68, 68, 0.2);
+      box-shadow: 0 0 24px rgba(239, 68, 68, 0.04);
     }
 
     .persona-icon {
       font-family: var(--mono);
-      font-size: 1.13rem;
+      font-size: 1.5rem;
       color: var(--accent);
-      opacity: 0.8;
-      margin-bottom: 10px;
+      margin-bottom: 14px;
+      text-shadow: 0 0 20px rgba(239, 68, 68, 0.2);
     }
 
     .persona h3 {
@@ -718,14 +721,22 @@
       font-size: 0.94rem;
       font-weight: 600;
       color: var(--text);
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
 
     .persona p {
-      font-size: 0.75rem;
+      font-size: 0.78rem;
       color: var(--text-secondary);
       font-weight: 400;
-      line-height: 1.5;
+      line-height: 1.6;
+    }
+
+    .persona-goal {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--accent);
+      margin-top: 12px;
+      opacity: 0.8;
     }
 
     /* ===== PHILOSOPHY ===== */
@@ -2021,18 +2032,21 @@
     <div class="persona-grid stagger-in">
       <div class="persona">
         <div class="persona-icon">$</div>
-        <h3>Solo founders chasing revenue</h3>
+        <h3>Founders chasing revenue</h3>
         <p>No co-founder, no board, no accountability. Cascade is the structure between your $200 MRR and your $5K goal.</p>
+        <p class="persona-goal">"$5K MRR by December"</p>
       </div>
       <div class="persona">
         <div class="persona-icon">//</div>
         <h3>Athletes training for a race</h3>
-        <p>Race day is non-negotiable. Training plans cascade naturally. Today's workout traces back to your October finish line.</p>
+        <p>Race day doesn't move. Your training plan cascades from finish line to today's workout.</p>
+        <p class="persona-goal">"Ironman 70.3 in October"</p>
       </div>
       <div class="persona">
         <div class="persona-icon">{}</div>
-        <h3>Builders shipping side projects</h3>
-        <p>You have the idea and the skills. You need the daily structure to actually ship it, week after week.</p>
+        <h3>Builders shipping projects</h3>
+        <p>You have the idea and the skills. You need daily structure to actually ship it, week after week.</p>
+        <p class="persona-goal">"Launch on Product Hunt by March"</p>
       </div>
     </div>
   </div>
@@ -2117,7 +2131,7 @@
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
         </button>
         <div class="faq-a">
-          <p>Anything that takes months and has a number attached. SaaS revenue targets, race finish times, job search funnels, side project launches. If you can measure it weekly, Cascade can track it. Works best if WhatsApp is your daily driver.</p>
+          <p>Anything that takes months and has a number attached. SaaS revenue targets, race finish times, side project launches, content milestones. If you can measure it weekly, Cascade can track it. Works best if WhatsApp is your daily driver.</p>
         </div>
       </div>
     </div>
