@@ -1,0 +1,10 @@
+Metadata-Version: 2.4
+Name: cascade-research
+Version: 0.1.0
+Summary: Semantic search CLI for Cascade research files
+Requires-Python: >=3.9
+Requires-Dist: chromadb>=1.0.0
+Requires-Dist: langchain-text-splitters>=0.2.0
+Requires-Dist: click>=8.0.0
+Requires-Dist: rich>=13.0.0
+Requires-Dist: pyyaml>=6.0

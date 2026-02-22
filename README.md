@@ -86,10 +86,13 @@ Setup takes about 30 minutes of focused conversation.
 
 This is what makes Cascade a system, not a prompt:
 
-```
-cascade (setup) → log (track daily) → review (weekly reflection)
-    ↓                                        ↓
-  plan (next week) ← ← ← ← ← ← adapt (learn patterns)
+```mermaid
+graph LR
+    cascade["cascade (setup)"] --> log["log (track daily)"]
+    log --> review["review (weekly reflection)"]
+    review --> adapt["adapt (learn patterns)"]
+    adapt --> plan["plan (next week)"]
+    plan --> cascade
 ```
 
 Each week, Cascade has more data. Your plans get more realistic. The system learns that you don't work Fridays, that your real velocity is 8 hours not 12, that you need a rest day every 6 days. It stops planning for who you wish you were and starts planning for who you actually are.

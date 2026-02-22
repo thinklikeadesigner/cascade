@@ -1,0 +1,2 @@
+[console_scripts]
+cascade-research = cascade_research.cli:main
