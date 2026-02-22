@@ -21,6 +21,7 @@ outputs/
 
 # Product research
 product-research/
+cascade-research/
 *.pptx
 
 # Environment
