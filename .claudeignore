@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+
+# Build artifacts
+.next/
+out/
+
+# OS files
+.DS_Store
+
+# Editor / IDE
+.vscode/
+.idea/
+.obsidian/
+
+# Outputs
+outputs/
+calendar/
+*.pptx
+
+# Environment
+.env
+.env.*
