@@ -34,28 +34,38 @@ log = structlog.get_logger()
 
 @asynccontextmanager
 async def lifespan(app):
-    bot_app = create_bot()
+    bot_app = None
+    try:
+        bot_app = create_bot()
+        if bot_app:
+            await bot_app.initialize()
+            log.info("telegram.initialized")
+            if settings.telegram_webhook_url:
+                try:
+                    await bot_app.bot.set_webhook(
+                        url=settings.telegram_webhook_url,
+                        secret_token=settings.telegram_webhook_secret or None,
+                    )
+                    log.info("telegram.webhook_set", url=settings.telegram_webhook_url)
+                except Exception as e:
+                    log.error("telegram.webhook_set_failed", error=str(e), url=settings.telegram_webhook_url)
+            else:
+                log.warning("telegram.no_webhook_url")
+    except Exception as e:
+        log.error("telegram.startup_failed", error=str(e))
+        bot_app = None
     app.state.bot_app = bot_app
-    if bot_app:
-        await bot_app.initialize()
-        if settings.telegram_webhook_url:
-            try:
-                await bot_app.bot.set_webhook(
-                    url=settings.telegram_webhook_url,
-                    secret_token=settings.telegram_webhook_secret or None,
-                )
-                log.info("telegram.webhook_set", url=settings.telegram_webhook_url)
-            except Exception as e:
-                log.error("telegram.webhook_set_failed", error=str(e), url=settings.telegram_webhook_url)
-        else:
-            log.warning("telegram.no_webhook_url", msg="TELEGRAM_WEBHOOK_URL not set, webhook not registered")
+    log.info("app.started")
     yield
     if bot_app:
         try:
             await bot_app.bot.delete_webhook()
         except Exception:
-            log.warning("telegram.webhook_delete_failed", msg="Could not delete webhook on shutdown")
-        await bot_app.shutdown()
+            pass
+        try:
+            await bot_app.shutdown()
+        except Exception:
+            pass
 
 
 app = FastAPI(title="Cascade API", version="0.1.0", lifespan=lifespan)
