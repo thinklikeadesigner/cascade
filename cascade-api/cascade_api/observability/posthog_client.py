@@ -13,7 +13,7 @@ def get_posthog() -> Posthog | None:
     if not settings.posthog_api_key:
         return None
     return Posthog(
-        api_key=settings.posthog_api_key,
+        settings.posthog_api_key,
         host=settings.posthog_host,
     )
 
