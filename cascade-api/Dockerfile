@@ -4,9 +4,8 @@ FROM python:3.11-slim
 WORKDIR /app
 
 COPY pyproject.toml .
-RUN pip install --no-cache-dir .
-
 COPY cascade_api/ cascade_api/
+RUN pip install --no-cache-dir .
 
 EXPOSE 8000
 
