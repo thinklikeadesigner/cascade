@@ -6,7 +6,6 @@ from datetime import datetime, timezone
 from pydantic import BaseModel
 from fastapi import APIRouter, HTTPException
 import structlog
-
 from cascade_api.dependencies import get_supabase
 from cascade_api.observability.posthog_client import track_event
 from cascade_api.telegram.tokens import generate_token
@@ -34,37 +33,41 @@ class TelegramConnectRequest(BaseModel):
 @router.post("/goal")
 async def create_goal(req: GoalRequest):
     """Create tenant (if needed) + goal. Transition to goal_set."""
-    supabase = get_supabase()
+    try:
+        supabase = get_supabase()
 
-    # Find or create tenant
-    result = supabase.table("tenants").select("*").eq("user_id", req.user_id).execute()
-    if result.data:
-        tenant = result.data[0]
-    else:
-        tenant = supabase.table("tenants").insert({
-            "user_id": req.user_id,
-            "core_hours": req.core_hours,
-            "flex_hours": req.flex_hours,
-            "onboarding_status": "signed_up",
+        # Find or create tenant
+        result = supabase.table("tenants").select("*").eq("user_id", req.user_id).execute()
+        if result.data:
+            tenant = result.data[0]
+        else:
+            tenant = supabase.table("tenants").insert({
+                "user_id": req.user_id,
+                "core_hours": req.core_hours,
+                "flex_hours": req.flex_hours,
+                "onboarding_status": "signed_up",
+            }).execute().data[0]
+
+        # Create goal
+        goal = supabase.table("goals").insert({
+            "tenant_id": tenant["id"],
+            "title": req.title,
+            "description": f"{req.description}\n\nCurrent state: {req.current_state}",
+            "success_criteria": req.success_criteria,
+            "target_date": req.target_date,
         }).execute().data[0]
 
-    # Create goal
-    goal = supabase.table("goals").insert({
-        "tenant_id": tenant["id"],
-        "title": req.title,
-        "description": f"{req.description}\n\nCurrent state: {req.current_state}",
-        "success_criteria": req.success_criteria,
-        "target_date": req.target_date,
-    }).execute().data[0]
+        # Update onboarding status
+        supabase.table("tenants").update({
+            "onboarding_status": "goal_set",
+        }).eq("id", tenant["id"]).execute()
 
-    # Update onboarding status
-    supabase.table("tenants").update({
-        "onboarding_status": "goal_set",
-    }).eq("id", tenant["id"]).execute()
+        track_event(req.user_id, "goal_defined", {"goal_title": req.title})
 
-    track_event(req.user_id, "goal_defined", {"goal_title": req.title})
-
-    return {"tenant_id": tenant["id"], "goal_id": goal["id"], "status": "goal_set"}
+        return {"tenant_id": tenant["id"], "goal_id": goal["id"], "status": "goal_set"}
+    except Exception as e:
+        log.error("create_goal.failed", error=str(e), user_id=req.user_id)
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.post("/connect-telegram")
