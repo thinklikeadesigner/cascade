@@ -1,27 +1,13 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-
-// ============================================================
-// CASCADE DEMO CHAT WIDGET
-// ============================================================
-// Configuration: Set your LangGraph backend URL below.
-// This widget connects to your LangGraph API endpoint
-// and streams goal breakdowns in real-time.
-//
-// SETUP:
-// 1. Set LANGGRAPH_API_URL to your deployed LangGraph endpoint
-// 2. Adjust RATE_LIMIT_MAX and RATE_LIMIT_WINDOW as needed
-// 3. Customize the SYSTEM_PROMPT for Cascade's personality
-// 4. Embed this component in your landing page
-// ============================================================
+import ReactMarkdown from "react-markdown";
 
 const CONFIG = {
-  LANGGRAPH_API_URL: "https://your-langgraph-api.langchain.app/runs/stream",
-  ASSISTANT_ID: "your-assistant-id",
-  RATE_LIMIT_MAX: 5,
+  API_URL: "/api/chat",
+  RATE_LIMIT_MAX: 12,
   RATE_LIMIT_WINDOW_MS: 60 * 60 * 1000, // 1 hour
-  DEMO_MODE: true, // Set false when backend is connected
+  DEMO_MODE: !process.env.NEXT_PUBLIC_ENABLE_CHAT,
 };
 
 // Simulated Cascade responses for demo mode
@@ -157,6 +143,7 @@ function Message({ message, isLast }) {
                 }}
               >
                 <span
+                  className="cascade-phase-timeframe"
                   style={{
                     background: PHASE_COLORS[i] || "#EF4444",
                     color: "#fff",
@@ -172,6 +159,7 @@ function Message({ message, isLast }) {
                   {phase.timeframe}
                 </span>
                 <span
+                  className="cascade-phase-name"
                   style={{
                     color: "#F8FAFC",
                     fontSize: 14,
@@ -183,6 +171,7 @@ function Message({ message, isLast }) {
                 </span>
               </div>
               <p
+                className="cascade-phase-desc"
                 style={{
                   color: "#94A3B8",
                   fontSize: 13,
@@ -204,6 +193,7 @@ function Message({ message, isLast }) {
                     }}
                   >
                     <span
+                      className="cascade-phase-bullet"
                       style={{
                         color: PHASE_COLORS[i] || "#EF4444",
                         fontSize: 10,
@@ -214,6 +204,7 @@ function Message({ message, isLast }) {
                       ▸
                     </span>
                     <span
+                      className="cascade-phase-task"
                       style={{
                         color: "#F8FAFC",
                         fontSize: 12.5,
@@ -244,6 +235,7 @@ function Message({ message, isLast }) {
       }}
     >
       <div
+        className="cascade-msg-bubble"
         style={{
           maxWidth: "85%",
           padding: "10px 16px",
@@ -254,13 +246,83 @@ function Message({ message, isLast }) {
           border: isUser ? "none" : "1px solid #2A1F22",
           color: "#F8FAFC",
           fontSize: 13.5,
-          lineHeight: 1.55,
+          lineHeight: 1.6,
           fontFamily: "'Outfit', sans-serif",
           overflowWrap: "break-word",
           wordBreak: "break-word",
         }}
       >
-        {message.content}
+        {isUser ? (
+          message.content
+        ) : (
+          <ReactMarkdown
+            components={{
+              p: ({ children }) => (
+                <p style={{ margin: "0 0 8px 0" }}>{children}</p>
+              ),
+              strong: ({ children }) => (
+                <strong style={{ color: "#F8FAFC", fontWeight: 600 }}>
+                  {children}
+                </strong>
+              ),
+              em: ({ children }) => (
+                <em style={{ color: "#CBD5E1" }}>{children}</em>
+              ),
+              ul: ({ children }) => (
+                <ul
+                  style={{
+                    margin: "4px 0 8px 0",
+                    paddingLeft: 16,
+                    listStyleType: "disc",
+                  }}
+                >
+                  {children}
+                </ul>
+              ),
+              ol: ({ children }) => (
+                <ol
+                  style={{
+                    margin: "4px 0 8px 0",
+                    paddingLeft: 16,
+                  }}
+                >
+                  {children}
+                </ol>
+              ),
+              li: ({ children }) => (
+                <li style={{ marginBottom: 2, color: "#F8FAFC" }}>
+                  {children}
+                </li>
+              ),
+              code: ({ children }) => (
+                <code
+                  style={{
+                    background: "rgba(248,113,113,0.1)",
+                    color: "#F87171",
+                    padding: "1px 5px",
+                    borderRadius: 4,
+                    fontSize: 12,
+                    fontFamily: "'JetBrains Mono', monospace",
+                  }}
+                >
+                  {children}
+                </code>
+              ),
+              a: ({ href, children }) => (
+                <a
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: "#F87171", textDecoration: "underline" }}
+                >
+                  {children}
+                </a>
+              ),
+            }}
+          >
+            {message.content}
+          </ReactMarkdown>
+        )}
         {message.isStreaming && (
           <span
             style={{
@@ -338,47 +400,172 @@ export default function CascadeDemoWidget({ fullScreen = false }) {
     }
   }, [messages, streamingText, isLoading]);
 
-  // Connect to LangGraph backend (real mode)
-  async function sendToLangGraph(userMessage) {
+  // Connect to Claude API (live mode)
+  async function sendToAPI(userMessage) {
     try {
-      const response = await fetch(CONFIG.LANGGRAPH_API_URL, {
+      // Build conversation history from messages state (text messages only)
+      const history = messages
+        .filter((m) => m.type === "text" && m.content)
+        .map((m) => ({ role: m.role, content: m.content }));
+      history.push({ role: "user", content: userMessage });
+
+      const response = await fetch(CONFIG.API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          assistant_id: CONFIG.ASSISTANT_ID,
-          input: { messages: [{ role: "user", content: userMessage }] },
-          stream_mode: ["messages"],
-        }),
+        body: JSON.stringify({ messages: history }),
       });
+
+      if (response.status === 429) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: Date.now(),
+            role: "assistant",
+            content: "Rate limit reached. Please try again later.",
+            type: "text",
+          },
+        ]);
+        return;
+      }
+
+      if (!response.ok) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: Date.now(),
+            role: "assistant",
+            content: "Something went wrong. Please try again.",
+            type: "text",
+          },
+        ]);
+        return;
+      }
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
-      let fullText = "";
+      let buffer = "";
+      let thinkingText = "";
+      let nudgeText = "";
+      let breakdownReceived = false;
+      let receivedDone = false;
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-        const chunk = decoder.decode(value);
-        // Parse SSE events from LangGraph
-        const lines = chunk.split("\n");
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop(); // keep incomplete line in buffer
+
         for (const line of lines) {
-          if (line.startsWith("data: ")) {
-            try {
-              const data = JSON.parse(line.slice(6));
-              if (data.content) {
-                fullText += data.content;
-                setStreamingText(fullText);
+          if (!line.startsWith("data: ")) continue;
+          let parsed;
+          try {
+            parsed = JSON.parse(line.slice(6));
+          } catch {
+            continue;
+          }
+
+          switch (parsed.type) {
+            case "text_delta":
+              if (!breakdownReceived) {
+                thinkingText += parsed.text;
+                setStreamingText(thinkingText);
+              } else {
+                nudgeText += parsed.text;
+                setStreamingText(nudgeText);
               }
-            } catch (e) {
-              // skip malformed chunks
-            }
+              break;
+
+            case "breakdown":
+              // Finalize thinking text as a message
+              if (thinkingText) {
+                setMessages((prev) => [
+                  ...prev,
+                  {
+                    id: Date.now(),
+                    role: "assistant",
+                    content: thinkingText,
+                    type: "text",
+                  },
+                ]);
+                setStreamingText("");
+              }
+
+              // Brief pause for visual smoothness
+              await new Promise((r) => setTimeout(r, 300));
+
+              // Add breakdown card
+              setMessages((prev) => [
+                ...prev,
+                {
+                  id: Date.now() + 1,
+                  role: "assistant",
+                  type: "breakdown",
+                  phases: parsed.phases,
+                },
+              ]);
+              breakdownReceived = true;
+
+              await new Promise((r) => setTimeout(r, 400));
+              break;
+
+            case "done":
+              receivedDone = true;
+              break;
+
+            case "error":
+              setStreamingText("");
+              setMessages((prev) => [
+                ...prev,
+                {
+                  id: Date.now(),
+                  role: "assistant",
+                  content: parsed.message || "Something went wrong.",
+                  type: "text",
+                },
+              ]);
+              return;
           }
         }
       }
-      return fullText;
+
+      // Finalize any remaining text
+      if (breakdownReceived && nudgeText) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: Date.now() + 2,
+            role: "assistant",
+            content: nudgeText,
+            type: "text",
+          },
+        ]);
+      } else if (!breakdownReceived && thinkingText) {
+        // Text-only response (no breakdown)
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: Date.now(),
+            role: "assistant",
+            content: thinkingText,
+            type: "text",
+          },
+        ]);
+      }
+      setStreamingText("");
     } catch (error) {
-      console.error("LangGraph API error:", error);
-      return "Connection error. Please check the API configuration.";
+      console.error("Chat API error:", error);
+      setStreamingText("");
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now(),
+          role: "assistant",
+          content: "Connection error. Please try again.",
+          type: "text",
+        },
+      ]);
     }
   }
 
@@ -464,17 +651,7 @@ export default function CascadeDemoWidget({ fullScreen = false }) {
     if (CONFIG.DEMO_MODE) {
       await simulateResponse(trimmed);
     } else {
-      const response = await sendToLangGraph(trimmed);
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: Date.now(),
-          role: "assistant",
-          content: response,
-          type: "text",
-        },
-      ]);
-      setStreamingText("");
+      await sendToAPI(trimmed);
     }
 
     setIsLoading(false);

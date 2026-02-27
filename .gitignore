@@ -25,5 +25,10 @@ cascade-research/
 docs/
 *.pptx
 
+# Python
+__pycache__/
+*.pyc
+
 # Environment
 .env
+.env.local
