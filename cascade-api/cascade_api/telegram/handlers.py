@@ -157,8 +157,15 @@ async def _handle_log(update: Update, tenant: dict, text: str):
         context="log_parse",
     )
 
+    # Strip markdown fences if present
+    cleaned = parsed_text.strip()
+    if cleaned.startswith("```"):
+        cleaned = cleaned.split("\n", 1)[1]
+    if cleaned.endswith("```"):
+        cleaned = cleaned.rsplit("```", 1)[0]
+
     try:
-        parsed = json.loads(parsed_text)
+        parsed = json.loads(cleaned.strip())
     except json.JSONDecodeError:
         await update.message.reply_text(
             "I couldn't parse that. Try something like: \"sent 5 DMs, energy was good\""

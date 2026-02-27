@@ -67,7 +67,13 @@ async def log_progress(req: LogRequest):
         import json
 
         raw_text = message.content[0].text
-        parsed = json.loads(raw_text)
+        # Strip markdown fences if present
+        cleaned = raw_text.strip()
+        if cleaned.startswith("```"):
+            cleaned = cleaned.split("\n", 1)[1]
+        if cleaned.endswith("```"):
+            cleaned = cleaned.rsplit("```", 1)[0]
+        parsed = json.loads(cleaned.strip())
     except json.JSONDecodeError:
         log.error("parse.json_failed", raw=raw_text)
         raise HTTPException(status_code=422, detail="Failed to parse progress text into structured data")
