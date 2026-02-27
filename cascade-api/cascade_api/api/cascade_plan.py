@@ -140,5 +140,11 @@ Today: {date.today().isoformat()}"""
 @router.post("/generate-plan")
 async def generate_plan_endpoint(req: CascadePlanRequest):
     """Generate the full cascade plan during onboarding."""
-    plan = await generate_cascade(req.tenant_id, req.goal_id, req.api_key)
-    return {"status": "plan_approved", "plan": plan}
+    try:
+        plan = await generate_cascade(req.tenant_id, req.goal_id, req.api_key)
+        return {"status": "plan_approved", "plan": plan}
+    except Exception as e:
+        import traceback
+        log.error("generate_plan.failed", error=str(e), traceback=traceback.format_exc(), tenant_id=req.tenant_id, goal_id=req.goal_id)
+        from fastapi import HTTPException
+        raise HTTPException(status_code=500, detail=str(e))
