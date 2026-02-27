@@ -39,11 +39,14 @@ async def lifespan(app):
     if bot_app:
         await bot_app.initialize()
         if settings.telegram_webhook_url:
-            await bot_app.bot.set_webhook(
-                url=settings.telegram_webhook_url,
-                secret_token=settings.telegram_webhook_secret or None,
-            )
-            log.info("telegram.webhook_set", url=settings.telegram_webhook_url)
+            try:
+                await bot_app.bot.set_webhook(
+                    url=settings.telegram_webhook_url,
+                    secret_token=settings.telegram_webhook_secret or None,
+                )
+                log.info("telegram.webhook_set", url=settings.telegram_webhook_url)
+            except Exception as e:
+                log.error("telegram.webhook_set_failed", error=str(e), url=settings.telegram_webhook_url)
         else:
             log.warning("telegram.no_webhook_url", msg="TELEGRAM_WEBHOOK_URL not set, webhook not registered")
     yield
