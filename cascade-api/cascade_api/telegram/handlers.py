@@ -101,8 +101,58 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await _handle_status(update, tenant)
         return
 
+    # Task query — what do I do today/this week
+    task_phrases = ("what are today", "what do i do", "today's tasks", "todays tasks",
+                    "my tasks", "what's the plan", "whats the plan", "what should i do")
+    if any(phrase in text for phrase in task_phrases):
+        await _handle_tasks(update, tenant)
+        return
+
     # Default: parse as progress log
     await _handle_log(update, tenant, update.message.text)
+
+
+async def _handle_tasks(update: Update, tenant: dict):
+    """Send today's tasks from the current week plan."""
+    from cascade_api.db.tasks import get_week_tasks
+    from datetime import date, timedelta
+
+    supabase = get_supabase()
+    tenant_id = tenant["id"]
+    today = date.today()
+    week_start = today - timedelta(days=today.weekday())
+
+    tasks = await get_week_tasks(supabase, tenant_id, week_start.isoformat())
+
+    # Filter to today's tasks
+    today_str = today.isoformat()
+    today_tasks = [t for t in tasks if t.get("scheduled_day") == today_str]
+
+    # If no tasks scheduled for today specifically, show all incomplete tasks
+    if not today_tasks:
+        today_tasks = [t for t in tasks if not t.get("completed")]
+
+    if not today_tasks:
+        await update.message.reply_text("No tasks for today. Enjoy the rest day.")
+        return
+
+    core = [t for t in today_tasks if t.get("category") == "core"]
+    flex = [t for t in today_tasks if t.get("category") == "flex"]
+
+    lines = []
+    if core:
+        lines.append(f"{today.strftime('%A')} — {len(core)} Core tasks:")
+        for t in core:
+            check = "✓" if t.get("completed") else "•"
+            lines.append(f"  {check} {t['title']}")
+
+    if flex:
+        lines.append(f"\nFlex if you have energy:")
+        for t in flex:
+            check = "✓" if t.get("completed") else "•"
+            lines.append(f"  {check} {t['title']}")
+
+    await update.message.reply_text("\n".join(lines))
 
 
 async def _handle_status(update: Update, tenant: dict):
