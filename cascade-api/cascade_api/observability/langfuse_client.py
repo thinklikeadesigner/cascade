@@ -10,7 +10,7 @@ from cascade_api.config import settings
 
 log = structlog.get_logger()
 
-MODEL = "claude-sonnet-4-5-20250514"
+MODEL = "claude-haiku-4-5-20251001"
 MAX_TOKENS = 4096
 
 

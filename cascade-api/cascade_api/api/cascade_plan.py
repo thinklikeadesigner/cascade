@@ -67,7 +67,13 @@ Today: {date.today().isoformat()}"""
         context="onboarding_cascade_generation",
     )
 
-    plan = json.loads(result)
+    # Strip markdown fences if present
+    cleaned = result.strip()
+    if cleaned.startswith("```"):
+        cleaned = cleaned.split("\n", 1)[1]  # remove ```json line
+    if cleaned.endswith("```"):
+        cleaned = cleaned.rsplit("```", 1)[0]
+    plan = json.loads(cleaned.strip())
 
     # Mark as plan_drafted BEFORE writing plan data to DB.
     # If the DB writes below fail, the user stays in plan_drafted (not plan_approved
@@ -80,30 +86,50 @@ Today: {date.today().isoformat()}"""
     today = date.today()
     current_quarter = (today.month - 1) // 3 + 1
     for qm in plan.get("quarterly_milestones", []):
-        supabase.table("quarterly_plans").insert({
+        supabase.table("quarterly_plans").upsert({
             "goal_id": goal_id,
             "quarter": qm.get("quarter", current_quarter),
             "year": today.year,
             "milestones": qm,
-        }).execute()
+        }, on_conflict="goal_id,quarter,year").execute()
 
     # Store monthly plan
-    supabase.table("monthly_plans").insert({
+    supabase.table("monthly_plans").upsert({
         "tenant_id": tenant_id,
         "month": today.month,
         "year": today.year,
         "targets": plan.get("monthly_targets", []),
-    }).execute()
+    }, on_conflict="tenant_id,month,year").execute()
 
     # Store weekly plan + tasks
     week_start = today - timedelta(days=today.weekday())  # Monday
     week_end = week_start + timedelta(days=6)
 
-    wp = supabase.table("weekly_plans").insert({
+    wp = supabase.table("weekly_plans").upsert({
         "tenant_id": tenant_id,
         "week_start": week_start.isoformat(),
         "week_end": week_end.isoformat(),
-    }).execute().data[0]
+    }, on_conflict="tenant_id,week_start").execute().data[0]
+
+    # Map day names to dates for this week
+    day_map = {
+        "monday": 0, "tuesday": 1, "wednesday": 2, "thursday": 3,
+        "friday": 4, "saturday": 5, "sunday": 6,
+    }
+
+    def resolve_day(raw_day):
+        """Convert day name or date string to ISO date."""
+        if not raw_day:
+            return None
+        lower = raw_day.lower().strip()
+        if lower in day_map:
+            return (week_start + timedelta(days=day_map[lower])).isoformat()
+        # Already a date string — validate it
+        try:
+            date.fromisoformat(raw_day)
+            return raw_day
+        except (ValueError, TypeError):
+            return None
 
     weekly = plan.get("weekly_tasks", {})
     for task in weekly.get("core", []):
@@ -114,7 +140,7 @@ Today: {date.today().isoformat()}"""
             "title": task["title"],
             "category": "core",
             "estimated_minutes": task.get("estimated_minutes"),
-            "scheduled_day": task.get("scheduled_day"),
+            "scheduled_day": resolve_day(task.get("scheduled_day")),
         }).execute()
 
     for task in weekly.get("flex", []):
