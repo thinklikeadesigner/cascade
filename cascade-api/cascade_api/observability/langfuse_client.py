@@ -5,7 +5,6 @@ from __future__ import annotations
 import anthropic
 import structlog
 from functools import lru_cache
-from langfuse import Langfuse
 
 from cascade_api.config import settings
 
@@ -16,14 +15,19 @@ MAX_TOKENS = 4096
 
 
 @lru_cache
-def get_langfuse() -> Langfuse | None:
+def get_langfuse():
     if not settings.langfuse_public_key:
         return None
-    return Langfuse(
-        public_key=settings.langfuse_public_key,
-        secret_key=settings.langfuse_secret_key,
-        host=settings.langfuse_host,
-    )
+    try:
+        from langfuse import Langfuse
+        return Langfuse(
+            public_key=settings.langfuse_public_key,
+            secret_key=settings.langfuse_secret_key,
+            host=settings.langfuse_host,
+        )
+    except Exception as e:
+        log.warning("langfuse.init_failed", error=str(e))
+        return None
 
 
 async def traced_ask(
@@ -44,19 +48,24 @@ async def traced_ask(
     generation = None
 
     if lf:
-        trace = lf.trace(
-            name=context or "claude_call",
-            user_id=user_id,
-            metadata={"context": context},
-        )
-        generation = trace.generation(
-            name="claude_completion",
-            model=model,
-            input=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_message},
-            ],
-        )
+        try:
+            trace = lf.trace(
+                name=context or "claude_call",
+                user_id=user_id,
+                metadata={"context": context},
+            )
+            generation = trace.generation(
+                name="claude_completion",
+                model=model,
+                input=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_message},
+                ],
+            )
+        except Exception as e:
+            log.warning("langfuse.trace_failed", error=str(e))
+            trace = None
+            generation = None
 
     response = await client.messages.create(
         model=model,
@@ -67,15 +76,21 @@ async def traced_ask(
     result = response.content[0].text
 
     if generation:
-        generation.end(
-            output=result,
-            usage={
-                "input": response.usage.input_tokens,
-                "output": response.usage.output_tokens,
-            },
-        )
+        try:
+            generation.end(
+                output=result,
+                usage={
+                    "input": response.usage.input_tokens,
+                    "output": response.usage.output_tokens,
+                },
+            )
+        except Exception:
+            pass
 
     if lf:
-        lf.flush()
+        try:
+            lf.flush()
+        except Exception:
+            pass
 
     return result
