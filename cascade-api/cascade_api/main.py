@@ -1,5 +1,7 @@
 from contextlib import asynccontextmanager
 
+import logging
+
 import sentry_sdk
 import structlog
 from fastapi import FastAPI
@@ -23,7 +25,7 @@ structlog.configure(
         structlog.dev.ConsoleRenderer(),
     ],
     wrapper_class=structlog.make_filtering_bound_logger(
-        structlog.get_level_from_name(settings.log_level)
+        logging.getLevelName(settings.log_level.upper())
     ),
 )
 
