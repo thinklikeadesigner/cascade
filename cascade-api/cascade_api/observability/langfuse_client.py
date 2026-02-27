@@ -36,7 +36,8 @@ async def traced_ask(
     max_tokens: int = MAX_TOKENS,
 ) -> str:
     """Call Claude with Langfuse tracing. Falls back to untraced if Langfuse is not configured."""
-    client = anthropic.AsyncAnthropic(api_key=api_key)
+    key = api_key or settings.anthropic_api_key
+    client = anthropic.AsyncAnthropic(api_key=key)
     lf = get_langfuse()
 
     trace = None
