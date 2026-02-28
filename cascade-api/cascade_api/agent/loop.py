@@ -15,7 +15,7 @@ log = structlog.get_logger()
 
 # Model routing thresholds
 SIMPLE_MODEL = "claude-haiku-4-5-20251001"
-COMPLEX_MODEL = "claude-sonnet-4-5-20250514"
+COMPLEX_MODEL = "claude-sonnet-4-6"
 MAX_TOOL_ROUNDS = 10
 
 
