@@ -32,3 +32,6 @@ __pycache__/
 # Environment
 .env
 .env.local
+
+# Deploy notes with secrets
+DEPLOY-STATUS.md
