@@ -63,6 +63,19 @@ export default function OnboardChatPage() {
     init();
   }, []);
 
+  function normalizeDate(dateStr) {
+    if (!dateStr) return "";
+    // Already ISO format
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
+    // Try to parse natural language dates like "March 2027", "Oct 1 2026", etc.
+    const parsed = new Date(dateStr);
+    if (!isNaN(parsed.getTime())) {
+      return parsed.toISOString().split("T")[0];
+    }
+    // Last resort: return empty string so backend doesn't choke
+    return "";
+  }
+
   async function handleComplete(planData) {
     setCompleted(true);
 
@@ -74,7 +87,7 @@ export default function OnboardChatPage() {
         description: "",
         success_criteria: planData.goal_summary?.success_criteria || "",
         current_state: planData.goal_summary?.current_state || "",
-        target_date: planData.goal_summary?.target_date || "",
+        target_date: normalizeDate(planData.goal_summary?.target_date),
         core_hours: planData.goal_summary?.core_hours || 10,
         flex_hours: planData.goal_summary?.flex_hours || 4,
       };

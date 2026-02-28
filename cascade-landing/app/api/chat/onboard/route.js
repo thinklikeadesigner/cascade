@@ -1,4 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { startObservation, updateActiveTrace } from "@langfuse/tracing";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60; // Node.js runtime (default) — Edge has 30s limit which is too short for multi-tool loops
@@ -127,9 +128,12 @@ Human approval at each time horizon is non-negotiable. Present each level, then 
 
 ## CURRENT STATE
 
+Today's date: ${new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
 Phase: ${cascadeState}
 ${stateInstruction}
 ${contextSection}
+
+IMPORTANT: All plans must account for today's date. Never schedule milestones or tasks in the past. If the current quarter is partially over, start planning from today forward. For example, if it's late February, Q1 milestones should only include what can be done in the remaining time — don't set deadlines in January or early February.
 
 ## TOOL USAGE
 
@@ -153,7 +157,7 @@ const ONBOARDING_TOOLS = [
         title: { type: "string", description: "The main goal title" },
         success_criteria: { type: "string", description: "How success will be measured" },
         current_state: { type: "string", description: "Where the user is starting from" },
-        target_date: { type: "string", description: "When they want to achieve this by" },
+        target_date: { type: "string", description: "When they want to achieve this by, in YYYY-MM-DD format (e.g. 2026-10-01)" },
         core_hours: { type: "number", description: "Weekly core hours commitment" },
         flex_hours: { type: "number", description: "Weekly flex hours (bonus)" },
         feasibility_notes: { type: "string", description: "Brief feasibility assessment" },
@@ -339,6 +343,13 @@ export async function POST(request) {
       try {
         const tools = ONBOARDING_TOOLS;
 
+        // Langfuse trace for this request (via OpenTelemetry, initialized in instrumentation.js)
+        const trace = startObservation("onboarding-chat", {
+          input: sanitizedMessages,
+          metadata: { cascade_state },
+        });
+        updateActiveTrace({ userId: user_id || rateLimitKey });
+
         // Claude call — may loop if tool calls need handling
         let currentMessages = [...sanitizedMessages];
         let loopCount = 0;
@@ -346,6 +357,16 @@ export async function POST(request) {
 
         while (loopCount < MAX_LOOPS) {
           loopCount++;
+
+          const generation = trace.startObservation(
+            `claude-call-${loopCount}`,
+            {
+              model: "claude-sonnet-4-6",
+              input: currentMessages,
+              metadata: { loop: loopCount, cascade_state },
+            },
+            { asType: "generation" }
+          );
 
           const stream1 = client.messages.stream({
             model: "claude-sonnet-4-6",
@@ -362,6 +383,14 @@ export async function POST(request) {
           });
 
           const finalMessage = await stream1.finalMessage();
+
+          generation.update({
+            output: finalMessage.content,
+            usageDetails: {
+              input: finalMessage.usage?.input_tokens,
+              output: finalMessage.usage?.output_tokens,
+            },
+          }).end();
 
           // If no tool use or end of turn, we're done
           if (finalMessage.stop_reason === "end_turn") {
@@ -436,10 +465,14 @@ export async function POST(request) {
           ];
         }
 
+        // Finalize Langfuse trace
+        trace.update({ output: "completed" }).end();
+
         send({ type: "done" });
         controller.close();
       } catch (error) {
         console.error("Onboarding chat error:", error);
+        try { trace.update({ output: `error: ${error.message}` }).end(); } catch (_) {}
         send({ type: "error", message: "Something went wrong. Please try again." });
         controller.close();
       }
