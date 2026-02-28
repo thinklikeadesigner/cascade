@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
+import posthog from "posthog-js";
 import ReactMarkdown from "react-markdown";
 
 const CONFIG = {
@@ -645,6 +646,7 @@ export default function CascadeDemoWidget({ fullScreen = false }) {
       type: "text",
     };
     setMessages((prev) => [...prev, userMsg]);
+    posthog.capture("demo_goal_submitted", { goal_text: trimmed });
     setInput("");
     setIsLoading(true);
 

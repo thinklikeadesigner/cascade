@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import posthog from "posthog-js";
 import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
@@ -38,11 +39,13 @@ export default function WaitlistForm({ id = "hero", children }) {
       if (sbError) {
         if (sbError.code === "23505") {
           setSuccess({ duplicate: true });
+          posthog.capture("waitlist_joined", { source: id, duplicate: true });
           return;
         }
         throw new Error(sbError.message);
       }
       setSuccess({ duplicate: false });
+      posthog.capture("waitlist_joined", { source: id });
     } catch (err) {
       setLoading(false);
       setError("Something went wrong. Try again.");

@@ -2,6 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import { useState, Suspense } from "react";
+import posthog from "posthog-js";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -12,6 +13,7 @@ function PaymentContent() {
 
   async function handleCheckout(plan) {
     setLoading(true);
+    posthog.capture("checkout_started", { plan });
     const res = await fetch(`${API_URL}/api/payment/create-checkout`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

@@ -8,6 +8,7 @@ from pydantic import BaseModel
 
 from cascade_api.config import settings
 from cascade_api.dependencies import get_supabase
+from cascade_api.observability.posthog_client import track_event
 
 router = APIRouter(prefix="/api/payment", tags=["payment"])
 
@@ -39,4 +40,5 @@ async def create_checkout(req: CheckoutRequest):
         cancel_url=f"{settings.frontend_url or 'https://cascade-flame.vercel.app'}/payment/cancel",
     )
 
+    track_event(req.tenant_id, "stripe_checkout_created", {"plan": req.plan})
     return {"checkout_url": session.url}

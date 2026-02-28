@@ -32,3 +32,17 @@ def track_event(
         event=event,
         properties=properties or {},
     )
+
+
+def identify_user(
+    user_id: str,
+    properties: dict | None = None,
+) -> None:
+    """Set user properties in PostHog. No-op if not configured."""
+    ph = get_posthog()
+    if not ph:
+        return
+    ph.identify(
+        distinct_id=user_id,
+        properties=properties or {},
+    )

@@ -1,4 +1,6 @@
 import "./globals.css";
+import { Suspense } from "react";
+import PostHogProvider from "@/components/PostHogProvider";
 
 export const viewport = {
   viewportFit: "cover",
@@ -36,7 +38,11 @@ export default function RootLayout({ children }) {
           crossOrigin="anonymous"
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <Suspense fallback={null}>
+          <PostHogProvider>{children}</PostHogProvider>
+        </Suspense>
+      </body>
     </html>
   );
 }

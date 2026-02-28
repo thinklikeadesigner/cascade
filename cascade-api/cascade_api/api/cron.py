@@ -11,6 +11,7 @@ import structlog
 from fastapi import APIRouter, Header, HTTPException, Request
 
 from cascade_api.config import settings
+from cascade_api.observability.posthog_client import track_event
 from cascade_api.telegram.scheduler import (
     send_morning_messages,
     send_evening_messages,
@@ -44,6 +45,7 @@ async def cron_morning(request: Request, x_cron_secret: str | None = Header(defa
     _verify_secret(x_cron_secret)
     bot = _get_bot(request)
     result = await send_morning_messages(bot)
+    track_event("system", "cron_morning_sent", result)
     log.info("cron.morning", **result)
     return result
 
@@ -53,6 +55,7 @@ async def cron_evening(request: Request, x_cron_secret: str | None = Header(defa
     _verify_secret(x_cron_secret)
     bot = _get_bot(request)
     result = await send_evening_messages(bot)
+    track_event("system", "cron_evening_sent", result)
     log.info("cron.evening", **result)
     return result
 
@@ -71,6 +74,7 @@ async def cron_sunday_review(request: Request, x_cron_secret: str | None = Heade
     _verify_secret(x_cron_secret)
     bot = _get_bot(request)
     result = await send_sunday_review_messages(bot)
+    track_event("system", "cron_sunday_review_sent", result)
     log.info("cron.sunday_review", **result)
     return result
 
@@ -80,5 +84,6 @@ async def cron_monday_kickoff(request: Request, x_cron_secret: str | None = Head
     _verify_secret(x_cron_secret)
     bot = _get_bot(request)
     result = await send_monday_kickoff_messages(bot)
+    track_event("system", "cron_monday_kickoff_sent", result)
     log.info("cron.monday_kickoff", **result)
     return result

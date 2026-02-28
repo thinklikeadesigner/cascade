@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import posthog from "posthog-js";
 import { createClient } from "@supabase/supabase-js";
 import { loadConversation, createConversation } from "@/lib/conversations";
 
@@ -45,6 +46,7 @@ export default function OnboardChatPage() {
         }
 
         setUser(authUser);
+        posthog.identify(authUser.id, { email: authUser.email });
 
         let conv = await loadConversation(getSupabase(), authUser.id);
         if (!conv) {
@@ -78,6 +80,9 @@ export default function OnboardChatPage() {
 
   async function handleComplete(planData) {
     setCompleted(true);
+    posthog.capture("onboard_completed", {
+      goal_title: planData.goal_summary?.title,
+    });
 
     try {
       // Send only fields the FastAPI endpoint expects — avoid Pydantic validation errors
@@ -177,6 +182,7 @@ export default function OnboardChatPage() {
             href={telegramLink}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => posthog.capture("telegram_link_clicked")}
             style={{ display: "inline-block", background: "#0088cc", color: "#fff", fontWeight: 600, padding: "16px 32px", borderRadius: 12, fontSize: 16, textDecoration: "none", fontFamily: "'Outfit', sans-serif", marginBottom: 32 }}
           >
             Open in Telegram

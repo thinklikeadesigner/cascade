@@ -14,6 +14,7 @@
     "@opentelemetry/sdk-node": "^0.212.0",
     "@supabase/supabase-js": "^2.97.0",
     "next": "16.1.6",
+    "posthog-js": "^1.356.1",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-markdown": "^10.1.0"
