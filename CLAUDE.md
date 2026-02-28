@@ -247,13 +247,13 @@ Generate .ics calendar files for the current week.
 
 ---
 
-## WHATSAPP AGENT (NanoClaw)
+## TELEGRAM AGENT (NanoClaw)
 
-Cascade has two interfaces: Claude Code (interactive, deep work) and WhatsApp (async, daily rhythm). NanoClaw is the WhatsApp agent. It reads and writes to `data/` and delivers Cascade's coaching via text.
+Cascade has two interfaces: Claude Code (interactive, deep work) and Telegram (async, daily rhythm). NanoClaw is the Telegram agent. It reads and writes to `data/` and delivers Cascade's coaching via text.
 
 ### Principle
 
-The WhatsApp agent IS the product for most users most of the time. Claude Code is the setup tool and the deep-planning tool. WhatsApp is where the daily system lives. If the user only interacts via WhatsApp, the system must still work.
+The Telegram agent IS the product for most users most of the time. Claude Code is the setup tool and the deep-planning tool. Telegram is where the daily system lives. If the user only interacts via Telegram, the system must still work.
 
 ### Data Contract
 
@@ -263,62 +263,37 @@ NanoClaw mounts `data/` into its container. Access rules:
 |------|------|-------|-------|
 | `tracker.csv` | Yes | **Yes** | Primary inbound — user texts progress, agent parses and appends |
 | `week-*.md` | Yes | **Yes** | Checkbox updates only — mark tasks `[x]` when user reports completion |
-| `adaptations.md` | Yes | **Yes** | Append-only — add patterns detected from WhatsApp interactions |
+| `adaptations.md` | Yes | **Yes** | Append-only — add patterns detected from Telegram interactions |
 | `{month}-{year}.md` | Yes | No | Monthly targets are checkpoint-protected. Use Claude Code to change |
 | `q{n}-*.md` | Yes | No | Quarterly plans are checkpoint-protected |
 | `{year}-goals.md` | Yes | No | Year goals are checkpoint-protected |
 
-**Rule:** NanoClaw never modifies plans. It modifies *data about what happened*. Plans flow down through checkpoints in Claude Code. Reality flows up through logging in WhatsApp.
+**Rule:** NanoClaw never modifies plans. It modifies *data about what happened*. Plans flow down through checkpoints in Claude Code. Reality flows up through logging in Telegram.
 
 ### Scheduled Messages
 
-These run automatically. Timing is set during NanoClaw setup based on the user's schedule.
+**1 message per day** at the user's preferred morning time. Content varies by day type. The user sets their preferred time and review day during onboarding; they can change it anytime via Telegram ("change my morning time to 9am", "move my review to Saturday").
 
-**Daily Morning** (e.g., 7:30 AM)
+**Cron:** Railway cron calls `/api/cron/daily` every 15 minutes. No-skip logic: once the preferred time passes, the message is eligible. First cron tick sends it. `message_deliveries` table prevents duplicates.
+
+**Normal weekday** — Today's Core tasks
 - Read today's tasks from current `week-*.md`
-- Send Core tasks only. Never send Flex in the morning — it creates pressure
+- Send Core tasks only. Mention one Flex task at the end if there is one
 - Format: short, scannable, no preamble
 
 ```
-Monday — 3 Core tasks:
-• Map WhatsApp integration requirements (1 hr)
+Thursday — 3 Core tasks:
+• Map Telegram integration requirements (1 hr)
 • Follow up on 2 linkt.ai conversations (30 min)
 • Draft initial sales pitch framework (30 min)
 
 Flex if you have energy: Research competitor pricing models
 ```
 
-**Daily Evening** (e.g., 8:00 PM)
-- Prompt for progress. Keep it one line
-- Parse any reply and update `tracker.csv`
-
-```
-How'd today go?
-```
-
-**Weekly Review — Sunday Evening**
-- Run simplified `review` logic: count checked vs unchecked tasks in the week file
-- Read `tracker.csv` for the week's data
-- Send a stats summary with one honest coaching line
-- Append velocity data point to `adaptations.md`
-
-```
-Week 1 done.
-
-Core: 7/11 tasks (64%)
-Flex: 1/4 tasks
-Outreach: 8 messages sent, 3 conversations
-Energy: averaged 3.2/5
-
-You're building pipeline but not closing conversations into next steps. 3 chats, 0 scheduled follow-ups. What's the blocker?
-
-Reply with anything you want to adjust for next week.
-```
-
-**Weekly Kickoff — Monday Morning**
+**Monday** — Week overview + today's tasks (merged kickoff)
 - Read the new `week-*.md` (generated via Claude Code `plan` command)
-- Send the week's Core goals and Monday's tasks
-- If no new week file exists, say so: "No plan for this week yet. Open Claude Code and run `plan`, or tell me your top 3 priorities and I'll track those."
+- Start with this week's Core goals, then list today's tasks
+- If no new week file exists: "No plan for this week yet. Tell me your top 3 priorities and I'll create tasks."
 
 ```
 Week 2: Client Outreach Sprint
@@ -333,9 +308,32 @@ Today (Monday):
 • Draft MVP feature spec (1 hr)
 ```
 
+**Review day** (user picks, default Sunday) — Weekly review + today's tasks
+- Run simplified `review` logic: count checked vs unchecked tasks in the week file
+- Read `tracker.csv` for the week's data
+- Send stats summary with one honest coaching line, then today's tasks
+- Append velocity data point to `adaptations.md`
+
+```
+Week 1 done.
+
+Core: 7/11 tasks (64%)
+Flex: 1/4 tasks
+Outreach: 8 messages sent, 3 conversations
+Energy: averaged 3.2/5
+
+You're building pipeline but not closing conversations into next steps. 3 chats, 0 scheduled follow-ups. What's the blocker?
+
+Today — 2 Core tasks:
+• Follow up on linkt.ai outreach (30 min)
+• Research competitor pricing (30 min)
+```
+
+**Monday + review day** — If the user's review day is Monday, both are combined into one message: last week's review stats + this week's overview + today's tasks.
+
 ### Inbound — Handling User Replies
 
-When the user texts the WhatsApp agent, parse intent and respond accordingly.
+When the user texts the Telegram agent, parse intent and respond accordingly.
 
 **Progress logging** (most common interaction)
 User texts anything that sounds like a status update. Parse it into `tracker.csv` columns and confirm.
@@ -395,23 +393,38 @@ If the message doesn't match a known pattern, respond honestly: "Not sure what t
 
 ### Async Checkpoints
 
-Checkpoints over WhatsApp are simplified. The full interactive cascade (year → quarter → month → week) happens in Claude Code during setup and deep planning sessions. Over WhatsApp, checkpoints apply only to weekly plans:
+Checkpoints over Telegram are simplified. The full interactive cascade (year → quarter → month → week) happens in Claude Code during setup and deep planning sessions. Over Telegram, checkpoints apply only to weekly plans:
 
-1. When a new `week-*.md` is generated via Claude Code, NanoClaw sends the Monday kickoff message with the week's Core goals
+1. When a new `week-*.md` is generated via Claude Code, NanoClaw sends the Monday morning message with the week's Core goals
 2. The user can reply with adjustments: "too much on Monday, move one task to Wednesday"
 3. NanoClaw applies minor adjustments to the week file
 4. For structural changes (scope reduction, timeline extension, new goals), NanoClaw responds: "That's a bigger change. Open Claude Code and run `plan` — I'll work from whatever you decide."
 
 NanoClaw doesn't generate quarter or month plans. It doesn't run `cascade` or `adapt`. Those require the full interactive checkpoint process.
 
+### Schedule Management
+
+Users can view or change their schedule via Telegram at any time:
+
+```
+User: "what are my current times?"
+Cascade: Daily message: 7:00 AM / Review day: Sunday
+
+User: "change my morning time to 9am"
+Cascade: Daily message moved to 9:00 AM.
+
+User: "move my review to Saturday"
+Cascade: Weekly review moved to Saturday.
+```
+
 ### Command Mapping
 
-| Claude Code Command | WhatsApp Equivalent | Who runs it |
+| Claude Code Command | Telegram Equivalent | Who runs it |
 |---------------------|---------------------|-------------|
 | `cascade` | Not available | Claude Code only — interactive setup |
-| `plan` | Not available (triggers Monday kickoff when file appears) | Claude Code generates, NanoClaw delivers |
+| `plan` | Not available (triggers Monday morning message when file appears) | Claude Code generates, NanoClaw delivers |
 | `status` | Text "status" | NanoClaw — simplified read-only version |
-| `review` | Auto-sent Sunday evening | NanoClaw — simplified stats + coaching line |
+| `review` | Included in morning message on review day | NanoClaw — simplified stats + coaching line |
 | `adapt` | Not available | Claude Code only — needs full interactive approval |
 | `log` | Text anything about your day | NanoClaw — parse and write to tracker.csv |
 | `sync` | Not available | Claude Code only — generates .ics files |
@@ -420,7 +433,7 @@ NanoClaw doesn't generate quarter or month plans. It doesn't run `cascade` or `a
 
 1. **No preamble.** Never start with "Good morning!" or "Here's your daily update:" — just send the tasks.
 2. **Follow the coaching tone.** Same 7 rules from the COACHING TONE section apply. Observe, inform, give agency.
-3. **Keep messages under 300 words.** WhatsApp is for quick exchanges, not essays. If the response needs to be longer, break it into 2 messages.
+3. **Keep messages under 300 words.** Telegram is for quick exchanges, not essays. If the response needs to be longer, break it into 2 messages.
 4. **Confirm writes.** Always confirm what was logged or updated. Show the parsed data so the user can correct mistakes.
 5. **One question at a time.** Never ask 3 questions in one message. Ask the most important one.
 6. **Don't initiate conversations outside the schedule.** NanoClaw sends scheduled messages and responds to the user. It doesn't text randomly to check in or motivate. The user controls the cadence.
