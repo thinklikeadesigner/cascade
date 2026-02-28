@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { startObservation, updateActiveTrace } from "@langfuse/tracing";
+import { startActiveObservation, startObservation, updateActiveTrace } from "@langfuse/tracing";
+import { getLangfuseSpanProcessor } from "@/instrumentation";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60; // Node.js runtime (default) — Edge has 30s limit which is too short for multi-tool loops
@@ -341,138 +342,142 @@ export async function POST(request) {
       }
 
       try {
-        const tools = ONBOARDING_TOOLS;
+        await startActiveObservation("onboarding-chat", async (trace) => {
+          updateActiveTrace({
+            name: "onboarding-chat",
+            userId: user_id || rateLimitKey,
+            input: sanitizedMessages,
+            metadata: { cascade_state },
+          });
 
-        // Langfuse trace for this request (via OpenTelemetry, initialized in instrumentation.js)
-        const trace = startObservation("onboarding-chat", {
-          input: sanitizedMessages,
-          metadata: { cascade_state },
-        });
-        updateActiveTrace({ userId: user_id || rateLimitKey });
+          const tools = ONBOARDING_TOOLS;
 
-        // Claude call — may loop if tool calls need handling
-        let currentMessages = [...sanitizedMessages];
-        let loopCount = 0;
-        const MAX_LOOPS = 4; // Safety: prevent infinite tool loops
+          // Claude call — may loop if tool calls need handling
+          let currentMessages = [...sanitizedMessages];
+          let loopCount = 0;
+          const MAX_LOOPS = 4; // Safety: prevent infinite tool loops
 
-        while (loopCount < MAX_LOOPS) {
-          loopCount++;
+          while (loopCount < MAX_LOOPS) {
+            loopCount++;
 
-          const generation = trace.startObservation(
-            `claude-call-${loopCount}`,
-            {
+            const generation = startObservation(
+              `claude-call-${loopCount}`,
+              {
+                model: "claude-sonnet-4-6",
+                input: currentMessages,
+                metadata: { loop: loopCount, cascade_state },
+              },
+              { asType: "generation" }
+            );
+
+            const stream1 = client.messages.stream({
               model: "claude-sonnet-4-6",
-              input: currentMessages,
-              metadata: { loop: loopCount, cascade_state },
-            },
-            { asType: "generation" }
-          );
+              max_tokens: 4000,
+              system: systemPrompt,
+              messages: currentMessages,
+              tools,
+              tool_choice: { type: "auto" },
+            });
 
-          const stream1 = client.messages.stream({
-            model: "claude-sonnet-4-6",
-            max_tokens: 4000,
-            system: systemPrompt,
-            messages: currentMessages,
-            tools,
-            tool_choice: { type: "auto" },
-          });
+            // Stream text deltas
+            stream1.on("text", (delta) => {
+              send({ type: "text_delta", text: delta });
+            });
 
-          // Stream text deltas
-          stream1.on("text", (delta) => {
-            send({ type: "text_delta", text: delta });
-          });
+            const finalMessage = await stream1.finalMessage();
 
-          const finalMessage = await stream1.finalMessage();
+            generation.update({
+              output: finalMessage.content,
+              usageDetails: {
+                input: finalMessage.usage?.input_tokens,
+                output: finalMessage.usage?.output_tokens,
+              },
+            }).end();
 
-          generation.update({
-            output: finalMessage.content,
-            usageDetails: {
-              input: finalMessage.usage?.input_tokens,
-              output: finalMessage.usage?.output_tokens,
-            },
-          }).end();
-
-          // If no tool use or end of turn, we're done
-          if (finalMessage.stop_reason === "end_turn") {
-            break;
-          }
-
-          // Collect ALL tool_use blocks (not just the first)
-          const toolBlocks = finalMessage.content.filter(
-            (block) => block.type === "tool_use"
-          );
-
-          if (toolBlocks.length === 0) {
-            break;
-          }
-
-          // Build tool results for all tool calls
-          const toolResults = [];
-
-          for (const toolBlock of toolBlocks) {
-            if (PLAN_TOOL_NAMES.includes(toolBlock.name)) {
-              // Plan tool — send card to browser
-              send({
-                type: "plan_card",
-                card_type: TOOL_TO_CARD_TYPE[toolBlock.name],
-                data: toolBlock.input,
-              });
-
-              toolResults.push({
-                type: "tool_result",
-                tool_use_id: toolBlock.id,
-                content: "Plan card displayed to user. They will now review it. Write a brief message asking them to review the plan above and let you know if they want to change anything.",
-              });
-            } else if (toolBlock.name === "web_search") {
-              // Execute web search server-side
-              let searchResult = "No results found.";
-              try {
-                const searchRes = await fetch(
-                  `https://api.search.brave.com/res/v1/web/search?q=${encodeURIComponent(toolBlock.input.query)}&count=5`,
-                  { headers: { "X-Subscription-Token": process.env.BRAVE_SEARCH_API_KEY } }
-                );
-                if (searchRes.ok) {
-                  const searchData = await searchRes.json();
-                  searchResult = (searchData.web?.results || [])
-                    .slice(0, 5)
-                    .map((r) => `- ${r.title}: ${r.description} (${r.url})`)
-                    .join("\n");
-                }
-              } catch (searchErr) {
-                console.error("Web search failed:", searchErr);
-                searchResult = "Web search unavailable. Please continue with available information.";
-              }
-              toolResults.push({
-                type: "tool_result",
-                tool_use_id: toolBlock.id,
-                content: searchResult,
-              });
-            } else {
-              // Unknown tool — should not happen, but handle gracefully
-              toolResults.push({
-                type: "tool_result",
-                tool_use_id: toolBlock.id,
-                content: "Unknown tool. Continuing without result.",
-              });
+            // If no tool use or end of turn, we're done
+            if (finalMessage.stop_reason === "end_turn") {
+              break;
             }
+
+            // Collect ALL tool_use blocks (not just the first)
+            const toolBlocks = finalMessage.content.filter(
+              (block) => block.type === "tool_use"
+            );
+
+            if (toolBlocks.length === 0) {
+              break;
+            }
+
+            // Build tool results for all tool calls
+            const toolResults = [];
+
+            for (const toolBlock of toolBlocks) {
+              if (PLAN_TOOL_NAMES.includes(toolBlock.name)) {
+                // Plan tool — send card to browser
+                send({
+                  type: "plan_card",
+                  card_type: TOOL_TO_CARD_TYPE[toolBlock.name],
+                  data: toolBlock.input,
+                });
+
+                toolResults.push({
+                  type: "tool_result",
+                  tool_use_id: toolBlock.id,
+                  content: "Plan card displayed to user. They will now review it. Write a brief message asking them to review the plan above and let you know if they want to change anything.",
+                });
+              } else if (toolBlock.name === "web_search") {
+                // Execute web search server-side
+                let searchResult = "No results found.";
+                try {
+                  const searchRes = await fetch(
+                    `https://api.search.brave.com/res/v1/web/search?q=${encodeURIComponent(toolBlock.input.query)}&count=5`,
+                    { headers: { "X-Subscription-Token": process.env.BRAVE_SEARCH_API_KEY } }
+                  );
+                  if (searchRes.ok) {
+                    const searchData = await searchRes.json();
+                    searchResult = (searchData.web?.results || [])
+                      .slice(0, 5)
+                      .map((r) => `- ${r.title}: ${r.description} (${r.url})`)
+                      .join("\n");
+                  }
+                } catch (searchErr) {
+                  console.error("Web search failed:", searchErr);
+                  searchResult = "Web search unavailable. Please continue with available information.";
+                }
+                toolResults.push({
+                  type: "tool_result",
+                  tool_use_id: toolBlock.id,
+                  content: searchResult,
+                });
+              } else {
+                // Unknown tool — should not happen, but handle gracefully
+                toolResults.push({
+                  type: "tool_result",
+                  tool_use_id: toolBlock.id,
+                  content: "Unknown tool. Continuing without result.",
+                });
+              }
+            }
+
+            // Send tool results back to Claude and continue
+            currentMessages = [
+              ...currentMessages,
+              { role: "assistant", content: finalMessage.content },
+              { role: "user", content: toolResults },
+            ];
           }
 
-          // Send tool results back to Claude and continue
-          currentMessages = [
-            ...currentMessages,
-            { role: "assistant", content: finalMessage.content },
-            { role: "user", content: toolResults },
-          ];
-        }
+          trace.update({ output: "completed" });
+        });
 
-        // Finalize Langfuse trace
-        trace.update({ output: "completed" }).end();
+        // Flush spans to Langfuse before the serverless function terminates
+        await getLangfuseSpanProcessor()?.forceFlush();
 
         send({ type: "done" });
         controller.close();
       } catch (error) {
         console.error("Onboarding chat error:", error);
-        try { trace.update({ output: `error: ${error.message}` }).end(); } catch (_) {}
+        await getLangfuseSpanProcessor()?.forceFlush().catch(() => {});
         send({ type: "error", message: "Something went wrong. Please try again." });
         controller.close();
       }
