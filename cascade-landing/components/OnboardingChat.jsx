@@ -133,10 +133,14 @@ export default function OnboardingChat({ conversation, onComplete }) {
   // Refs to track latest state during async streaming (avoids closure bugs)
   const messagesRef = useRef(messages);
   const planCardsRef = useRef(planCards);
+  const cascadeStateRef = useRef(cascadeState);
+  const planDataRef = useRef(planData);
 
   // Keep refs in sync with state
   useEffect(() => { messagesRef.current = messages; }, [messages]);
   useEffect(() => { planCardsRef.current = planCards; }, [planCards]);
+  useEffect(() => { cascadeStateRef.current = cascadeState; }, [cascadeState]);
+  useEffect(() => { planDataRef.current = planData; }, [planData]);
 
   // Auto-scroll
   useEffect(() => {
@@ -220,8 +224,8 @@ export default function OnboardingChat({ conversation, onComplete }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: apiMessages,
-          cascade_state: cascadeState,
-          plan_data: planData,
+          cascade_state: cascadeStateRef.current,
+          plan_data: planDataRef.current,
         }),
       });
 
@@ -327,7 +331,7 @@ export default function OnboardingChat({ conversation, onComplete }) {
       setStreamingText("");
 
       // Persist
-      await persistConversation(messagesRef.current, cascadeState, planData, planCardsRef.current);
+      await persistConversation(messagesRef.current, cascadeStateRef.current, planDataRef.current, planCardsRef.current);
     } catch (error) {
       console.error("Chat error:", error);
       const connErrMsg = {
@@ -353,7 +357,11 @@ export default function OnboardingChat({ conversation, onComplete }) {
     const newPlanCards = planCardsRef.current.map((c) =>
       c.cardType === cardType && !c.approved ? { ...c, approved: true } : c
     );
+
+    // Update refs synchronously BEFORE sendMessage reads them
     planCardsRef.current = newPlanCards;
+    cascadeStateRef.current = newCascadeState;
+    planDataRef.current = newPlanData;
 
     setPlanData(newPlanData);
     setCascadeState(newCascadeState);
