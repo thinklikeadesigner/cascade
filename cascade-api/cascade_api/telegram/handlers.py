@@ -98,12 +98,12 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await save_turn(supabase, tenant_id, "user", text)
         await save_turn(supabase, tenant_id, "assistant", response_text)
 
-        # Send response (split if > 4096 chars for Telegram limit)
+        # Send response with HTML formatting (split if > 4096 chars for Telegram limit)
         if len(response_text) <= 4096:
-            await update.message.reply_text(response_text)
+            await update.message.reply_text(response_text, parse_mode="HTML")
         else:
             for i in range(0, len(response_text), 4096):
-                await update.message.reply_text(response_text[i:i + 4096])
+                await update.message.reply_text(response_text[i:i + 4096], parse_mode="HTML")
 
         track_event(tenant.get("user_id", tenant_id), "message_processed", {"intent": "agent_loop"})
 
