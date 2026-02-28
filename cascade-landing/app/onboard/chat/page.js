@@ -80,6 +80,9 @@ export default function OnboardChatPage() {
 
   async function handleComplete(planData) {
     setCompleted(true);
+
+    const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "America/New_York";
+
     posthog.capture("onboard_completed", {
       goal_title: planData.goal_summary?.title,
     });
@@ -124,6 +127,31 @@ export default function OnboardChatPage() {
 
       if (!planRes.ok) {
         console.warn("Plan generation failed, continuing to Telegram setup");
+      }
+
+      // Set schedule preferences if user provided them
+      if (planData.schedule_summary) {
+        const scheduleData = planData.schedule_summary;
+        const dayNameToNum = { sunday: 0, monday: 1, tuesday: 2, wednesday: 3, thursday: 4, friday: 5, saturday: 6 };
+        const reviewDay = typeof scheduleData.review_day === "string"
+          ? (dayNameToNum[scheduleData.review_day.toLowerCase()] ?? 0)
+          : (scheduleData.review_day ?? 0);
+
+        const scheduleRes = await fetch(`${API_URL}/api/onboard/set-schedule`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            user_id: user.id,
+            morning_hour: scheduleData.morning_hour ?? 7,
+            morning_minute: scheduleData.morning_minute ?? 0,
+            review_day: reviewDay,
+            timezone: scheduleData.timezone || detectedTimezone,
+          }),
+        });
+
+        if (!scheduleRes.ok) {
+          console.warn("Schedule preferences failed, continuing with defaults");
+        }
       }
 
       // Generate Telegram link
@@ -193,8 +221,7 @@ export default function OnboardChatPage() {
             </h3>
             <ul style={{ color: "#94A3B8", fontSize: 14, lineHeight: 2, listStyle: "none", padding: 0, margin: 0 }}>
               <li>Every morning: your Core tasks for the day</li>
-              <li>Every evening: &quot;How&apos;d today go?&quot; — reply to log progress</li>
-              <li>Sundays: weekly review with stats and coaching</li>
+              <li>Weekly: review with stats and coaching</li>
               <li>Text anytime to log progress or check status</li>
             </ul>
           </div>

@@ -14,6 +14,7 @@ const PLAN_TOOL_NAMES = [
   "present_quarter_plan",
   "present_month_plan",
   "present_week_plan",
+  "present_schedule_summary",
 ];
 
 // Map tool names to card types for the frontend
@@ -23,6 +24,7 @@ const TOOL_TO_CARD_TYPE = {
   present_quarter_plan: "quarter_plan",
   present_month_plan: "month_plan",
   present_week_plan: "week_plan",
+  present_schedule_summary: "schedule_summary",
 };
 
 // Rate limiting: per-user, in-memory
@@ -50,7 +52,7 @@ function checkRateLimit(userId) {
   return true;
 }
 
-function buildSystemPrompt(cascadeState, planData) {
+function buildSystemPrompt(cascadeState, planData, timezone) {
   let contextSection = "";
 
   if (planData && Object.keys(planData).length > 0) {
@@ -84,7 +86,8 @@ function buildSystemPrompt(cascadeState, planData) {
     year: "The user approved the year plan. Now present quarterly milestones using present_quarter_plan.",
     quarter: "The user approved the quarterly milestones. Now present this month's targets using present_month_plan.",
     month: "The user approved the monthly targets. Now present the first week's plan using present_week_plan.",
-    week: "The user approved the week plan. Congratulate them briefly. Their onboarding is complete.",
+    week: "The user approved the week plan. Now ask them about their preferred schedule. Ask ONE question at a time:\n1. First ask: \"What time would you like your daily tasks sent?\" (e.g., 7am, 8:30am, 9am)\n2. After they answer, ask: \"What day do you want your weekly review included?\" (e.g., Sunday, Saturday)\n3. After both answers, call present_schedule_summary with the parsed values.\n\nParse natural language times into 24h format. '7am' = hour 7, '8:30pm' = hour 20 minute 30. Map day names to numbers: Sunday=0, Monday=1, ..., Saturday=6.\n\nMorning time should be between 4 AM and 12 PM. If they ask for a time outside that range, explain that the message works best as a morning briefing and suggest a time in range.",
+    schedule: "The user approved their schedule. Congratulate them briefly. Their onboarding is complete.",
   }[cascadeState] || "You are in the goal exploration phase. Ask clarifying questions.";
 
   return `You are Cascade, a goal-execution engine that helps ambitious builders break down yearly goals into daily structure through cascading time horizons with human-in-the-loop checkpoints.
@@ -143,9 +146,11 @@ IMPORTANT: All plans must account for today's date. Never schedule milestones or
 - present_quarter_plan: Call after year plan is approved. Present all four quarters with milestones.
 - present_month_plan: Call after quarter plan is approved. Present the current month's concrete targets.
 - present_week_plan: Call after month plan is approved. Present week 1 with Core/Flex task split and daily blocks.
+- present_schedule_summary: Call after week plan is approved and user has provided their preferred morning time and review day. Present their notification schedule for approval.
 - web_search: Use when you need to research market data, realistic timelines, competitor info, or validate assumptions. The user has enabled this for market research.
 
-IMPORTANT: Only call ONE plan tool per response. When you call a plan tool, the structured data will be displayed as a card to the user. After calling the tool, write a brief follow-up message asking the user to review — something like "Take a look at the plan above. Does this match what you had in mind, or would you change anything?"`;
+IMPORTANT: Only call ONE plan tool per response. When you call a plan tool, the structured data will be displayed as a card to the user. After calling the tool, write a brief follow-up message asking the user to review — something like "Take a look at the plan above. Does this match what you had in mind, or would you change anything?"
+${timezone ? `\n\nUser's timezone (auto-detected): ${timezone}. Include this in the schedule summary.` : ""}`;
 }
 
 const ONBOARDING_TOOLS = [
@@ -273,6 +278,20 @@ const ONBOARDING_TOOLS = [
     },
   },
   {
+    name: "present_schedule_summary",
+    description: "Present the user's notification schedule for approval. Call after collecting preferred morning time and weekly review day.",
+    input_schema: {
+      type: "object",
+      properties: {
+        morning_hour: { type: "number", description: "Preferred morning hour (0-23)" },
+        morning_minute: { type: "number", description: "Preferred morning minute (0-59)" },
+        review_day: { type: "string", description: "Day name for weekly review (e.g., Sunday, Saturday)" },
+        timezone: { type: "string", description: "User's timezone (e.g., America/New_York)" },
+      },
+      required: ["morning_hour", "morning_minute", "review_day"],
+    },
+  },
+  {
     name: "web_search",
     description: "Search the web for market data, realistic timelines, competitor info, or to validate assumptions. Use when the user says 'I don't know' or needs research.",
     input_schema: {
@@ -302,7 +321,7 @@ export async function POST(request) {
   const body = await request.json().catch(() => null);
   if (!body) return new Response("Bad request", { status: 400 });
 
-  const { messages: clientMessages, cascade_state = "exploring", plan_data = {}, user_id } = body;
+  const { messages: clientMessages, cascade_state = "exploring", plan_data = {}, user_id, timezone } = body;
 
   // Rate limit by user_id (fall back to IP if no user_id)
   const rateLimitKey = user_id || request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
@@ -331,7 +350,7 @@ export async function POST(request) {
     return new Response("Invalid messages", { status: 400 });
   }
 
-  const systemPrompt = buildSystemPrompt(cascade_state, plan_data);
+  const systemPrompt = buildSystemPrompt(cascade_state, plan_data, timezone);
 
   const stream = new ReadableStream({
     async start(controller) {

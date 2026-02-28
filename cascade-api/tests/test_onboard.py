@@ -147,3 +147,39 @@ def test_create_goal_tracks_posthog_event(onboard_app):
         mock_track.assert_called_once_with(
             "auth-user-123", "goal_defined", {"goal_title": "Run a marathon"}
         )
+
+
+def test_set_schedule_success(onboard_app):
+    """POST /api/onboard/set-schedule should update tenant schedule columns."""
+    app, _ = onboard_app
+    mock_supabase = _make_supabase_mock(tenant_exists=True)
+
+    with patch("cascade_api.api.onboard.get_supabase", return_value=mock_supabase):
+        client = TestClient(app)
+        response = client.post("/api/onboard/set-schedule", json={
+            "user_id": "auth-user-123",
+            "morning_hour": 8,
+            "morning_minute": 30,
+            "review_day": 6,
+            "timezone": "America/Los_Angeles",
+        })
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "schedule_set"
+
+
+def test_set_schedule_tenant_not_found(onboard_app):
+    """POST /api/onboard/set-schedule should 404 if tenant doesn't exist."""
+    app, _ = onboard_app
+    mock_supabase = _make_supabase_mock(tenant_exists=False)
+
+    with patch("cascade_api.api.onboard.get_supabase", return_value=mock_supabase):
+        client = TestClient(app)
+        response = client.post("/api/onboard/set-schedule", json={
+            "user_id": "nonexistent-user",
+            "morning_hour": 8,
+            "morning_minute": 0,
+            "review_day": 0,
+            "timezone": "America/New_York",
+        })
+        assert response.status_code == 404

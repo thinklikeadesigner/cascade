@@ -47,6 +47,10 @@ Probing (ask first): "goal feels wrong" > ask which part. "change things" > clar
 Emotional (respond): frustration > acknowledge + show data. excitement > brief acknowledge + log. \
 burnout > surface rest debt + suggest lighter schedule.
 
+Schedule changes: "change morning time" / "move my message time" > update_schedule. \
+"move review to Saturday" > update_schedule with review_day. \
+"what are my times" / "current schedule" > get_schedule.
+
 Pattern detection: low energy 3+ days > flag it. task category skipped repeatedly > name it. \
 finishing early consistently > scope too light. flex never done > consider dropping.
 

@@ -198,6 +198,42 @@ TOOLS = [
             "required": [],
         },
     },
+    {
+        "name": "get_schedule",
+        "description": "Get the user's current notification schedule. Use when the user asks 'what are my times', 'current schedule', or 'when do I get messages'.",
+        "input_schema": {
+            "type": "object",
+            "properties": {},
+            "required": [],
+        },
+    },
+    {
+        "name": "update_schedule",
+        "description": "Update the user's daily message time or weekly review day. Use when the user asks to change their morning time or review day. If the user only specifies a day without a time, ask them for the time before calling this tool.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "schedule_type": {
+                    "type": "string",
+                    "enum": ["morning", "review_day"],
+                    "description": "'morning' changes daily message time. 'review_day' changes which day the weekly review is included.",
+                },
+                "hour": {
+                    "type": "integer",
+                    "description": "Hour (0-23). Required for 'morning'. Not used for 'review_day'.",
+                },
+                "minute": {
+                    "type": "integer",
+                    "description": "Minute (0-59). Default: 0.",
+                },
+                "day_of_week": {
+                    "type": "integer",
+                    "description": "Day of week (0=Sunday, 1=Monday, ..., 6=Saturday). Required for 'review_day'.",
+                },
+            },
+            "required": ["schedule_type"],
+        },
+    },
 ]
 
 
@@ -504,6 +540,53 @@ async def _get_weekly_review(inp: dict, sb: SupabaseClient, tid: str) -> dict:
     }
 
 
+async def _get_schedule(inp: dict, sb: SupabaseClient, tid: str) -> dict:
+    result = sb.table("tenants").select(
+        "morning_hour, morning_minute, review_day, timezone"
+    ).eq("id", tid).execute()
+    if not result.data:
+        return {"error": "Tenant not found"}
+    t = result.data[0]
+    morning_h = t.get("morning_hour", 7)
+    morning_m = t.get("morning_minute", 0)
+    day_names = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+    return {
+        "daily_message": f"{morning_h:02d}:{morning_m:02d}",
+        "review_day": day_names[t.get("review_day", 0)],
+        "timezone": t.get("timezone", "America/New_York"),
+    }
+
+
+async def _update_schedule(inp: dict, sb: SupabaseClient, tid: str) -> dict:
+    schedule_type = inp["schedule_type"]
+    updates = {}
+    day_names = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+
+    if schedule_type == "morning":
+        hour = inp.get("hour")
+        minute = inp.get("minute", 0)
+        if hour is None:
+            return {"error": "hour is required for morning schedule type."}
+        if hour < 0 or hour > 23 or minute < 0 or minute > 59:
+            return {"error": "Invalid time. Hour must be 0-23, minute 0-59."}
+        updates["morning_hour"] = hour
+        updates["morning_minute"] = minute
+        result_msg = f"Daily message moved to {hour:02d}:{minute:02d}."
+    elif schedule_type == "review_day":
+        day_of_week = inp.get("day_of_week")
+        if day_of_week is None:
+            return {"error": "day_of_week is required for review_day schedule type."}
+        if day_of_week < 0 or day_of_week > 6:
+            return {"error": "Invalid day_of_week. Must be 0 (Sunday) through 6 (Saturday)."}
+        updates["review_day"] = day_of_week
+        result_msg = f"Weekly review moved to {day_names[day_of_week]}."
+    else:
+        return {"error": f"Unknown schedule_type: {schedule_type}"}
+
+    sb.table("tenants").update(updates).eq("id", tid).execute()
+    return {"status": "updated", "message": result_msg}
+
+
 _EXECUTORS = {
     "get_tasks": _get_tasks,
     "complete_task": _complete_task,
@@ -519,4 +602,6 @@ _EXECUTORS = {
     "add_adaptation": _add_adaptation,
     "update_monthly_targets": _update_monthly_targets,
     "get_weekly_review": _get_weekly_review,
+    "get_schedule": _get_schedule,
+    "update_schedule": _update_schedule,
 }

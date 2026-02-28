@@ -24,6 +24,7 @@ const STATE_AFTER_APPROVAL = {
   quarter_plan: "quarter",
   month_plan: "month",
   week_plan: "week",
+  schedule_summary: "schedule",
 };
 
 // Message bubble (reused from CascadeDemoWidget with minor tweaks)
@@ -226,6 +227,7 @@ export default function OnboardingChat({ conversation, onComplete }) {
           messages: apiMessages,
           cascade_state: cascadeStateRef.current,
           plan_data: planDataRef.current,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "America/New_York",
         }),
       });
 
@@ -368,7 +370,7 @@ export default function OnboardingChat({ conversation, onComplete }) {
     setPlanCards(newPlanCards);
 
     // Check if onboarding is complete
-    if (cardType === "week_plan") {
+    if (cardType === "schedule_summary") {
       const completedState = "completed";
       setCascadeState(completedState);
       persistConversation(messagesRef.current, completedState, newPlanData, newPlanCards);
@@ -474,7 +476,7 @@ export default function OnboardingChat({ conversation, onComplete }) {
 
         {/* Progress indicator */}
         <div style={{ display: "flex", gap: 4 }}>
-          {["exploring", "goal", "year", "quarter", "month", "week"].map((state, i) => (
+          {["exploring", "goal", "year", "quarter", "month", "week", "schedule"].map((state, i) => (
             <div
               key={state}
               style={{
@@ -482,7 +484,7 @@ export default function OnboardingChat({ conversation, onComplete }) {
                 height: 3,
                 borderRadius: 2,
                 background:
-                  ["exploring", "goal", "year", "quarter", "month", "week"].indexOf(cascadeState) >= i
+                  ["exploring", "goal", "year", "quarter", "month", "week", "schedule"].indexOf(cascadeState) >= i
                     ? "#EF4444"
                     : "#2A1F22",
                 transition: "background 0.3s ease",

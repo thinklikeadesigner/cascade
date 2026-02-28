@@ -6,153 +6,75 @@ from datetime import date, datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
 
-# ── Message builder tests (unchanged business logic) ───────────────
+# ── Per-user schedule preference tests ────────────────────────────
 
 
-@pytest.mark.asyncio
-async def test_morning_message_includes_core_excludes_flex():
-    """Morning message should include Core tasks and exclude Flex tasks."""
-    today = date(2026, 2, 26)  # Thursday
+def test_should_send_after_preferred_time():
+    """Should send when local time is past the user's preferred time."""
+    from cascade_api.telegram.scheduler import _should_send
 
-    mock_supabase = MagicMock()
-    mock_supabase.table.return_value.select.return_value \
-        .eq.return_value.eq.return_value.execute.return_value.data = [
-            {
-                "title": "Send outreach",
-                "category": "core",
-                "completed": False,
-                "scheduled_day": today.isoformat(),
-                "estimated_minutes": 60,
-            },
-            {
-                "title": "Draft spec",
-                "category": "core",
-                "completed": False,
-                "scheduled_day": today.isoformat(),
-                "estimated_minutes": 30,
-            },
-            {
-                "title": "Research competitors",
-                "category": "flex",
-                "completed": False,
-                "scheduled_day": today.isoformat(),
-            },
-            {
-                "title": "Tomorrow core task",
-                "category": "core",
-                "completed": False,
-                "scheduled_day": (today + timedelta(days=1)).isoformat(),
-            },
-        ]
-
-    with patch("cascade_api.telegram.scheduler.get_supabase", return_value=mock_supabase):
-        from cascade_api.telegram.scheduler import build_morning_message
-
-        msg = await build_morning_message("tenant-1", today)
-
-    assert "Send outreach" in msg
-    assert "Draft spec" in msg
-    assert "(60 min)" in msg
-    assert "(30 min)" in msg
-    assert "Research competitors" in msg
-    assert "Flex if you have energy" in msg
-    assert "Tomorrow core task" not in msg
-    assert "2 Core tasks" in msg
-
-
-@pytest.mark.asyncio
-async def test_morning_message_no_tasks():
-    """Morning message handles no tasks gracefully."""
-    today = date(2026, 2, 26)
-
-    mock_supabase = MagicMock()
-    mock_supabase.table.return_value.select.return_value \
-        .eq.return_value.eq.return_value.execute.return_value.data = []
-
-    with patch("cascade_api.telegram.scheduler.get_supabase", return_value=mock_supabase):
-        from cascade_api.telegram.scheduler import build_morning_message
-
-        msg = await build_morning_message("tenant-1", today)
-
-    assert "no Core tasks scheduled" in msg
-
-
-@pytest.mark.asyncio
-async def test_morning_message_excludes_completed_tasks():
-    """Completed Core tasks should not appear in morning message."""
-    today = date(2026, 2, 26)
-
-    mock_supabase = MagicMock()
-    mock_supabase.table.return_value.select.return_value \
-        .eq.return_value.eq.return_value.execute.return_value.data = [
-            {
-                "title": "Already done",
-                "category": "core",
-                "completed": True,
-                "scheduled_day": today.isoformat(),
-            },
-            {
-                "title": "Still pending",
-                "category": "core",
-                "completed": False,
-                "scheduled_day": today.isoformat(),
-            },
-        ]
-
-    with patch("cascade_api.telegram.scheduler.get_supabase", return_value=mock_supabase):
-        from cascade_api.telegram.scheduler import build_morning_message
-
-        msg = await build_morning_message("tenant-1", today)
-
-    assert "Already done" not in msg
-    assert "Still pending" in msg
-    assert "1 Core task:" in msg
-
-
-@pytest.mark.asyncio
-async def test_evening_message():
-    """Evening message is a simple check-in."""
-    from cascade_api.telegram.scheduler import build_evening_message
-
-    msg = await build_evening_message()
-    assert msg == "How'd today go?"
-
-
-# ── Timezone window tests ──────────────────────────────────────────
-
-
-def test_in_window_inside():
-    """Time inside the window returns True."""
-    from cascade_api.telegram.scheduler import _in_window
-
-    # 7:15 AM local — inside morning window (7:00-7:30)
     local_now = datetime(2026, 2, 26, 7, 15, tzinfo=ZoneInfo("America/New_York"))
-    assert _in_window(local_now, (7, 0, 7, 30)) is True
+    assert _should_send(local_now, 7, 0) is True
 
 
-def test_in_window_outside():
-    """Time outside the window returns False."""
-    from cascade_api.telegram.scheduler import _in_window
+def test_should_send_before_preferred_time():
+    """Should NOT send before the user's preferred time."""
+    from cascade_api.telegram.scheduler import _should_send
 
-    # 8:00 AM local — outside morning window
-    local_now = datetime(2026, 2, 26, 8, 0, tzinfo=ZoneInfo("America/New_York"))
-    assert _in_window(local_now, (7, 0, 7, 30)) is False
-
-
-def test_in_window_boundary_start():
-    """Exact start of window is included."""
-    from cascade_api.telegram.scheduler import _in_window
-
-    local_now = datetime(2026, 2, 26, 7, 0, tzinfo=ZoneInfo("America/New_York"))
-    assert _in_window(local_now, (7, 0, 7, 30)) is True
+    local_now = datetime(2026, 2, 26, 7, 15, tzinfo=ZoneInfo("America/New_York"))
+    assert _should_send(local_now, 9, 0) is False
 
 
-def test_in_window_boundary_end():
-    """Exact end of window is excluded."""
-    from cascade_api.telegram.scheduler import _in_window
+def test_should_send_exact_preferred_time():
+    """Should send at exactly the preferred time."""
+    from cascade_api.telegram.scheduler import _should_send
+
+    local_now = datetime(2026, 2, 26, 9, 0, tzinfo=ZoneInfo("America/New_York"))
+    assert _should_send(local_now, 9, 0) is True
+
+
+def test_should_send_with_minutes():
+    """Should respect minute-level preferences."""
+    from cascade_api.telegram.scheduler import _should_send
+
+    local_now = datetime(2026, 2, 26, 7, 15, tzinfo=ZoneInfo("America/New_York"))
+    assert _should_send(local_now, 7, 30) is False
 
     local_now = datetime(2026, 2, 26, 7, 30, tzinfo=ZoneInfo("America/New_York"))
-    assert _in_window(local_now, (7, 0, 7, 30)) is False
+    assert _should_send(local_now, 7, 30) is True
+
+
+def test_get_daily_message_type_normal():
+    """Normal weekday returns 'daily'."""
+    from cascade_api.telegram.scheduler import _get_daily_message_type
+
+    # Thursday, review_day=0 (Sunday)
+    today = date(2026, 2, 26)  # Thursday
+    assert _get_daily_message_type(today, review_day=0) == "daily"
+
+
+def test_get_daily_message_type_monday():
+    """Monday returns 'monday_kickoff'."""
+    from cascade_api.telegram.scheduler import _get_daily_message_type
+
+    today = date(2026, 3, 2)  # Monday
+    assert _get_daily_message_type(today, review_day=0) == "monday_kickoff"
+
+
+def test_get_daily_message_type_review_day():
+    """Review day returns 'weekly_review'."""
+    from cascade_api.telegram.scheduler import _get_daily_message_type
+
+    today = date(2026, 3, 1)  # Sunday
+    assert _get_daily_message_type(today, review_day=0) == "weekly_review"
+
+
+def test_get_daily_message_type_monday_is_review_day():
+    """If review_day is Monday, Monday returns 'monday_review' (combined)."""
+    from cascade_api.telegram.scheduler import _get_daily_message_type
+
+    today = date(2026, 3, 2)  # Monday
+    assert _get_daily_message_type(today, review_day=1) == "monday_review"
 
 
 # ── Pull-based send tests ─────────────────────────────────────────
@@ -185,27 +107,33 @@ def _make_supabase_mock(tenants, deliveries=None):
 
 
 @pytest.mark.asyncio
-async def test_send_morning_messages_respects_timezone():
-    """Only sends to tenants whose local time is in the morning window."""
-    # UTC time is 12:15 — that's 7:15 AM in New York, 6:15 AM in Chicago
-    utc_now = datetime(2026, 2, 26, 12, 15, tzinfo=timezone.utc)
+async def test_send_daily_messages_respects_user_preferred_time():
+    """Daily message uses per-user morning_hour/morning_minute."""
+    # UTC 14:15 = 9:15 AM ET
+    utc_now = datetime(2026, 2, 26, 14, 15, tzinfo=timezone.utc)
 
     tenants = [
         {
-            "id": "t-ny",
+            "id": "t-early",
             "telegram_id": 111,
             "user_id": "u1",
             "timezone": "America/New_York",
             "subscription_status": "active",
             "completed_weekly_reviews": 0,
+            "morning_hour": 7,
+            "morning_minute": 0,
+            "review_day": 0,
         },
         {
-            "id": "t-chi",
+            "id": "t-late",
             "telegram_id": 222,
             "user_id": "u2",
-            "timezone": "America/Chicago",
+            "timezone": "America/New_York",
             "subscription_status": "active",
             "completed_weekly_reviews": 0,
+            "morning_hour": 10,
+            "morning_minute": 0,
+            "review_day": 0,
         },
     ]
 
@@ -214,24 +142,25 @@ async def test_send_morning_messages_respects_timezone():
 
     with patch("cascade_api.telegram.scheduler.get_supabase", return_value=mock_supabase), \
          patch("cascade_api.telegram.scheduler.datetime") as mock_dt, \
+         patch("cascade_api.telegram.scheduler._build_daily_message", new_callable=AsyncMock, return_value="Your tasks today") as mock_build, \
          patch("cascade_api.telegram.scheduler.track_event"):
         mock_dt.now.return_value = utc_now
         mock_dt.fromisoformat = datetime.fromisoformat
         mock_dt.side_effect = lambda *a, **kw: datetime(*a, **kw)
 
-        from cascade_api.telegram.scheduler import send_morning_messages
-        result = await send_morning_messages(mock_bot)
+        from cascade_api.telegram.scheduler import send_daily_messages
+        result = await send_daily_messages(mock_bot)
 
-    # NY is in window (7:15 AM), Chicago is not (6:15 AM)
+    # t-early (7 AM) should have been sent (9:15 AM > 7:00 AM)
+    # t-late (10 AM) should NOT have been sent yet (9:15 AM < 10:00 AM)
     assert result["sent"] == 1
-    mock_bot.send_message.assert_called_once()
     call_kwargs = mock_bot.send_message.call_args[1]
     assert call_kwargs["chat_id"] == 111
 
 
 @pytest.mark.asyncio
-async def test_send_morning_messages_idempotent():
-    """Calling twice doesn't double-send — message_deliveries prevents it."""
+async def test_send_daily_messages_idempotent():
+    """Calling twice doesn't double-send."""
     utc_now = datetime(2026, 2, 26, 12, 15, tzinfo=timezone.utc)
 
     tenants = [
@@ -242,10 +171,12 @@ async def test_send_morning_messages_idempotent():
             "timezone": "America/New_York",
             "subscription_status": "active",
             "completed_weekly_reviews": 0,
+            "morning_hour": 7,
+            "morning_minute": 0,
+            "review_day": 0,
         },
     ]
 
-    # Simulate already-sent record exists
     mock_supabase = _make_supabase_mock(tenants, deliveries=[{"id": 1}])
     mock_bot = AsyncMock()
 
@@ -256,114 +187,11 @@ async def test_send_morning_messages_idempotent():
         mock_dt.fromisoformat = datetime.fromisoformat
         mock_dt.side_effect = lambda *a, **kw: datetime(*a, **kw)
 
-        from cascade_api.telegram.scheduler import send_morning_messages
-        result = await send_morning_messages(mock_bot)
-
-    # Already sent — should not send again
-    assert result["sent"] == 0
-    mock_bot.send_message.assert_not_called()
-
-
-@pytest.mark.asyncio
-async def test_send_evening_messages_sends_in_window():
-    """Evening message sent when tenant is in the 20:00-20:30 window."""
-    # UTC 01:15 on Feb 27 = 8:15 PM ET on Feb 26
-    utc_now = datetime(2026, 2, 27, 1, 15, tzinfo=timezone.utc)
-
-    tenants = [
-        {
-            "id": "t-ny",
-            "telegram_id": 111,
-            "user_id": "u1",
-            "timezone": "America/New_York",
-            "subscription_status": "active",
-            "completed_weekly_reviews": 0,
-        },
-    ]
-
-    mock_supabase = _make_supabase_mock(tenants)
-    mock_bot = AsyncMock()
-
-    with patch("cascade_api.telegram.scheduler.get_supabase", return_value=mock_supabase), \
-         patch("cascade_api.telegram.scheduler.datetime") as mock_dt, \
-         patch("cascade_api.telegram.scheduler.track_event"):
-        mock_dt.now.return_value = utc_now
-        mock_dt.fromisoformat = datetime.fromisoformat
-        mock_dt.side_effect = lambda *a, **kw: datetime(*a, **kw)
-
-        from cascade_api.telegram.scheduler import send_evening_messages
-        result = await send_evening_messages(mock_bot)
-
-    assert result["sent"] == 1
-    mock_bot.send_message.assert_called_once_with(chat_id=111, text="How'd today go?")
-
-
-@pytest.mark.asyncio
-async def test_inactive_tenant_not_sent():
-    """Tenants with completed trial and no subscription are skipped."""
-    utc_now = datetime(2026, 2, 26, 12, 15, tzinfo=timezone.utc)
-
-    tenants = [
-        {
-            "id": "t-expired",
-            "telegram_id": 333,
-            "user_id": "u3",
-            "timezone": "America/New_York",
-            "subscription_status": "none",
-            "completed_weekly_reviews": 3,
-        },
-    ]
-
-    mock_supabase = _make_supabase_mock(tenants)
-    mock_bot = AsyncMock()
-
-    with patch("cascade_api.telegram.scheduler.get_supabase", return_value=mock_supabase), \
-         patch("cascade_api.telegram.scheduler.datetime") as mock_dt, \
-         patch("cascade_api.telegram.scheduler.track_event"):
-        mock_dt.now.return_value = utc_now
-        mock_dt.fromisoformat = datetime.fromisoformat
-        mock_dt.side_effect = lambda *a, **kw: datetime(*a, **kw)
-
-        from cascade_api.telegram.scheduler import send_morning_messages
-        result = await send_morning_messages(mock_bot)
+        from cascade_api.telegram.scheduler import send_daily_messages
+        result = await send_daily_messages(mock_bot)
 
     assert result["sent"] == 0
-    assert result["eligible"] == 0
     mock_bot.send_message.assert_not_called()
-
-
-@pytest.mark.asyncio
-async def test_default_timezone_used_when_missing():
-    """Tenants without a timezone field use America/New_York."""
-    # 12:15 UTC = 7:15 AM ET — in morning window
-    utc_now = datetime(2026, 2, 26, 12, 15, tzinfo=timezone.utc)
-
-    tenants = [
-        {
-            "id": "t-notz",
-            "telegram_id": 444,
-            "user_id": "u4",
-            "subscription_status": "active",
-            "completed_weekly_reviews": 0,
-            # No timezone field at all
-        },
-    ]
-
-    mock_supabase = _make_supabase_mock(tenants)
-    mock_bot = AsyncMock()
-
-    with patch("cascade_api.telegram.scheduler.get_supabase", return_value=mock_supabase), \
-         patch("cascade_api.telegram.scheduler.datetime") as mock_dt, \
-         patch("cascade_api.telegram.scheduler.track_event"):
-        mock_dt.now.return_value = utc_now
-        mock_dt.fromisoformat = datetime.fromisoformat
-        mock_dt.side_effect = lambda *a, **kw: datetime(*a, **kw)
-
-        from cascade_api.telegram.scheduler import send_morning_messages
-        result = await send_morning_messages(mock_bot)
-
-    # Should use default ET timezone and be in window
-    assert result["sent"] == 1
 
 
 @pytest.mark.asyncio

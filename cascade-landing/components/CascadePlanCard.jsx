@@ -23,6 +23,10 @@ const CARD_CONFIGS = {
     title: "Week Plan",
     color: "#F59E0B",
   },
+  schedule_summary: {
+    title: "Notification Schedule",
+    color: "#22C55E",
+  },
 };
 
 function GoalSummaryContent({ data }) {
@@ -173,12 +177,59 @@ function WeekPlanContent({ data }) {
   );
 }
 
+function ScheduleSummaryContent({ data }) {
+  if (!data) return null;
+
+  function formatTime(hour, minute) {
+    const h = hour % 12 || 12;
+    const ampm = hour < 12 ? "AM" : "PM";
+    const m = String(minute || 0).padStart(2, "0");
+    return `${h}:${m} ${ampm}`;
+  }
+
+  const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const reviewDayName = typeof data.review_day === "string"
+    ? data.review_day
+    : dayNames[data.review_day] || "Sunday";
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: "1px solid #2A1F22" }}>
+          <div>
+            <div style={{ color: "#F8FAFC", fontSize: 13, fontWeight: 600 }}>Daily Tasks</div>
+            <div style={{ color: "#8E9DB0", fontSize: 11 }}>Your Core tasks every morning</div>
+          </div>
+          <div style={{ color: "#22C55E", fontSize: 14, fontWeight: 600, fontFamily: "'JetBrains Mono', monospace" }}>
+            {formatTime(data.morning_hour, data.morning_minute)}
+          </div>
+        </div>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0" }}>
+          <div>
+            <div style={{ color: "#F8FAFC", fontSize: 13, fontWeight: 600 }}>Weekly Review</div>
+            <div style={{ color: "#8E9DB0", fontSize: 11 }}>Stats + coaching included in your morning message</div>
+          </div>
+          <div style={{ color: "#22C55E", fontSize: 14, fontWeight: 600, fontFamily: "'JetBrains Mono', monospace" }}>
+            {reviewDayName}
+          </div>
+        </div>
+      </div>
+      {data.timezone && (
+        <div style={{ color: "#8E9DB0", fontSize: 11, fontFamily: "'JetBrains Mono', monospace", textAlign: "center", paddingTop: 4 }}>
+          Timezone: {data.timezone}
+        </div>
+      )}
+    </div>
+  );
+}
+
 const CONTENT_RENDERERS = {
   goal_summary: GoalSummaryContent,
   year_plan: YearPlanContent,
   quarter_plan: QuarterPlanContent,
   month_plan: MonthPlanContent,
   week_plan: WeekPlanContent,
+  schedule_summary: ScheduleSummaryContent,
 };
 
 export default function CascadePlanCard({ cardType, data, active, approved, onApprove, onRequestChanges }) {

@@ -25,6 +25,14 @@ class GoalRequest(BaseModel):
     flex_hours: int
 
 
+class SetScheduleRequest(BaseModel):
+    user_id: str
+    morning_hour: int
+    morning_minute: int
+    review_day: int
+    timezone: str
+
+
 class TelegramConnectRequest(BaseModel):
     user_id: str
     telegram_id: int
@@ -107,3 +115,29 @@ async def generate_telegram_link(req: TelegramLinkRequest):
     token = generate_token(supabase, tenant["id"])
 
     return {"token": token, "tenant_id": tenant["id"]}
+
+
+@router.post("/set-schedule")
+async def set_schedule(req: SetScheduleRequest):
+    """Set user's schedule preferences and timezone during onboarding."""
+    supabase = get_supabase()
+
+    result = supabase.table("tenants").select("*").eq("user_id", req.user_id).execute()
+    if not result.data:
+        raise HTTPException(status_code=404, detail="Tenant not found")
+
+    tenant = result.data[0]
+    supabase.table("tenants").update({
+        "morning_hour": req.morning_hour,
+        "morning_minute": req.morning_minute,
+        "review_day": req.review_day,
+        "timezone": req.timezone,
+    }).eq("id", tenant["id"]).execute()
+
+    track_event(req.user_id, "schedule_set", {
+        "morning_hour": req.morning_hour,
+        "review_day": req.review_day,
+        "timezone": req.timezone,
+    })
+
+    return {"status": "schedule_set", "tenant_id": tenant["id"]}
