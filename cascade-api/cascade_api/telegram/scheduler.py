@@ -18,6 +18,7 @@ from cascade_api.dependencies import get_supabase
 from cascade_api.observability.posthog_client import track_event
 from cascade_api.telegram.trial_manager import get_trial_actions
 from cascade_api.utils import is_user_active
+from cascade_api.config import settings
 
 log = structlog.get_logger()
 
@@ -66,49 +67,25 @@ def _record_delivery(supabase, tenant_id: str, message_type: str, today: date):
     }).execute()
 
 
-# ── Message builders (unchanged business logic) ────────────────────
+# ── Message builders (agent loop powered) ──────────────────────────
 
 async def build_morning_message(tenant_id: str, today: date) -> str:
-    """Build morning message with Core tasks only.
+    """Generate morning message via agent loop."""
+    from cascade_api.agent.loop import run_agent
 
-    Mentions one Flex task at the bottom if available.
-    """
-    supabase = get_supabase()
-    week_start = today - timedelta(days=today.weekday())
-
-    tasks = supabase.table("tasks").select("*") \
-        .eq("tenant_id", tenant_id) \
-        .eq("week_start", week_start.isoformat()) \
-        .execute().data
-
-    day_tasks = [
-        t for t in tasks
-        if t.get("scheduled_day") == today.isoformat()
-        and t.get("category") == "core"
-        and not t.get("completed")
-    ]
-
-    if not day_tasks:
-        return f"{today.strftime('%A')} — no Core tasks scheduled. Rest day or use Flex time."
-
-    day_name = today.strftime("%A")
-    lines = [f"{day_name} — {len(day_tasks)} Core task{'s' if len(day_tasks) != 1 else ''}:"]
-    for t in day_tasks:
-        mins = t.get("estimated_minutes", "")
-        time_str = f" ({mins} min)" if mins else ""
-        lines.append(f"  {t['title']}{time_str}")
-
-    # Check for flex tasks to mention at bottom
-    flex_tasks = [
-        t for t in tasks
-        if t.get("scheduled_day") == today.isoformat()
-        and t.get("category") == "flex"
-        and not t.get("completed")
-    ]
-    if flex_tasks:
-        lines.append(f"\nFlex if you have energy: {flex_tasks[0]['title']}")
-
-    return "\n".join(lines)
+    response, _ = await run_agent(
+        tenant_id=tenant_id,
+        user_message="Generate today's morning message.",
+        conversation_history=[],
+        api_key=settings.anthropic_api_key,
+        is_scheduled=True,
+        scheduled_context=(
+            f"You are sending the daily morning message. Today is {today.isoformat()} "
+            f"({today.strftime('%A')}). List today's Core tasks. Short, scannable, no preamble. "
+            "Mention one Flex task at the end if there is one. If no tasks, say so."
+        ),
+    )
+    return response
 
 
 async def build_evening_message() -> str:
@@ -117,97 +94,41 @@ async def build_evening_message() -> str:
 
 
 async def build_sunday_review_message(tenant_id: str, week_start: date) -> str:
-    """Build Sunday review with stats and a coaching line."""
-    supabase = get_supabase()
-    week_end = week_start + timedelta(days=6)
+    """Generate Sunday review via agent loop."""
+    from cascade_api.agent.loop import run_agent
 
-    # Get tasks for this week
-    tasks = supabase.table("tasks").select("*") \
-        .eq("tenant_id", tenant_id) \
-        .eq("week_start", week_start.isoformat()) \
-        .execute().data
-
-    core = [t for t in tasks if t.get("category") == "core"]
-    flex = [t for t in tasks if t.get("category") == "flex"]
-    core_done = len([t for t in core if t.get("completed")])
-    flex_done = len([t for t in flex if t.get("completed")])
-
-    # Get tracker entries for energy
-    entries = supabase.table("tracker_entries").select("energy_level") \
-        .eq("tenant_id", tenant_id) \
-        .gte("date", week_start.isoformat()) \
-        .lte("date", week_end.isoformat()) \
-        .execute().data
-
-    energy_values = [e["energy_level"] for e in entries if e.get("energy_level")]
-    avg_energy = sum(energy_values) / len(energy_values) if energy_values else None
-
-    # Build message
-    core_pct = round(core_done / len(core) * 100) if core else 0
-    lines = ["Week done.\n"]
-    lines.append(f"Core: {core_done}/{len(core)} tasks ({core_pct}%)")
-    lines.append(f"Flex: {flex_done}/{len(flex)} tasks")
-    if avg_energy is not None:
-        lines.append(f"Energy: averaged {avg_energy:.1f}/5")
-
-    # Coaching line — honest, no cheerleading
-    if core_pct >= 80:
-        lines.append(f"\nStrong week. {core_pct}% Core completion.")
-    elif core_pct >= 60:
-        lines.append(f"\nSolid. {core_pct}% Core — room to tighten up next week.")
-    elif core_pct >= 40:
-        lines.append(f"\n{core_pct}% Core. Below target. Was scope too high or was it a rough week?")
-    else:
-        lines.append(f"\n{core_pct}% Core. Let's figure out what happened and adjust next week's plan.")
-
-    return "\n".join(lines)
+    response, _ = await run_agent(
+        tenant_id=tenant_id,
+        user_message="Generate the Sunday review.",
+        conversation_history=[],
+        api_key=settings.anthropic_api_key,
+        is_scheduled=True,
+        scheduled_context=(
+            f"You are sending the weekly Sunday review. The week started {week_start.isoformat()}. "
+            "Run the weekly review. Show completion rates, energy, what worked, what didn't. "
+            "One coaching line. Under 200 words."
+        ),
+    )
+    return response
 
 
 async def build_monday_kickoff_message(tenant_id: str, today: date) -> str:
-    """Build Monday kickoff with week's Core goals and today's tasks."""
-    supabase = get_supabase()
-    week_start = today  # Monday IS the week start
+    """Generate Monday kickoff via agent loop."""
+    from cascade_api.agent.loop import run_agent
 
-    # Check if a weekly plan exists
-    plan = supabase.table("weekly_plans").select("id") \
-        .eq("tenant_id", tenant_id) \
-        .eq("week_start", week_start.isoformat()) \
-        .execute().data
-
-    if not plan:
-        return (
-            "No plan for this week yet. Open Claude Code and run `plan`, "
-            "or tell me your top 3 priorities and I'll track those."
-        )
-
-    # Get tasks for the week
-    tasks = supabase.table("tasks").select("*") \
-        .eq("tenant_id", tenant_id) \
-        .eq("week_start", week_start.isoformat()) \
-        .order("sort_order") \
-        .execute().data
-
-    core = [t for t in tasks if t.get("category") == "core"]
-
-    lines = ["This week's Core:"]
-    for t in core:
-        lines.append(f"  {t['title']}")
-
-    # Today's tasks
-    today_tasks = [
-        t for t in tasks
-        if t.get("scheduled_day") == today.isoformat()
-        and t.get("category") == "core"
-    ]
-
-    if today_tasks:
-        lines.append(f"\nToday (Monday):")
-        for t in today_tasks:
-            mins = t.get("estimated_minutes", "")
-            time_str = f" ({mins} min)" if mins else ""
-            lines.append(f"  {t['title']}{time_str}")
-
-    return "\n".join(lines)
+    response, _ = await run_agent(
+        tenant_id=tenant_id,
+        user_message="Generate the Monday kickoff.",
+        conversation_history=[],
+        api_key=settings.anthropic_api_key,
+        is_scheduled=True,
+        scheduled_context=(
+            f"You are sending the weekly Monday kickoff. Today is {today.isoformat()}. "
+            "List this week's Core goals and today's tasks. If no tasks exist, say "
+            "'No plan for this week yet. Tell me your top 3 priorities and I'll create tasks.'"
+        ),
+    )
+    return response
 
 
 # ── Pull-based send functions (called by cron endpoints) ───────────

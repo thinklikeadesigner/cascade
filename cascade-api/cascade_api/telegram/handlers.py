@@ -2,37 +2,17 @@
 
 from __future__ import annotations
 
-import json
 import structlog
 from telegram import Update
 from telegram.ext import ContextTypes
 
 from cascade_api.dependencies import get_supabase
 from cascade_api.observability.posthog_client import track_event
-from cascade_api.observability.langfuse_client import traced_ask
 from cascade_api.config import settings
 from cascade_api.telegram.tokens import verify_token
 from cascade_api.utils import is_user_active
 
 log = structlog.get_logger()
-
-LOG_PARSE_PROMPT = """You are a progress log parser. Extract structured data from the user's message.
-Return JSON with these fields (include only what's mentioned):
-- tasks_completed: list of task titles mentioned as done
-- energy_level: integer 1-5 if mentioned
-- notes: any other info as a string
-- metrics: dict of any quantifiable data (e.g. {"outreach_sent": 5, "conversations": 1})
-
-Return valid JSON only."""
-
-STATUS_PROMPT = """You are Cascade, a goal coach. Given the user's progress data, give a brief status update.
-Be honest about numbers. No preamble. Under 200 words. Follow this format:
-- Week progress (tasks done / total)
-- Key metric highlights
-- One honest coaching sentence
-
-Data:
-{data}"""
 
 
 async def handle_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -76,10 +56,13 @@ async def handle_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handle inbound text messages — parse for logging, status, or task completion."""
+    """Route all messages through the agent loop."""
     supabase = get_supabase()
     telegram_id = update.effective_user.id
-    text = update.message.text.strip().lower()
+    text = update.message.text.strip()
+
+    if not text:
+        return
 
     # Find tenant
     result = supabase.table("tenants").select("*").eq("telegram_id", telegram_id).execute()
@@ -96,162 +79,36 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    # Status check
-    if text in ("status", "how am i doing", "where do i stand"):
-        await _handle_status(update, tenant)
-        return
+    # Get conversation history
+    from cascade_api.db.conversation_history import get_history, save_turn
+    from cascade_api.agent.loop import run_agent
 
-    # Task query — what do I do today/this week
-    task_phrases = ("what are today", "what do i do", "today's tasks", "todays tasks",
-                    "my tasks", "what's the plan", "whats the plan", "what should i do")
-    if any(phrase in text for phrase in task_phrases):
-        await _handle_tasks(update, tenant)
-        return
+    history = await get_history(supabase, tenant_id)
 
-    # Default: parse as progress log
-    await _handle_log(update, tenant, update.message.text)
-
-
-async def _handle_tasks(update: Update, tenant: dict):
-    """Send today's tasks from the current week plan."""
-    from cascade_api.db.tasks import get_week_tasks
-    from datetime import date, timedelta
-
-    supabase = get_supabase()
-    tenant_id = tenant["id"]
-    today = date.today()
-    week_start = today - timedelta(days=today.weekday())
-
-    tasks = await get_week_tasks(supabase, tenant_id, week_start.isoformat())
-
-    # Filter to today's tasks
-    today_str = today.isoformat()
-    today_tasks = [t for t in tasks if t.get("scheduled_day") == today_str]
-
-    # If no tasks scheduled for today specifically, show all incomplete tasks
-    if not today_tasks:
-        today_tasks = [t for t in tasks if not t.get("completed")]
-
-    if not today_tasks:
-        await update.message.reply_text("No tasks for today. Enjoy the rest day.")
-        return
-
-    core = [t for t in today_tasks if t.get("category") == "core"]
-    flex = [t for t in today_tasks if t.get("category") == "flex"]
-
-    lines = []
-    if core:
-        lines.append(f"{today.strftime('%A')} — {len(core)} Core tasks:")
-        for t in core:
-            check = "✓" if t.get("completed") else "•"
-            lines.append(f"  {check} {t['title']}")
-
-    if flex:
-        lines.append(f"\nFlex if you have energy:")
-        for t in flex:
-            check = "✓" if t.get("completed") else "•"
-            lines.append(f"  {check} {t['title']}")
-
-    await update.message.reply_text("\n".join(lines))
-
-
-async def _handle_status(update: Update, tenant: dict):
-    """Send a status snapshot."""
-    from cascade_api.db.tasks import get_week_tasks
-    from cascade_api.db.tracker import get_entries
-    from datetime import date, timedelta
-
-    supabase = get_supabase()
-    tenant_id = tenant["id"]
-    today = date.today()
-    week_start = today - timedelta(days=today.weekday())
-
-    tasks = await get_week_tasks(supabase, tenant_id, week_start.isoformat())
-    core_tasks = [t for t in tasks if t.get("category") == "core"]
-    core_done = len([t for t in core_tasks if t.get("completed")])
-
-    entries = await get_entries(supabase, tenant_id, week_start.isoformat(), today.isoformat())
-
-    data = {
-        "core_completed": core_done,
-        "core_total": len(core_tasks),
-        "days_this_week": len(entries),
-        "today": today.isoformat(),
-    }
-
-    response = await traced_ask(
-        system_prompt=STATUS_PROMPT.format(data=json.dumps(data)),
-        user_message="Give me my status.",
-        api_key=settings.anthropic_api_key,
-        user_id=tenant_id,
-        context="status_check",
-    )
-
-    await update.message.reply_text(response)
-
-
-async def _handle_log(update: Update, tenant: dict, text: str):
-    """Parse a progress update and log it."""
-    from cascade_api.db.tracker import log_entry
-    from cascade_api.db.tasks import get_week_tasks, complete_task
-    from datetime import date, timedelta
-
-    supabase = get_supabase()
-    tenant_id = tenant["id"]
-
-    parsed_text = await traced_ask(
-        system_prompt=LOG_PARSE_PROMPT,
-        user_message=text,
-        api_key=settings.anthropic_api_key,
-        user_id=tenant_id,
-        context="log_parse",
-    )
-
-    # Strip markdown fences if present
-    cleaned = parsed_text.strip()
-    if cleaned.startswith("```"):
-        cleaned = cleaned.split("\n", 1)[1]
-    if cleaned.endswith("```"):
-        cleaned = cleaned.rsplit("```", 1)[0]
-
+    # Run the agent loop
     try:
-        parsed = json.loads(cleaned.strip())
-    except json.JSONDecodeError:
-        await update.message.reply_text(
-            "I couldn't parse that. Try something like: \"sent 5 DMs, energy was good\""
+        response_text, _updated_messages = await run_agent(
+            tenant_id=tenant_id,
+            user_message=text,
+            conversation_history=history,
+            api_key=settings.anthropic_api_key,
         )
-        return
 
-    # Build tracker data
-    data = parsed.get("metrics", {})
-    if parsed.get("energy_level"):
-        data["energy_level"] = parsed["energy_level"]
-    if parsed.get("notes"):
-        data["notes"] = parsed["notes"]
+        # Save turns
+        await save_turn(supabase, tenant_id, "user", text)
+        await save_turn(supabase, tenant_id, "assistant", response_text)
 
-    await log_entry(supabase, tenant_id, date.today().isoformat(), data)
+        # Send response (split if > 4096 chars for Telegram limit)
+        if len(response_text) <= 4096:
+            await update.message.reply_text(response_text)
+        else:
+            for i in range(0, len(response_text), 4096):
+                await update.message.reply_text(response_text[i:i + 4096])
 
-    # Mark completed tasks
-    if parsed.get("tasks_completed"):
-        today = date.today()
-        week_start = today - timedelta(days=today.weekday())
-        tasks = await get_week_tasks(supabase, tenant_id, week_start.isoformat())
+        track_event(tenant.get("user_id", tenant_id), "message_processed", {"intent": "agent_loop"})
 
-        for task_title in parsed["tasks_completed"]:
-            for task in tasks:
-                if task_title.lower() in task["title"].lower() and not task["completed"]:
-                    await complete_task(supabase, task["id"])
-                    break
-
-    track_event(tenant.get("user_id", tenant_id), "progress_logged", data)
-
-    # Confirmation
-    lines = ["Got it."]
-    for k, v in data.items():
-        if k != "notes":
-            lines.append(f"  {k}: {v}")
-    if data.get("notes"):
-        lines.append(f"  notes: \"{data['notes']}\"")
-    lines.append(f"\nLogged for {date.today().strftime('%b %d')}.")
-
-    await update.message.reply_text("\n".join(lines))
+    except Exception as e:
+        log.error("agent.failed", tenant_id=tenant_id, error=str(e))
+        await update.message.reply_text(
+            "Something went wrong. Try again, or rephrase your message."
+        )
