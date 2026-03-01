@@ -193,7 +193,7 @@ async def send_daily_messages(bot: Bot):
 
         try:
             msg = await _build_daily_message(tenant_id, today, message_type)
-            await bot.send_message(chat_id=telegram_id, text=msg)
+            await bot.send_message(chat_id=telegram_id, text=msg, parse_mode="HTML")
             _record_delivery(supabase, tenant_id, "daily", today)
 
             # Increment weekly review counter when review is included
