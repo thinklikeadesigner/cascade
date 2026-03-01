@@ -1992,6 +1992,18 @@ button:focus-visible {
   letter-spacing: 0.02em;
 }
 
+.onboard-link {
+  color: var(--glow);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.onboard-link:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
 .onboard-spinner {
   display: inline-block;
   width: 16px;

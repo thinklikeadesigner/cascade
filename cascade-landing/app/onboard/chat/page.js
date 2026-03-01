@@ -41,7 +41,7 @@ export default function OnboardChatPage() {
         const { data: { user: authUser } } = await getSupabase().auth.getUser();
 
         if (!authUser) {
-          window.location.href = "/onboard";
+          window.location.href = "/login";
           return;
         }
 

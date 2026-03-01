@@ -14,30 +14,28 @@ function getSupabase() {
   return _supabase;
 }
 
-export default function OnboardingFlow() {
+export default function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  async function handleSignup(e) {
+  async function handleLogin(e) {
     e.preventDefault();
     setLoading(true);
     setError(null);
     try {
-      const { data, error: authError } = await getSupabase().auth.signUp({
-        email,
-        password,
-      });
-
-      if (authError) throw authError;
-
-      // User already exists — signUp returns a user with no identities
-      if (!data.user?.identities?.length) {
-        setError("An account with this email already exists. Please log in instead.");
-        return;
+      const { error: signInError } =
+        await getSupabase().auth.signInWithPassword({ email, password });
+      if (signInError) {
+        if (signInError.message === "Invalid login credentials") {
+          throw new Error("Wrong email or password. Please try again.");
+        }
+        if (signInError.message === "Email not confirmed") {
+          throw new Error("Please confirm your email before logging in. Check your inbox.");
+        }
+        throw signInError;
       }
-
       window.location.href = "/onboard/chat";
     } catch (err) {
       setError(err.message);
@@ -48,20 +46,20 @@ export default function OnboardingFlow() {
 
   return (
     <div className="onboard-wrap">
-      <h1>Create your account</h1>
+      <h1>Welcome back</h1>
       <p className="onboard-sub">
-        Free to start. No credit card needed.
+        Log in to continue your plan.
       </p>
 
       {error && <div className="onboard-error">{error}</div>}
 
-      <form onSubmit={handleSignup}>
+      <form onSubmit={handleLogin}>
         <div className="onboard-field">
-          <label className="onboard-label" htmlFor="onboard-email">
+          <label className="onboard-label" htmlFor="login-email">
             Email
           </label>
           <input
-            id="onboard-email"
+            id="login-email"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -72,17 +70,16 @@ export default function OnboardingFlow() {
         </div>
 
         <div className="onboard-field">
-          <label className="onboard-label" htmlFor="onboard-password">
+          <label className="onboard-label" htmlFor="login-password">
             Password
           </label>
           <input
-            id="onboard-password"
+            id="login-password"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="8+ characters"
+            placeholder="Your password"
             required
-            minLength={8}
             className="onboard-input"
           />
         </div>
@@ -91,17 +88,17 @@ export default function OnboardingFlow() {
           {loading ? (
             <>
               <span className="onboard-spinner" />
-              Creating account...
+              Logging in...
             </>
           ) : (
-            "Get Started"
+            "Log In"
           )}
         </button>
       </form>
 
       <p className="onboard-footer">
-        Already have an account?{" "}
-        <a href="/login" className="onboard-link">Log in</a>
+        Don&apos;t have an account?{" "}
+        <a href="/onboard" className="onboard-link">Sign up</a>
       </p>
     </div>
   );
