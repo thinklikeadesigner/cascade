@@ -234,6 +234,131 @@ TOOLS = [
             "required": ["schedule_type"],
         },
     },
+    # ── Memory Tools ──────────────────────────────────────────────
+    {
+        "name": "core_memory_read",
+        "description": "Read your core memory document — the persistent profile you maintain about this user. Use this to check what you already know before asking the user.",
+        "input_schema": {
+            "type": "object",
+            "properties": {},
+            "required": [],
+        },
+    },
+    {
+        "name": "core_memory_append",
+        "description": "Append a line to a section of core memory. REQUIRES user approval — tell the user what you want to add and why, then call this only after they confirm.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "section": {
+                    "type": "string",
+                    "description": "Section header to append to (e.g., 'User Profile', 'Active Goals', 'Working Patterns'). Created if it doesn't exist.",
+                },
+                "content": {
+                    "type": "string",
+                    "description": "The line to append (e.g., '- Timezone: PST').",
+                },
+            },
+            "required": ["section", "content"],
+        },
+    },
+    {
+        "name": "core_memory_replace",
+        "description": "Replace text in core memory. REQUIRES user approval — show the user the old and new text, then call this only after they confirm.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "old_text": {
+                    "type": "string",
+                    "description": "The exact text to find and replace.",
+                },
+                "new_text": {
+                    "type": "string",
+                    "description": "The replacement text.",
+                },
+            },
+            "required": ["old_text", "new_text"],
+        },
+    },
+    {
+        "name": "save_memory",
+        "description": "Save a fact to archival memory for future reference. Use for details that don't belong in the core profile but are worth remembering. No user approval needed.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string",
+                    "description": "The fact to remember (e.g., 'Had a great call with PM from Stripe on Feb 18').",
+                },
+                "memory_type": {
+                    "type": "string",
+                    "enum": ["fact", "preference", "pattern", "goal_context"],
+                    "description": "Type of memory. Default: fact.",
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Context tags for retrieval (e.g., ['outreach', 'stripe']).",
+                },
+            },
+            "required": ["content"],
+        },
+    },
+    {
+        "name": "recall",
+        "description": "Search your archival memory about this user. Returns semantically relevant memories matching the query. Use get_goals or get_adaptations separately if needed. Use when you need context beyond what's in core memory.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "query": {
+                    "type": "string",
+                    "description": "What to search for (e.g., 'outreach progress', 'energy patterns').",
+                },
+            },
+            "required": ["query"],
+        },
+    },
+    {
+        "name": "update_memory",
+        "description": "Update an existing archival memory. REQUIRES user approval — show the old content and proposed change first.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "memory_id": {
+                    "type": "string",
+                    "description": "UUID of the memory to update.",
+                },
+                "content": {
+                    "type": "string",
+                    "description": "The new content.",
+                },
+            },
+            "required": ["memory_id", "content"],
+        },
+    },
+    {
+        "name": "forget_memory",
+        "description": "Forget an archival memory. REQUIRES user approval — tell the user what you want to forget and why.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "memory_id": {
+                    "type": "string",
+                    "description": "UUID of the memory to forget.",
+                },
+            },
+            "required": ["memory_id"],
+        },
+    },
+    {
+        "name": "get_current_datetime",
+        "description": "Get the current date and time in the user's timezone. Use for time calculations like 'how many days since last rest day'.",
+        "input_schema": {
+            "type": "object",
+            "properties": {},
+            "required": [],
+        },
+    },
 ]
 
 
@@ -308,7 +433,7 @@ async def _log_progress(inp: dict, sb: SupabaseClient, tid: str) -> dict:
     )
     if existing.data:
         row_id = existing.data[0]["id"]
-        result = sb.table("tracker_entries").update(data).eq("id", row_id).execute()
+        result = sb.table("tracker_entries").update(data).eq("id", row_id).eq("tenant_id", tid).execute()
     else:
         row = {"tenant_id": tid, "date": entry_date, **data}
         result = sb.table("tracker_entries").insert(row).execute()
@@ -587,6 +712,186 @@ async def _update_schedule(inp: dict, sb: SupabaseClient, tid: str) -> dict:
     return {"status": "updated", "message": result_msg}
 
 
+# ── Memory Tool Executors ────────────────────────────────────────
+
+async def _core_memory_read(inp: dict, sb: SupabaseClient, tid: str) -> dict:
+    from cascade_api.db.memory import get_core_memory
+    content = await get_core_memory(sb, tid)
+    if not content:
+        return {"content": "(empty — no core memory yet)", "hint": "Use core_memory_append to start building the user's profile."}
+    return {"content": content}
+
+
+async def _core_memory_append(inp: dict, sb: SupabaseClient, tid: str) -> dict:
+    from cascade_api.db.memory import get_core_memory_with_version, upsert_core_memory
+
+    section = inp["section"]
+    line = inp["content"]
+    current, version = await get_core_memory_with_version(sb, tid)
+
+    # Enforce core memory size limit (3000 chars hard cap)
+    if len(current) + len(line) + 20 > 3000:
+        return {
+            "error": "Core memory is at its size limit (3000 chars). "
+            "Move some details to archival memory with save_memory first, "
+            "then remove them from core memory with core_memory_replace."
+        }
+
+    header = f"## {section}"
+    if header in current:
+        # Find the section and append after its last non-empty line
+        lines = current.split("\n")
+        insert_idx = None
+        last_content_idx = None
+        in_section = False
+        for i, l in enumerate(lines):
+            if l.strip() == header:
+                in_section = True
+                last_content_idx = i
+                continue
+            if in_section:
+                if l.startswith("## "):
+                    # Hit next section — insert before it
+                    insert_idx = last_content_idx + 1 if last_content_idx is not None else i
+                    break
+                if l.strip():
+                    last_content_idx = i
+        if insert_idx is None:
+            insert_idx = (last_content_idx + 1) if last_content_idx is not None else len(lines)
+        lines.insert(insert_idx, line)
+        new_content = "\n".join(lines)
+    else:
+        # Create new section
+        if current:
+            new_content = f"{current}\n\n{header}\n{line}"
+        else:
+            new_content = f"{header}\n{line}"
+
+    result = await upsert_core_memory(sb, tid, new_content, expected_version=version)
+    return {"status": "appended", "section": section, "version": result.get("version")}
+
+
+async def _core_memory_replace(inp: dict, sb: SupabaseClient, tid: str) -> dict:
+    from cascade_api.db.memory import get_core_memory_with_version, upsert_core_memory
+
+    old_text = inp["old_text"]
+    new_text = inp["new_text"]
+    current, version = await get_core_memory_with_version(sb, tid)
+
+    if old_text not in current:
+        return {"error": f"Could not find '{old_text}' in core memory. Use core_memory_read to check current content."}
+
+    new_content = current.replace(old_text, new_text, 1)
+
+    # Enforce core memory size limit (3000 chars hard cap)
+    if len(new_content) > 3000:
+        return {
+            "error": "This replacement would exceed the core memory size limit (3000 chars). "
+            "Move some details to archival memory with save_memory first."
+        }
+
+    result = await upsert_core_memory(sb, tid, new_content, expected_version=version)
+    return {"status": "replaced", "old": old_text, "new": new_text, "version": result.get("version")}
+
+
+async def _save_memory_tool(inp: dict, sb: SupabaseClient, tid: str) -> dict:
+    from cascade_api.db.memory import save_memory as db_save_memory
+    from cascade_api.db.embeddings import generate_embedding
+
+    content = inp["content"]
+    memory_type = inp.get("memory_type", "fact")
+    tags = inp.get("tags", [])
+
+    # Generate embedding for semantic search
+    try:
+        embedding = await generate_embedding(content)
+    except Exception:
+        embedding = None
+
+    result = await db_save_memory(
+        sb, tid, content,
+        memory_type=memory_type, tags=tags,
+        embedding=embedding,
+    )
+    return {"status": "saved", "memory_id": result.get("id"), "content": content}
+
+
+async def _recall(inp: dict, sb: SupabaseClient, tid: str) -> dict:
+    from cascade_api.db.embeddings import semantic_search
+    from cascade_api.db.memory import update_memory_accessed
+
+    query = inp["query"]
+
+    # Semantic search over memories (tenant-scoped via match_memories RPC)
+    try:
+        memories = await semantic_search(sb, tid, query, match_count=5)
+    except Exception:
+        memories = []
+
+    # Touch accessed memories for decay tracking
+    if memories:
+        await update_memory_accessed(sb, tid, [m["id"] for m in memories])
+
+    return {
+        "memories": memories,
+        "hint": "Use get_goals or get_adaptations if you need those specifically.",
+    }
+
+
+async def _update_memory_tool(inp: dict, sb: SupabaseClient, tid: str) -> dict:
+    from cascade_api.db.embeddings import generate_embedding
+
+    memory_id = inp["memory_id"]
+    content = inp["content"]
+
+    updates = {"content": content}
+    try:
+        updates["embedding"] = await generate_embedding(content)
+    except Exception:
+        pass
+
+    result = sb.table("memories").update(updates).eq(
+        "id", memory_id
+    ).eq("tenant_id", tid).execute()
+
+    if result.data:
+        return {"status": "updated", "memory_id": memory_id}
+    return {"error": f"Memory {memory_id} not found"}
+
+
+async def _forget_memory(inp: dict, sb: SupabaseClient, tid: str) -> dict:
+    from cascade_api.db.memory import update_memory_status
+
+    result = await update_memory_status(sb, tid, inp["memory_id"], "forgotten")
+    return {"status": "forgotten", "memory_id": inp["memory_id"]}
+
+
+async def _get_current_datetime(inp: dict, sb: SupabaseClient, tid: str) -> dict:
+    from zoneinfo import ZoneInfo
+
+    tenant = sb.table("tenants").select("timezone").eq("id", tid).execute().data
+    tz_name = tenant[0].get("timezone", "America/New_York") if tenant else "America/New_York"
+
+    try:
+        tz = ZoneInfo(tz_name)
+    except (KeyError, Exception):
+        tz = ZoneInfo("America/New_York")
+
+    now = datetime.now(tz)
+    today = now.date()
+    _, days_in_month = calendar.monthrange(today.year, today.month)
+
+    return {
+        "datetime": now.isoformat(),
+        "date": today.isoformat(),
+        "time": now.strftime("%I:%M %p"),
+        "day_of_week": now.strftime("%A"),
+        "timezone": tz_name,
+        "days_left_in_month": days_in_month - today.day,
+        "week_number": today.isocalendar()[1],
+    }
+
+
 _EXECUTORS = {
     "get_tasks": _get_tasks,
     "complete_task": _complete_task,
@@ -604,4 +909,12 @@ _EXECUTORS = {
     "get_weekly_review": _get_weekly_review,
     "get_schedule": _get_schedule,
     "update_schedule": _update_schedule,
+    "core_memory_read": _core_memory_read,
+    "core_memory_append": _core_memory_append,
+    "core_memory_replace": _core_memory_replace,
+    "save_memory": _save_memory_tool,
+    "recall": _recall,
+    "update_memory": _update_memory_tool,
+    "forget_memory": _forget_memory,
+    "get_current_datetime": _get_current_datetime,
 }

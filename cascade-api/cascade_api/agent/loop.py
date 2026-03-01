@@ -8,7 +8,7 @@ import structlog
 import anthropic
 
 from cascade_api.agent.tools import TOOLS, execute_tool
-from cascade_api.agent.system_prompt import SYSTEM_PROMPT
+from cascade_api.agent.system_prompt import SYSTEM_PROMPT, build_system_prompt
 from cascade_api.dependencies import get_supabase
 
 log = structlog.get_logger()
@@ -38,10 +38,17 @@ async def run_agent(
     client = anthropic.AsyncAnthropic(api_key=api_key)
     supabase = get_supabase()
 
-    # Build system prompt — add scheduled context if present
-    system = SYSTEM_PROMPT
-    if scheduled_context:
-        system = f"{SYSTEM_PROMPT}\n\n## Current Task\n\n{scheduled_context}"
+    # Build system prompt — dynamic with date context + core memory
+    # Fetch tenant for timezone and schedule info
+    tenant_result = supabase.table("tenants").select(
+        "timezone, morning_hour, morning_minute, review_day"
+    ).eq("id", tenant_id).execute()
+    tenant = tenant_result.data[0] if tenant_result.data else {}
+
+    system = await build_system_prompt(
+        supabase, tenant_id, tenant,
+        scheduled_context=scheduled_context,
+    )
 
     # Build messages: history + new user message
     messages = list(conversation_history)
