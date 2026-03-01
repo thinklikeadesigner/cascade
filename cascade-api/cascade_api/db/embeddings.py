@@ -1,6 +1,6 @@
 """Embedding generation and semantic search for the memory system.
 
-Uses OpenAI's text-embedding-3-small (1536 dims) via the openai package.
+Uses Google's gemini-embedding-001 (768 dims) via the google-genai package.
 Supabase's match_memories RPC handles the pgvector similarity search.
 """
 
@@ -9,30 +9,30 @@ from __future__ import annotations
 from functools import lru_cache
 
 import structlog
-from openai import AsyncOpenAI
+from google import genai
 from supabase import Client as SupabaseClient
 
 from cascade_api.config import settings
 
 log = structlog.get_logger()
 
-EMBEDDING_MODEL = "text-embedding-3-small"
-EMBEDDING_DIMS = 1536
+EMBEDDING_MODEL = "gemini-embedding-001"
+EMBEDDING_DIMS = 768
 
 
 @lru_cache
-def _get_openai_client() -> AsyncOpenAI:
-    return AsyncOpenAI(api_key=settings.openai_api_key)
+def _get_genai_client() -> genai.Client:
+    return genai.Client(api_key=settings.gemini_api_key)
 
 
 async def generate_embedding(text: str) -> list[float]:
-    """Generate a 1536-dim embedding for the given text."""
-    client = _get_openai_client()
-    response = await client.embeddings.create(
+    """Generate a 768-dim embedding for the given text."""
+    client = _get_genai_client()
+    response = client.models.embed_content(
         model=EMBEDDING_MODEL,
-        input=text,
+        contents=text,
     )
-    return response.data[0].embedding
+    return list(response.embeddings[0].values)
 
 
 async def semantic_search(

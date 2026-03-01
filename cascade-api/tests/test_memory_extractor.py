@@ -27,7 +27,7 @@ class TestExtractMemories:
         mock_anthropic.messages.create = AsyncMock(return_value=mock_response)
 
         with patch("cascade_api.agent.memory_extractor.generate_embedding", new_callable=AsyncMock) as mock_embed:
-            mock_embed.return_value = [0.1] * 1536
+            mock_embed.return_value = [0.1] * 768
 
             result = await extract_memories_from_conversation(
                 supabase=mock_sb,

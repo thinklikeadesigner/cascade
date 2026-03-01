@@ -35,7 +35,7 @@ CREATE TABLE memories (
   confidence REAL NOT NULL DEFAULT 1.0,
   decay_score REAL NOT NULL DEFAULT 1.0,
   source_conversation_id BIGINT REFERENCES conversations(id) ON DELETE SET NULL,
-  embedding VECTOR(1536),
+  embedding VECTOR(768),
   status TEXT NOT NULL DEFAULT 'active'
     CHECK (status IN ('active', 'pending_review', 'archived', 'forgotten')),
   superseded_by UUID REFERENCES memories(id) ON DELETE SET NULL,
@@ -84,7 +84,7 @@ CREATE POLICY tenant_isolation_memory_links ON memory_links
 -- ============================================================
 
 CREATE OR REPLACE FUNCTION match_memories(
-  query_embedding VECTOR(1536),
+  query_embedding VECTOR(768),
   match_tenant_id UUID,
   match_count INTEGER DEFAULT 5,
   match_threshold FLOAT DEFAULT 0.5

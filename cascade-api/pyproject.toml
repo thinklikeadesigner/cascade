@@ -22,7 +22,7 @@ dependencies = [
     "posthog>=3.0.0",
     "stripe>=8.0.0",
     "python-telegram-bot>=21.0",
-    "openai>=1.0",
+    "google-genai>=1.0",
 ]
 
 [project.optional-dependencies]
