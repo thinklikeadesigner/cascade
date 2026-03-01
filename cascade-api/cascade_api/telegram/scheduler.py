@@ -188,13 +188,13 @@ async def send_daily_messages(bot: Bot):
         # Determine message type based on day
         message_type = _get_daily_message_type(today, review_day)
 
-        if _already_sent(supabase, tenant_id, "daily", today):
+        if _already_sent(supabase, tenant_id, "morning", today):
             continue
 
         try:
             msg = await _build_daily_message(tenant_id, today, message_type)
             await bot.send_message(chat_id=telegram_id, text=msg, parse_mode="HTML")
-            _record_delivery(supabase, tenant_id, "daily", today)
+            _record_delivery(supabase, tenant_id, "morning", today)
 
             # Increment weekly review counter when review is included
             if message_type in ("weekly_review", "monday_review"):
