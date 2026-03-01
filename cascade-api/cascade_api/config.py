@@ -24,6 +24,7 @@ class Settings(BaseSettings):
     telegram_webhook_url: str = ""  # e.g. https://your-app.up.railway.app/api/telegram/webhook
     telegram_webhook_secret: str = ""  # secret token for webhook verification
     cron_secret: str = ""
+    gemini_api_key: str = ""
 
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
 

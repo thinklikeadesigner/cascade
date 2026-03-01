@@ -1,5 +1,13 @@
 """System prompt for the Cascade agent."""
 
+from __future__ import annotations
+
+import calendar
+from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
+
+from cascade_api.db.memory import get_core_memory
+
 SYSTEM_PROMPT = """\
 You are Cascade, a goal-execution coaching agent on Telegram. You help builders \
 track progress, stay accountable, and adapt plans based on real data.
@@ -83,4 +91,91 @@ Flex: 1/3 done
 On pace for monthly targets. Outreach is the bottleneck.
 
 Keep it scannable on a phone screen. Short lines. No walls of text.
+
+## Memory
+
+You have two memory systems:
+
+1. <b>Core Memory</b> — a short profile document about this user, always visible to you \
+in the "Core Memory" section above. This is your persistent knowledge. Keep it under 2000 \
+characters. Only the most important, current facts belong here.
+
+2. <b>Archival Memory</b> — a searchable store of detailed facts. Use `recall` to search it \
+when you need specifics. Use `save_memory` to store noteworthy details during conversations.
+
+Memory rules:
+• Before asking a question, check if the answer is already in Core Memory.
+• NEVER silently update Core Memory. Always tell the user what you want to change and why. \
+Only call core_memory_append or core_memory_replace AFTER the user confirms.
+• Use save_memory freely for archival facts — no approval needed for those.
+• When you detect a contradiction with Core Memory, surface it: show the old fact and \
+the new one, ask which is current, then update with permission.
+• During weekly reviews, consider surfacing 1-2 stale memories for confirmation.
 """
+
+
+async def build_system_prompt(
+    supabase,
+    tenant_id: str,
+    tenant: dict,
+    scheduled_context: str | None = None,
+) -> str:
+    """Build the full system prompt with date context and core memory.
+
+    Structure:
+    1. Base coaching prompt (SYSTEM_PROMPT)
+    2. Current date/time context
+    3. Core memory document (if exists)
+    4. Scheduled context (if scheduled message)
+    """
+    tz_name = tenant.get("timezone") or "America/New_York"
+    try:
+        tz = ZoneInfo(tz_name)
+    except (KeyError, Exception):
+        tz = ZoneInfo("America/New_York")
+
+    now = datetime.now(tz)
+    today = now.date()
+    _, days_in_month = calendar.monthrange(today.year, today.month)
+    days_left_month = days_in_month - today.day
+    # Days left in quarter
+    quarter_end_month = ((today.month - 1) // 3 + 1) * 3
+    quarter_end_day = calendar.monthrange(today.year, quarter_end_month)[1]
+    from datetime import date as date_type
+    quarter_end = date_type(today.year, quarter_end_month, quarter_end_day)
+    days_left_quarter = (quarter_end - today).days
+
+    day_names = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+    review_day = tenant.get("review_day", 0)
+    morning_h = tenant.get("morning_hour", 7)
+    morning_m = tenant.get("morning_minute", 0)
+
+    date_context = (
+        f"## Current Context\n\n"
+        f"Date: {now.strftime('%A, %B %d, %Y')}\n"
+        f"Time: {now.strftime('%I:%M %p')} {tz_name}\n"
+        f"Day of week: {now.strftime('%A')}\n"
+        f"Week: {today.isocalendar()[1]} of {today.year}\n"
+        f"Days left in month: {days_left_month}\n"
+        f"Days left in quarter: {days_left_quarter}\n"
+        f"User's review day: {day_names[review_day]}\n"
+        f"User's morning message time: {morning_h:02d}:{morning_m:02d} {tz_name}\n"
+    )
+
+    # Core memory
+    core_memory = await get_core_memory(supabase, tenant_id)
+    if core_memory:
+        memory_section = f"\n## Core Memory\n\n{core_memory}\n"
+    else:
+        memory_section = (
+            "\n## Core Memory\n\n"
+            "No core memory yet. As you learn about this user, use core_memory_append "
+            "to build their profile (with their approval).\n"
+        )
+
+    # Assemble
+    parts = [SYSTEM_PROMPT, date_context, memory_section]
+    if scheduled_context:
+        parts.append(f"\n## Current Task\n\n{scheduled_context}")
+
+    return "\n\n".join(parts)

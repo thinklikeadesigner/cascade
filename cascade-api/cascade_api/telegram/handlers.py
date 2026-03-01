@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import asyncio
+
 import structlog
 from telegram import Update
 from telegram.ext import ContextTypes
@@ -13,6 +15,9 @@ from cascade_api.telegram.tokens import verify_token
 from cascade_api.utils import is_user_active
 
 log = structlog.get_logger()
+
+# Module-level set to prevent garbage collection of background tasks
+_background_tasks: set[asyncio.Task] = set()
 
 
 async def handle_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -106,6 +111,38 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await update.message.reply_text(response_text[i:i + 4096], parse_mode="HTML")
 
         track_event(tenant.get("user_id", tenant_id), "message_processed", {"intent": "agent_loop"})
+
+        # Background memory extraction (fire-and-forget with proper task lifecycle)
+        try:
+            from cascade_api.agent.memory_extractor import extract_memories_from_conversation
+            from cascade_api.dependencies import get_anthropic
+
+            # Get the conversation ID from the saved turn
+            recent = supabase.table("conversations").select("id").eq(
+                "tenant_id", tenant_id
+            ).eq("source", "agent_history").order(
+                "created_at", desc=True
+            ).limit(1).execute()
+            conv_id = recent.data[0]["id"] if recent.data else None
+
+            # Build transcript from the exchange
+            transcript = f"User: {text}\n\nAssistant: {response_text}"
+
+            # Store task reference to prevent GC and log exceptions
+            task = asyncio.create_task(
+                extract_memories_from_conversation(
+                    supabase=supabase,
+                    anthropic_client=get_anthropic(),
+                    tenant_id=tenant_id,
+                    conversation_text=transcript,
+                    conversation_id=conv_id,
+                ),
+                name=f"memory_extract_{tenant_id[:8]}",
+            )
+            _background_tasks.add(task)
+            task.add_done_callback(_background_tasks.discard)
+        except Exception as e:
+            log.warning("memory_extraction.trigger_failed", error=str(e))
 
     except Exception as e:
         log.error("agent.failed", tenant_id=tenant_id, error=str(e))

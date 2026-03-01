@@ -32,6 +32,18 @@ async def cron_daily(request: Request):
     bot = create_bot().bot
     result = await send_daily_messages(bot)
     log.info("cron.daily", **result)
+
+    # Memory decay — update scores daily
+    from cascade_api.agent.memory_decay import update_decay_scores
+    from cascade_api.dependencies import get_supabase
+    try:
+        supabase = get_supabase()
+        decay_updated = await update_decay_scores(supabase)
+        result["decay_updated"] = decay_updated
+    except Exception as e:
+        log.warning("cron.decay_failed", error=str(e))
+        result["decay_updated"] = 0
+
     return result
 
 
