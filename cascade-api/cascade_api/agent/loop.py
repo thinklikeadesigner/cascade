@@ -62,7 +62,7 @@ async def run_agent(
             model=model,
             max_tokens=1024,
             system=[{"type": "text", "text": system, "cache_control": {"type": "ephemeral"}}],
-            tools=TOOLS,
+            tools=[*TOOLS, {"type": "web_search_20250305"}],
             messages=messages,
         )
 
