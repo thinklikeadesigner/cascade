@@ -364,7 +364,7 @@ class TestIndicators:
     async def test_complete_indicator_bumps_skill(self):
         mock_sb = MagicMock()
 
-        # complete_indicator update
+        # complete_indicator update — marks indicator completed
         update_result = MagicMock()
         update_result.data = [{
             "id": "i1",
@@ -376,25 +376,23 @@ class TestIndicators:
             return_value=update_result
         )
 
-        # user_skills lookup for bump
-        user_result = MagicMock()
-        user_result.data = [{"proficiency": "0.3"}]
+        # SELECT calls in order:
+        #   1. complete_indicator selects proficiency from user_skills
+        #   2. update_skill selects id from user_skills (to decide insert vs update)
+        proficiency_result = MagicMock()
+        proficiency_result.data = [{"proficiency": "0.3"}]
 
-        # user_skills upsert select (no existing)
-        no_result = MagicMock()
-        no_result.data = [{"id": "s1"}]
-
-        skill_update_result = MagicMock()
-        skill_update_result.data = [{"proficiency": 0.4}]
+        skill_id_result = MagicMock()
+        skill_id_result.data = [{"id": "s1"}]
 
         call_count = 0
         def mock_execute():
             nonlocal call_count
             call_count += 1
-            if call_count <= 2:
-                return user_result
+            if call_count == 1:
+                return proficiency_result
             else:
-                return skill_update_result
+                return skill_id_result
 
         mock_sb.table.return_value.select.return_value.eq.return_value.eq.return_value.execute = mock_execute
 

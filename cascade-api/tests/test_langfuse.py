@@ -7,10 +7,14 @@ async def test_traced_ask_calls_langfuse_and_returns_response():
     """Traced ask should create a Langfuse generation and return Claude's response."""
     mock_anthropic = AsyncMock()
     mock_anthropic.messages.create.return_value = MagicMock(
-        content=[MagicMock(text="test response")]
+        content=[MagicMock(text="test response")],
+        usage=MagicMock(input_tokens=10, output_tokens=5),
     )
 
-    with patch("cascade_api.observability.langfuse_client.get_langfuse") as mock_lf:
+    with (
+        patch("cascade_api.observability.langfuse_client.get_langfuse") as mock_lf,
+        patch("cascade_api.observability.langfuse_client.anthropic.AsyncAnthropic", return_value=mock_anthropic),
+    ):
         mock_trace = MagicMock()
         mock_generation = MagicMock()
         mock_trace.generation.return_value = mock_generation

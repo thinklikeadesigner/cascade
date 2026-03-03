@@ -2,9 +2,22 @@
 
 from __future__ import annotations
 
-from unittest.mock import MagicMock
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
+
+
+def _mock_memory_client(core_content: str = ""):
+    """Build a mock MemoryClient for patching get_memory_client."""
+    core_mock = AsyncMock()
+    core_mock.read.return_value = (core_content, 1 if core_content else 0)
+
+    scoped = MagicMock()
+    scoped.core = core_mock
+
+    client = MagicMock()
+    client.for_tenant.return_value = scoped
+    return client
 
 
 class TestBuildSystemPrompt:
@@ -13,12 +26,11 @@ class TestBuildSystemPrompt:
         from cascade_api.agent.system_prompt import build_system_prompt
 
         mock_sb = MagicMock()
-        # No core memory
-        mock_sb.table.return_value.select.return_value.eq.return_value.execute.return_value.data = []
-        # Tenant timezone
         tenant = {"timezone": "America/New_York", "morning_hour": 7, "morning_minute": 0, "review_day": 0}
 
-        prompt = await build_system_prompt(mock_sb, "tenant-1", tenant)
+        with patch("cascade_api.agent.system_prompt.get_memory_client", return_value=_mock_memory_client()):
+            prompt = await build_system_prompt(mock_sb, "tenant-1", tenant)
+
         assert "Date:" in prompt
         assert "Days left in month:" in prompt
 
@@ -27,12 +39,12 @@ class TestBuildSystemPrompt:
         from cascade_api.agent.system_prompt import build_system_prompt
 
         mock_sb = MagicMock()
-        mock_sb.table.return_value.select.return_value.eq.return_value.execute.return_value.data = [
-            {"content": "## User Profile\n- Name: Test User"}
-        ]
         tenant = {"timezone": "America/New_York", "morning_hour": 7, "morning_minute": 0, "review_day": 0}
 
-        prompt = await build_system_prompt(mock_sb, "tenant-1", tenant)
+        client = _mock_memory_client("## User Profile\n- Name: Test User")
+        with patch("cascade_api.agent.system_prompt.get_memory_client", return_value=client):
+            prompt = await build_system_prompt(mock_sb, "tenant-1", tenant)
+
         assert "## User Profile" in prompt
         assert "Test User" in prompt
 
@@ -41,8 +53,9 @@ class TestBuildSystemPrompt:
         from cascade_api.agent.system_prompt import build_system_prompt
 
         mock_sb = MagicMock()
-        mock_sb.table.return_value.select.return_value.eq.return_value.execute.return_value.data = []
         tenant = {"timezone": "America/New_York", "morning_hour": 7, "morning_minute": 0, "review_day": 0}
 
-        prompt = await build_system_prompt(mock_sb, "tenant-1", tenant)
+        with patch("cascade_api.agent.system_prompt.get_memory_client", return_value=_mock_memory_client()):
+            prompt = await build_system_prompt(mock_sb, "tenant-1", tenant)
+
         assert "Coaching Tone" in prompt

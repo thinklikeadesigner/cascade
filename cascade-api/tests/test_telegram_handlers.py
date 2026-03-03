@@ -136,8 +136,8 @@ async def test_message_from_inactive_user():
 
 
 @pytest.mark.asyncio
-async def test_status_message_triggers_status_handler():
-    """Sending 'status' should trigger the status handler."""
+async def test_status_message_routes_through_agent():
+    """Sending 'status' should route through the agent loop."""
     mock_supabase = MagicMock()
     mock_supabase.table.return_value.select.return_value.eq.return_value.execute.return_value.data = [
         {
@@ -151,7 +151,11 @@ async def test_status_message_triggers_status_handler():
 
     with (
         patch("cascade_api.telegram.handlers.get_supabase", return_value=mock_supabase),
-        patch("cascade_api.telegram.handlers._handle_status", new_callable=AsyncMock) as mock_status,
+        patch("cascade_api.db.conversation_history.get_history", new_callable=AsyncMock, return_value=[]),
+        patch("cascade_api.db.conversation_history.save_turn", new_callable=AsyncMock),
+        patch("cascade_api.agent.loop.run_agent", new_callable=AsyncMock, return_value=("Here's your status.", [])) as mock_agent,
+        patch("cascade_api.dependencies.get_memory_client", side_effect=Exception("skip")),
+        patch("cascade_api.telegram.handlers.track_event"),
     ):
         from cascade_api.telegram.handlers import handle_message
 
@@ -164,12 +168,14 @@ async def test_status_message_triggers_status_handler():
 
         await handle_message(update, context)
 
-        mock_status.assert_called_once()
+        mock_agent.assert_called_once()
+        assert mock_agent.call_args.kwargs["user_message"] == "status"
+        update.message.reply_text.assert_called_once()
 
 
 @pytest.mark.asyncio
-async def test_log_message_triggers_log_handler():
-    """Sending a regular message should trigger the log handler."""
+async def test_log_message_routes_through_agent():
+    """Sending a regular message should route through the agent loop."""
     mock_supabase = MagicMock()
     mock_supabase.table.return_value.select.return_value.eq.return_value.execute.return_value.data = [
         {
@@ -183,7 +189,11 @@ async def test_log_message_triggers_log_handler():
 
     with (
         patch("cascade_api.telegram.handlers.get_supabase", return_value=mock_supabase),
-        patch("cascade_api.telegram.handlers._handle_log", new_callable=AsyncMock) as mock_log,
+        patch("cascade_api.db.conversation_history.get_history", new_callable=AsyncMock, return_value=[]),
+        patch("cascade_api.db.conversation_history.save_turn", new_callable=AsyncMock),
+        patch("cascade_api.agent.loop.run_agent", new_callable=AsyncMock, return_value=("Got it. Logged.", [])) as mock_agent,
+        patch("cascade_api.dependencies.get_memory_client", side_effect=Exception("skip")),
+        patch("cascade_api.telegram.handlers.track_event"),
     ):
         from cascade_api.telegram.handlers import handle_message
 
@@ -196,4 +206,6 @@ async def test_log_message_triggers_log_handler():
 
         await handle_message(update, context)
 
-        mock_log.assert_called_once()
+        mock_agent.assert_called_once()
+        assert "sent 5 DMs" in mock_agent.call_args.kwargs["user_message"]
+        update.message.reply_text.assert_called_once()

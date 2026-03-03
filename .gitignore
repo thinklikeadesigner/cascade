@@ -22,16 +22,40 @@ outputs/
 # Product research
 product-research/
 cascade-research/
+research/
 docs/
 *.pptx
+
+# Diagrams
+*.excalidraw
+
+# Referral
+referral link.md
 
 # Python
 __pycache__/
 *.pyc
+.venv*/
+*.egg-info/
+dist/
+.pytest_cache/
+.ruff_cache/
 
 # Environment
 .env
 .env.local
+
+# Claude Code
+.claude/
+
+# cascade-memory has its own repo
+cascade-memory/
+
+# Supabase local
+supabase/.temp/
+
+# Lock files (each subpackage manages its own)
+uv.lock
 
 # Deploy notes with secrets
 DEPLOY-STATUS.md

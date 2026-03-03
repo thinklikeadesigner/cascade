@@ -114,8 +114,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         # Background memory extraction (fire-and-forget with proper task lifecycle)
         try:
-            from cascade_api.agent.memory_extractor import extract_memories_from_conversation
-            from cascade_api.dependencies import get_anthropic
+            from cascade_api.dependencies import get_memory_client
 
             # Get the conversation ID from the saved turn
             recent = supabase.table("conversations").select("id").eq(
@@ -128,15 +127,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             # Build transcript from the exchange
             transcript = f"User: {text}\n\nAssistant: {response_text}"
 
-            # Store task reference to prevent GC and log exceptions
+            scoped = get_memory_client().for_tenant(tenant_id)
             task = asyncio.create_task(
-                extract_memories_from_conversation(
-                    supabase=supabase,
-                    anthropic_client=get_anthropic(),
-                    tenant_id=tenant_id,
-                    conversation_text=transcript,
-                    conversation_id=conv_id,
-                ),
+                scoped.extract(transcript, source_id=str(conv_id) if conv_id else None),
                 name=f"memory_extract_{tenant_id[:8]}",
             )
             _background_tasks.add(task)

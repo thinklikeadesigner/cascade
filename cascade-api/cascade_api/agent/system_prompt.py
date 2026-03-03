@@ -6,7 +6,7 @@ import calendar
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
-from cascade_api.db.memory import get_core_memory
+from cascade_api.dependencies import get_memory_client
 
 SYSTEM_PROMPT = """\
 You are Cascade, a goal-execution coaching agent on Telegram. You help builders \
@@ -132,7 +132,7 @@ the new one, ask which is current, then update with permission.
 
 
 async def build_system_prompt(
-    supabase,
+    supabase,  # kept for backward compat — no longer used for memory
     tenant_id: str,
     tenant: dict,
     scheduled_context: str | None = None,
@@ -180,7 +180,8 @@ async def build_system_prompt(
     )
 
     # Core memory
-    core_memory = await get_core_memory(supabase, tenant_id)
+    scoped = get_memory_client().for_tenant(tenant_id)
+    core_memory, _ = await scoped.core.read()
     if core_memory:
         memory_section = f"\n## Core Memory\n\n{core_memory}\n"
     else:

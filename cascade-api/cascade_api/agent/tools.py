@@ -715,123 +715,61 @@ async def _update_schedule(inp: dict, sb: SupabaseClient, tid: str) -> dict:
 # ── Memory Tool Executors ────────────────────────────────────────
 
 async def _core_memory_read(inp: dict, sb: SupabaseClient, tid: str) -> dict:
-    from cascade_api.db.memory import get_core_memory
-    content = await get_core_memory(sb, tid)
+    from cascade_api.dependencies import get_memory_client
+    scoped = get_memory_client().for_tenant(tid)
+    content, _ = await scoped.core.read()
     if not content:
         return {"content": "(empty — no core memory yet)", "hint": "Use core_memory_append to start building the user's profile."}
     return {"content": content}
 
 
 async def _core_memory_append(inp: dict, sb: SupabaseClient, tid: str) -> dict:
-    from cascade_api.db.memory import get_core_memory_with_version, upsert_core_memory
+    from cascade_api.dependencies import get_memory_client
+    from cascade_memory.errors import StoreLimitError
 
-    section = inp["section"]
-    line = inp["content"]
-    current, version = await get_core_memory_with_version(sb, tid)
-
-    # Enforce core memory size limit (3000 chars hard cap)
-    if len(current) + len(line) + 20 > 3000:
-        return {
-            "error": "Core memory is at its size limit (3000 chars). "
-            "Move some details to archival memory with save_memory first, "
-            "then remove them from core memory with core_memory_replace."
-        }
-
-    header = f"## {section}"
-    if header in current:
-        # Find the section and append after its last non-empty line
-        lines = current.split("\n")
-        insert_idx = None
-        last_content_idx = None
-        in_section = False
-        for i, l in enumerate(lines):
-            if l.strip() == header:
-                in_section = True
-                last_content_idx = i
-                continue
-            if in_section:
-                if l.startswith("## "):
-                    # Hit next section — insert before it
-                    insert_idx = last_content_idx + 1 if last_content_idx is not None else i
-                    break
-                if l.strip():
-                    last_content_idx = i
-        if insert_idx is None:
-            insert_idx = (last_content_idx + 1) if last_content_idx is not None else len(lines)
-        lines.insert(insert_idx, line)
-        new_content = "\n".join(lines)
-    else:
-        # Create new section
-        if current:
-            new_content = f"{current}\n\n{header}\n{line}"
-        else:
-            new_content = f"{header}\n{line}"
-
-    result = await upsert_core_memory(sb, tid, new_content, expected_version=version)
-    return {"status": "appended", "section": section, "version": result.get("version")}
+    scoped = get_memory_client().for_tenant(tid)
+    try:
+        version = await scoped.core.append(inp["section"], inp["content"])
+        return {"status": "appended", "section": inp["section"], "version": version}
+    except StoreLimitError as e:
+        return {"error": str(e)}
 
 
 async def _core_memory_replace(inp: dict, sb: SupabaseClient, tid: str) -> dict:
-    from cascade_api.db.memory import get_core_memory_with_version, upsert_core_memory
+    from cascade_api.dependencies import get_memory_client
+    from cascade_memory.errors import StoreLimitError
 
-    old_text = inp["old_text"]
-    new_text = inp["new_text"]
-    current, version = await get_core_memory_with_version(sb, tid)
-
-    if old_text not in current:
-        return {"error": f"Could not find '{old_text}' in core memory. Use core_memory_read to check current content."}
-
-    new_content = current.replace(old_text, new_text, 1)
-
-    # Enforce core memory size limit (3000 chars hard cap)
-    if len(new_content) > 3000:
-        return {
-            "error": "This replacement would exceed the core memory size limit (3000 chars). "
-            "Move some details to archival memory with save_memory first."
-        }
-
-    result = await upsert_core_memory(sb, tid, new_content, expected_version=version)
-    return {"status": "replaced", "old": old_text, "new": new_text, "version": result.get("version")}
+    scoped = get_memory_client().for_tenant(tid)
+    try:
+        version = await scoped.core.replace(inp["old_text"], inp["new_text"])
+        return {"status": "replaced", "old": inp["old_text"], "new": inp["new_text"], "version": version}
+    except ValueError:
+        return {"error": f"Could not find '{inp['old_text']}' in core memory. Use core_memory_read to check current content."}
+    except StoreLimitError as e:
+        return {"error": str(e)}
 
 
 async def _save_memory_tool(inp: dict, sb: SupabaseClient, tid: str) -> dict:
-    from cascade_api.db.memory import save_memory as db_save_memory
-    from cascade_api.db.embeddings import generate_embedding
+    from cascade_api.dependencies import get_memory_client
 
-    content = inp["content"]
-    memory_type = inp.get("memory_type", "fact")
-    tags = inp.get("tags", [])
-
-    # Generate embedding for semantic search
-    try:
-        embedding = await generate_embedding(content)
-    except Exception:
-        embedding = None
-
-    result = await db_save_memory(
-        sb, tid, content,
-        memory_type=memory_type, tags=tags,
-        embedding=embedding,
+    scoped = get_memory_client().for_tenant(tid)
+    mid = await scoped.save(
+        inp["content"],
+        memory_type=inp.get("memory_type", "fact"),
+        tags=inp.get("tags", []),
     )
-    return {"status": "saved", "memory_id": result.get("id"), "content": content}
+    return {"status": "saved", "memory_id": mid, "content": inp["content"]}
 
 
 async def _recall(inp: dict, sb: SupabaseClient, tid: str) -> dict:
-    from cascade_api.db.embeddings import semantic_search
-    from cascade_api.db.memory import update_memory_accessed
+    from cascade_api.dependencies import get_memory_client
 
-    query = inp["query"]
-
-    # Semantic search over memories (tenant-scoped via match_memories RPC)
-    try:
-        memories = await semantic_search(sb, tid, query, match_count=5)
-    except Exception:
-        memories = []
-
-    # Touch accessed memories for decay tracking
-    if memories:
-        await update_memory_accessed(sb, tid, [m["id"] for m in memories])
-
+    scoped = get_memory_client().for_tenant(tid)
+    results = await scoped.recall(inp["query"])
+    memories = [
+        {"id": r.memory.id, "content": r.memory.content, "similarity": r.similarity}
+        for r in results
+    ]
     return {
         "memories": memories,
         "hint": "Use get_goals or get_adaptations if you need those specifically.",
@@ -839,30 +777,18 @@ async def _recall(inp: dict, sb: SupabaseClient, tid: str) -> dict:
 
 
 async def _update_memory_tool(inp: dict, sb: SupabaseClient, tid: str) -> dict:
-    from cascade_api.db.embeddings import generate_embedding
+    from cascade_api.dependencies import get_memory_client
 
-    memory_id = inp["memory_id"]
-    content = inp["content"]
-
-    updates = {"content": content}
-    try:
-        updates["embedding"] = await generate_embedding(content)
-    except Exception:
-        pass
-
-    result = sb.table("memories").update(updates).eq(
-        "id", memory_id
-    ).eq("tenant_id", tid).execute()
-
-    if result.data:
-        return {"status": "updated", "memory_id": memory_id}
-    return {"error": f"Memory {memory_id} not found"}
+    scoped = get_memory_client().for_tenant(tid)
+    await scoped.update(inp["memory_id"], inp["content"])
+    return {"status": "updated", "memory_id": inp["memory_id"]}
 
 
 async def _forget_memory(inp: dict, sb: SupabaseClient, tid: str) -> dict:
-    from cascade_api.db.memory import update_memory_status
+    from cascade_api.dependencies import get_memory_client
 
-    result = await update_memory_status(sb, tid, inp["memory_id"], "forgotten")
+    scoped = get_memory_client().for_tenant(tid)
+    await scoped.forget(inp["memory_id"])
     return {"status": "forgotten", "memory_id": inp["memory_id"]}
 
 

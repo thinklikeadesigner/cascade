@@ -73,17 +73,38 @@ class TestLogEndpoint:
         mock_msg = MagicMock()
         mock_msg.content = [MagicMock(type="text", text=json.dumps(parsed_data))]
 
-        # Mock tracker entry insert
-        insert_result = MagicMock()
-        insert_result.data = [{"id": 1, "date": "2026-02-27", **parsed_data}]
-        mock_supabase.table.return_value.execute = MagicMock(return_value=insert_result)
+        # tracker.log_entry does: SELECT (existing check) → INSERT (new row)
+        # conversation insert also goes through .insert().execute()
+        # Use side_effect to differentiate the calls.
+        select_result = MagicMock()
+        select_result.data = []  # No existing row → takes INSERT path
 
-        # Mock conversation insert
-        conv_result = MagicMock()
-        conv_result.data = [{"id": 42}]
-        mock_supabase.table.return_value.insert.return_value.execute = MagicMock(return_value=conv_result)
+        tracker_row = {"id": 1, "date": "2026-02-27", **parsed_data}
+        insert_tracker = MagicMock()
+        insert_tracker.data = [tracker_row]
 
-        with patch("cascade_api.api.log.get_anthropic") as mock_get:
+        conv_row = {"id": 42}
+        insert_conv = MagicMock()
+        insert_conv.data = [conv_row]
+
+        # First execute() = SELECT existing, second = INSERT tracker, third = INSERT conversation
+        call_count = 0
+        def mock_execute():
+            nonlocal call_count
+            call_count += 1
+            if call_count == 1:
+                return select_result
+            elif call_count == 2:
+                return insert_tracker
+            else:
+                return insert_conv
+
+        mock_supabase.table.return_value.execute = mock_execute
+
+        with (
+            patch("cascade_api.api.log.get_supabase", return_value=mock_supabase),
+            patch("cascade_api.api.log.get_anthropic") as mock_get,
+        ):
             mock_client = AsyncMock()
             mock_client.messages.create = AsyncMock(return_value=mock_msg)
             mock_get.return_value = mock_client
