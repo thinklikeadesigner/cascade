@@ -1,0 +1,108 @@
+-- cascade-memory migration
+-- Parameters: {tenant_table}, {tenant_fk}, {embedding_dimensions}
+
+CREATE EXTENSION IF NOT EXISTS vector;
+
+-- Core memories (single doc per tenant, always in context)
+CREATE TABLE IF NOT EXISTS core_memories (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES {tenant_table}({tenant_fk}) ON DELETE CASCADE,
+    content TEXT NOT NULL DEFAULT '',
+    version INTEGER NOT NULL DEFAULT 1,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_core_memories_tenant ON core_memories(tenant_id);
+
+-- Archival memories (searchable facts with embeddings)
+CREATE TABLE IF NOT EXISTS memories (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES {tenant_table}({tenant_fk}) ON DELETE CASCADE,
+    content TEXT NOT NULL,
+    memory_type TEXT NOT NULL DEFAULT 'fact'
+        CHECK (memory_type IN ('fact','preference','pattern','goal_context','contradiction')),
+    tags TEXT[] DEFAULT '{}',
+    confidence REAL NOT NULL DEFAULT 1.0,
+    decay_score REAL NOT NULL DEFAULT 1.0,
+    source_id TEXT,
+    embedding VECTOR({embedding_dimensions}),
+    status TEXT NOT NULL DEFAULT 'active'
+        CHECK (status IN ('active','pending_review','archived','forgotten')),
+    superseded_by UUID REFERENCES memories(id) ON DELETE SET NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    last_accessed_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    last_confirmed_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_memories_tenant ON memories(tenant_id, status);
+CREATE INDEX IF NOT EXISTS idx_memories_tenant_type ON memories(tenant_id, memory_type) WHERE status = 'active';
+CREATE INDEX IF NOT EXISTS idx_memories_vector ON memories
+    USING hnsw (embedding vector_cosine_ops) WITH (m = 16, ef_construction = 64);
+
+-- Memory links (zettelkasten connections)
+CREATE TABLE IF NOT EXISTS memory_links (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES {tenant_table}({tenant_fk}) ON DELETE CASCADE,
+    source_memory_id UUID NOT NULL REFERENCES memories(id) ON DELETE CASCADE,
+    target_memory_id UUID NOT NULL REFERENCES memories(id) ON DELETE CASCADE,
+    link_type TEXT NOT NULL CHECK (link_type IN ('related','supports','contradicts','supersedes','part_of')),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE (source_memory_id, target_memory_id, link_type)
+);
+CREATE INDEX IF NOT EXISTS idx_memory_links_tenant ON memory_links(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_memory_links_source ON memory_links(source_memory_id);
+CREATE INDEX IF NOT EXISTS idx_memory_links_target ON memory_links(target_memory_id);
+
+-- Metadata table for dimension tracking
+CREATE TABLE IF NOT EXISTS _cascade_memory_config (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+INSERT INTO _cascade_memory_config (key, value)
+VALUES ('embedding_dimensions', '{embedding_dimensions}')
+ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW();
+
+-- Semantic search function
+CREATE OR REPLACE FUNCTION match_memories(
+    query_embedding VECTOR({embedding_dimensions}),
+    match_tenant_id UUID,
+    match_count INT DEFAULT 5,
+    match_threshold FLOAT DEFAULT 0.5
+)
+RETURNS TABLE (
+    id UUID, content TEXT, memory_type TEXT, tags TEXT[],
+    confidence REAL, decay_score REAL, similarity FLOAT,
+    created_at TIMESTAMPTZ, last_confirmed_at TIMESTAMPTZ
+)
+LANGUAGE sql STABLE AS $$
+    SELECT
+        m.id, m.content, m.memory_type, m.tags,
+        m.confidence, m.decay_score,
+        (1 - (m.embedding <=> query_embedding))::float AS similarity,
+        m.created_at, m.last_confirmed_at
+    FROM memories m
+    WHERE m.tenant_id = match_tenant_id
+      AND m.status = 'active'
+      AND m.embedding IS NOT NULL
+      AND (1 - (m.embedding <=> query_embedding)) > match_threshold
+    ORDER BY (1 - (m.embedding <=> query_embedding)) * (0.3 + 0.7 * m.decay_score) * m.confidence DESC
+    LIMIT match_count;
+$$;
+
+-- Decay update function
+CREATE OR REPLACE FUNCTION update_memory_decay_scores(p_decay_rate FLOAT DEFAULT 0.95)
+RETURNS INTEGER
+LANGUAGE plpgsql AS $$
+DECLARE
+    updated_count INTEGER;
+BEGIN
+    UPDATE memories
+    SET decay_score = ROUND(
+        POWER(p_decay_rate, EXTRACT(EPOCH FROM (NOW() - last_accessed_at)) / 86400)::numeric,
+        4
+    )
+    WHERE status = 'active'
+      AND ABS(decay_score - POWER(p_decay_rate, EXTRACT(EPOCH FROM (NOW() - last_accessed_at)) / 86400)) > 0.01;
+    GET DIAGNOSTICS updated_count = ROW_COUNT;
+    RETURN updated_count;
+END;
+$$;

@@ -1,0 +1,30 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "cascade-memory"
+version = "0.1.0"
+description = "Pluggable memory system for AI agents — core memory, archival search with decay, LLM extraction"
+requires-python = ">=3.11"
+license = "MIT"
+readme = "README.md"
+
+[project.optional-dependencies]
+supabase = ["supabase>=2.0"]
+gemini = ["google-genai>=1.0"]
+openai = ["openai>=1.0"]
+anthropic = ["anthropic>=0.40"]
+all = ["cascade-memory[supabase,gemini,openai,anthropic]"]
+dev = ["pytest>=8.3.0", "pytest-asyncio>=0.25.0", "ruff>=0.8.0"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/cascade_memory"]
