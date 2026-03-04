@@ -7,6 +7,7 @@ WORKDIR /app
 
 COPY pyproject.toml .
 COPY cascade_api/ cascade_api/
+COPY cascade-memory/ cascade-memory/
 RUN pip install --no-cache-dir .
 
 EXPOSE ${PORT:-8000}
