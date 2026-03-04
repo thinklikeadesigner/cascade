@@ -9,6 +9,7 @@ data/
 # Editor files
 .vscode/
 .idea/
+.obsidian/
 
 # Calendar exports
 calendar/
@@ -61,3 +62,9 @@ uv.lock
 
 # Deploy notes with secrets
 DEPLOY-STATUS.md
+
+
+
+
+# Ignore Smart Environment folder
+.smart-env
