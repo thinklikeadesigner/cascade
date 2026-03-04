@@ -29,6 +29,7 @@ docs/
 
 # Diagrams
 *.excalidraw
+*.canvas
 
 # Referral
 referral link.md
