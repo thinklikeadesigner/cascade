@@ -54,10 +54,12 @@ async def approve(
     """Mark an adaptation as approved."""
     result = (
         supabase.table("adaptations")
-        .update({
-            "approved": True,
-            "approved_at": datetime.now(timezone.utc).isoformat(),
-        })
+        .update(
+            {
+                "approved": True,
+                "approved_at": datetime.now(timezone.utc).isoformat(),
+            }
+        )
         .eq("id", adaptation_id)
         .execute()
     )

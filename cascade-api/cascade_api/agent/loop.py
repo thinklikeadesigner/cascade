@@ -8,9 +8,9 @@ import structlog
 import anthropic
 
 from cascade_api.agent.tools import TOOLS, execute_tool
-from cascade_api.agent.system_prompt import SYSTEM_PROMPT, build_system_prompt
+from cascade_api.agent.system_prompt import build_system_prompt
 from cascade_api.dependencies import get_supabase
-from cascade_api.observability.langfuse_client import get_langfuse, should_eval, flush_langfuse
+from cascade_api.observability.langfuse_client import get_langfuse, should_eval
 
 log = structlog.get_logger()
 
@@ -38,20 +38,27 @@ async def run_agent(
     lf = get_langfuse()
 
     # Build system prompt
-    tenant_result = supabase.table("tenants").select(
-        "timezone, morning_hour, morning_minute, review_day"
-    ).eq("id", tenant_id).execute()
+    tenant_result = (
+        supabase.table("tenants")
+        .select("timezone, morning_hour, morning_minute, review_day")
+        .eq("id", tenant_id)
+        .execute()
+    )
     tenant = tenant_result.data[0] if tenant_result.data else {}
 
     system = await build_system_prompt(
-        supabase, tenant_id, tenant,
+        supabase,
+        tenant_id,
+        tenant,
         scheduled_context=scheduled_context,
     )
 
     messages = list(conversation_history)
     messages.append({"role": "user", "content": user_message})
 
-    model = scheduled_model if scheduled_model else _pick_model(user_message, is_scheduled=is_scheduled)
+    model = (
+        scheduled_model if scheduled_model else _pick_model(user_message, is_scheduled=is_scheduled)
+    )
 
     # --- Langfuse trace (root) ---
     trace = None
@@ -125,6 +132,7 @@ async def run_agent(
             if trace and should_eval(user_message, is_scheduled):
                 try:
                     from cascade_api.observability.evals import score_trace
+
                     await score_trace(
                         trace_id=trace.id,
                         user_message=user_message,
@@ -162,18 +170,25 @@ async def run_agent(
 
             try:
                 result = await execute_tool(
-                    tool_block.name, tool_block.input, supabase, tenant_id,
+                    tool_block.name,
+                    tool_block.input,
+                    supabase,
+                    tenant_id,
                 )
-                tool_results.append({
-                    "type": "tool_result",
-                    "tool_use_id": tool_block.id,
-                    "content": result,
-                })
-                tool_calls_log.append({
-                    "tool": tool_block.name,
-                    "input": tool_block.input,
-                    "output": result,
-                })
+                tool_results.append(
+                    {
+                        "type": "tool_result",
+                        "tool_use_id": tool_block.id,
+                        "content": result,
+                    }
+                )
+                tool_calls_log.append(
+                    {
+                        "tool": tool_block.name,
+                        "input": tool_block.input,
+                        "output": result,
+                    }
+                )
 
                 if tool_span:
                     try:
@@ -184,12 +199,14 @@ async def run_agent(
             except Exception as e:
                 log.error("tool.failed", tool=tool_block.name, error=str(e))
                 error_result = json.dumps({"error": str(e)})
-                tool_results.append({
-                    "type": "tool_result",
-                    "tool_use_id": tool_block.id,
-                    "content": error_result,
-                    "is_error": True,
-                })
+                tool_results.append(
+                    {
+                        "type": "tool_result",
+                        "tool_use_id": tool_block.id,
+                        "content": error_result,
+                        "is_error": True,
+                    }
+                )
 
                 if tool_span:
                     try:

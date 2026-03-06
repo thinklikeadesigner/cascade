@@ -16,9 +16,11 @@ async def test_start_command_links_telegram_to_tenant():
         {"id": "tenant-1", "telegram_id": 12345, "onboarding_status": "tg_connected"}
     ]
 
-    with patch("cascade_api.telegram.handlers.get_supabase", return_value=mock_supabase), \
-         patch("cascade_api.telegram.handlers.verify_token", return_value="tenant-1"), \
-         patch("cascade_api.telegram.handlers.track_event"):
+    with (
+        patch("cascade_api.telegram.handlers.get_supabase", return_value=mock_supabase),
+        patch("cascade_api.telegram.handlers.verify_token", return_value="tenant-1"),
+        patch("cascade_api.telegram.handlers.track_event"),
+    ):
         from cascade_api.telegram.handlers import handle_start
 
         update = MagicMock()
@@ -62,8 +64,10 @@ async def test_start_command_with_invalid_token():
     """The /start command with an invalid token should show an error."""
     mock_supabase = MagicMock()
 
-    with patch("cascade_api.telegram.handlers.get_supabase", return_value=mock_supabase), \
-         patch("cascade_api.telegram.handlers.verify_token", return_value=None):
+    with (
+        patch("cascade_api.telegram.handlers.get_supabase", return_value=mock_supabase),
+        patch("cascade_api.telegram.handlers.verify_token", return_value=None),
+    ):
         from cascade_api.telegram.handlers import handle_start
 
         update = MagicMock()
@@ -151,9 +155,17 @@ async def test_status_message_routes_through_agent():
 
     with (
         patch("cascade_api.telegram.handlers.get_supabase", return_value=mock_supabase),
-        patch("cascade_api.db.conversation_history.get_history", new_callable=AsyncMock, return_value=[]),
+        patch(
+            "cascade_api.db.conversation_history.get_history",
+            new_callable=AsyncMock,
+            return_value=[],
+        ),
         patch("cascade_api.db.conversation_history.save_turn", new_callable=AsyncMock),
-        patch("cascade_api.agent.loop.run_agent", new_callable=AsyncMock, return_value=("Here's your status.", [])) as mock_agent,
+        patch(
+            "cascade_api.agent.loop.run_agent",
+            new_callable=AsyncMock,
+            return_value=("Here's your status.", []),
+        ) as mock_agent,
         patch("cascade_api.dependencies.get_memory_client", side_effect=Exception("skip")),
         patch("cascade_api.telegram.handlers.track_event"),
     ):
@@ -189,9 +201,17 @@ async def test_log_message_routes_through_agent():
 
     with (
         patch("cascade_api.telegram.handlers.get_supabase", return_value=mock_supabase),
-        patch("cascade_api.db.conversation_history.get_history", new_callable=AsyncMock, return_value=[]),
+        patch(
+            "cascade_api.db.conversation_history.get_history",
+            new_callable=AsyncMock,
+            return_value=[],
+        ),
         patch("cascade_api.db.conversation_history.save_turn", new_callable=AsyncMock),
-        patch("cascade_api.agent.loop.run_agent", new_callable=AsyncMock, return_value=("Got it. Logged.", [])) as mock_agent,
+        patch(
+            "cascade_api.agent.loop.run_agent",
+            new_callable=AsyncMock,
+            return_value=("Got it. Logged.", []),
+        ) as mock_agent,
         patch("cascade_api.dependencies.get_memory_client", side_effect=Exception("skip")),
         patch("cascade_api.telegram.handlers.track_event"),
     ):

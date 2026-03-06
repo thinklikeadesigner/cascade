@@ -51,8 +51,7 @@ def build_detect_level_prompt(
 ) -> str:
     """Build the user message for the detect-level LLM call."""
     file_list = "\n\n".join(
-        f"## {level}\n```\n{info['content']}\n```"
-        for level, info in files.items()
+        f"## {level}\n```\n{info['content']}\n```" for level, info in files.items()
     )
     return f'User\'s request: "{user_request}"\n\nCurrent cascade files:\n{file_list}'
 

@@ -36,8 +36,7 @@ async def analyze_impact(state: ReverseCascadeState) -> dict:
 
     applied = state.get("applied_changes", [])
     changes_context = [
-        {"level": c.level, "summary": c.summary, "content": c.new_content}
-        for c in applied
+        {"level": c.level, "summary": c.summary, "content": c.new_content} for c in applied
     ]
 
     prompt = build_analyze_impact_prompt(
@@ -83,19 +82,21 @@ def _format_checkpoint_message(level: CascadeLevel, analysis: Analysis) -> str:
     if len(analysis.proposed_content) > 1500:
         proposed_preview += "\n..."
 
-    return "\n".join([
-        f"*Reverse Cascade — {level.upper()} level*",
-        "",
-        f"*Impact:* {analysis.impact_summary}",
-        "",
-        "*Proposed changes:*",
-        "```",
-        proposed_preview,
-        "```",
-        "",
-        "Reply with:",
-        "- *approve* — accept and continue cascading up",
-        "- *reject* — discard changes, stop",
-        "- *stop* — accept changes but don't cascade further",
-        "- *modify: [your feedback]* — revise the proposal",
-    ])
+    return "\n".join(
+        [
+            f"*Reverse Cascade — {level.upper()} level*",
+            "",
+            f"*Impact:* {analysis.impact_summary}",
+            "",
+            "*Proposed changes:*",
+            "```",
+            proposed_preview,
+            "```",
+            "",
+            "Reply with:",
+            "- *approve* — accept and continue cascading up",
+            "- *reject* — discard changes, stop",
+            "- *stop* — accept changes but don't cascade further",
+            "- *modify: [your feedback]* — revise the proposal",
+        ]
+    )

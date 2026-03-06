@@ -7,7 +7,6 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 from cascade_api.config import settings
-from cascade_api.dependencies import get_supabase
 from cascade_api.observability.posthog_client import track_event
 
 router = APIRouter(prefix="/api/payment", tags=["payment"])

@@ -65,9 +65,7 @@ async def evaluate_task_roi(
         messages=[
             {
                 "role": "user",
-                "content": TASK_SKILL_MAPPING_PROMPT.format(
-                    task_description=task_description
-                ),
+                "content": TASK_SKILL_MAPPING_PROMPT.format(task_description=task_description),
             }
         ],
     )
@@ -122,7 +120,9 @@ async def evaluate_task_roi(
         weighted_gap_sum += contribution
 
     # Normalize: alignment = weighted gap coverage relative to max possible
-    max_possible = sum(float(r["weight"]) for r in expert_result.data) if expert_result.data else 1.0
+    max_possible = (
+        sum(float(r["weight"]) for r in expert_result.data) if expert_result.data else 1.0
+    )
     alignment_score = round(weighted_gap_sum / max_possible, 4) if max_possible > 0 else 0.0
     alignment_score = min(1.0, alignment_score)
 

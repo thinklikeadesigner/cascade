@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from cascade_memory.models import MemoryRecord, SearchResult
+from cascade_api.memory.models import MemoryRecord, SearchResult
 
 
 def _mock_memory_client():
@@ -115,7 +115,9 @@ class TestRecall:
         from cascade_api.agent.tools import execute_tool
 
         record = MemoryRecord(
-            id="mem-1", content="User likes mornings", memory_type="preference",
+            id="mem-1",
+            content="User likes mornings",
+            memory_type="preference",
         )
         client = _mock_memory_client()
         client.for_tenant.return_value.recall.return_value = [
@@ -137,6 +139,9 @@ class TestForgetMemory:
 
         with patch("cascade_api.dependencies.get_memory_client", return_value=client):
             result = await execute_tool(
-                "forget_memory", {"memory_id": "mem-1"}, mock_sb, "tenant-1",
+                "forget_memory",
+                {"memory_id": "mem-1"},
+                mock_sb,
+                "tenant-1",
             )
         assert "forgotten" in result.lower()

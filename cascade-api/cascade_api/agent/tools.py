@@ -96,7 +96,10 @@ TOOLS = [
                 "description": {"type": "string"},
                 "success_criteria": {"type": "string"},
                 "target_date": {"type": "string", "description": "YYYY-MM-DD"},
-                "status": {"type": "string", "enum": ["active", "paused", "completed", "abandoned"]},
+                "status": {
+                    "type": "string",
+                    "enum": ["active", "paused", "completed", "abandoned"],
+                },
             },
             "required": ["goal_id"],
         },
@@ -108,8 +111,15 @@ TOOLS = [
             "type": "object",
             "properties": {
                 "title": {"type": "string"},
-                "scheduled_day": {"type": "string", "description": "YYYY-MM-DD or day name (monday, tuesday...)."},
-                "category": {"type": "string", "enum": ["core", "flex"], "description": "Default: core."},
+                "scheduled_day": {
+                    "type": "string",
+                    "description": "YYYY-MM-DD or day name (monday, tuesday...).",
+                },
+                "category": {
+                    "type": "string",
+                    "enum": ["core", "flex"],
+                    "description": "Default: core.",
+                },
                 "estimated_minutes": {"type": "integer"},
             },
             "required": ["title"],
@@ -144,7 +154,10 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "days": {"type": "integer", "description": "Number of days to look back. Default: 7."},
+                "days": {
+                    "type": "integer",
+                    "description": "Number of days to look back. Default: 7.",
+                },
             },
             "required": [],
         },
@@ -364,6 +377,7 @@ TOOLS = [
 
 # --- Tool executors ---
 
+
 def _current_week_start() -> str:
     today = date.today()
     monday = today - timedelta(days=today.weekday())
@@ -391,8 +405,10 @@ async def execute_tool(
 async def _get_tasks(inp: dict, sb: SupabaseClient, tid: str) -> dict:
     week_start = _current_week_start()
     query = (
-        sb.table("tasks").select("*")
-        .eq("tenant_id", tid).eq("week_start", week_start)
+        sb.table("tasks")
+        .select("*")
+        .eq("tenant_id", tid)
+        .eq("week_start", week_start)
         .order("sort_order")
     )
     if inp.get("category"):
@@ -403,7 +419,15 @@ async def _get_tasks(inp: dict, sb: SupabaseClient, tid: str) -> dict:
         day = inp["day"]
         if day == "today":
             target = date.today().isoformat()
-        elif day.lower() in ("monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"):
+        elif day.lower() in (
+            "monday",
+            "tuesday",
+            "wednesday",
+            "thursday",
+            "friday",
+            "saturday",
+            "sunday",
+        ):
             target = _day_name_to_date(day, week_start)
         else:
             target = day
@@ -416,7 +440,10 @@ async def _complete_task(inp: dict, sb: SupabaseClient, tid: str) -> dict:
     result = (
         sb.table("tasks")
         .update({"completed": True, "completed_at": datetime.now(timezone.utc).isoformat()})
-        .eq("id", inp["task_id"]).eq("tenant_id", tid).eq("completed", False).execute()
+        .eq("id", inp["task_id"])
+        .eq("tenant_id", tid)
+        .eq("completed", False)
+        .execute()
     )
     if result.data:
         return {"status": "completed", "task": result.data[0]}
@@ -428,12 +455,17 @@ async def _log_progress(inp: dict, sb: SupabaseClient, tid: str) -> dict:
     data = {k: v for k, v in inp.items() if v is not None and k != "entry_date"}
 
     existing = (
-        sb.table("tracker_entries").select("*")
-        .eq("tenant_id", tid).eq("date", entry_date).execute()
+        sb.table("tracker_entries")
+        .select("*")
+        .eq("tenant_id", tid)
+        .eq("date", entry_date)
+        .execute()
     )
     if existing.data:
         row_id = existing.data[0]["id"]
-        result = sb.table("tracker_entries").update(data).eq("id", row_id).eq("tenant_id", tid).execute()
+        result = (
+            sb.table("tracker_entries").update(data).eq("id", row_id).eq("tenant_id", tid).execute()
+        )
     else:
         row = {"tenant_id": tid, "date": entry_date, **data}
         result = sb.table("tracker_entries").insert(row).execute()
@@ -444,27 +476,39 @@ async def _log_progress(inp: dict, sb: SupabaseClient, tid: str) -> dict:
 async def _get_status(inp: dict, sb: SupabaseClient, tid: str) -> dict:
     week_start = _current_week_start()
     week_tasks = (
-        sb.table("tasks").select("*")
-        .eq("tenant_id", tid).eq("week_start", week_start)
-        .order("sort_order").execute().data
+        sb.table("tasks")
+        .select("*")
+        .eq("tenant_id", tid)
+        .eq("week_start", week_start)
+        .order("sort_order")
+        .execute()
+        .data
     )
 
-    velocity_weeks = sb.rpc(
-        "get_weekly_velocity", {"p_tenant_id": tid, "p_weeks": 4}
-    ).execute().data
+    velocity_weeks = (
+        sb.rpc("get_weekly_velocity", {"p_tenant_id": tid, "p_weeks": 4}).execute().data
+    )
 
     today = date.today()
     month_start = today.replace(day=1).isoformat()
     month_entries = (
-        sb.table("tracker_entries").select("*")
-        .eq("tenant_id", tid).gte("date", month_start)
-        .order("date", desc=True).execute().data
+        sb.table("tracker_entries")
+        .select("*")
+        .eq("tenant_id", tid)
+        .gte("date", month_start)
+        .order("date", desc=True)
+        .execute()
+        .data
     )
 
     recent_entries = (
-        sb.table("tracker_entries").select("*")
-        .eq("tenant_id", tid).order("date", desc=True)
-        .limit(14).execute().data
+        sb.table("tracker_entries")
+        .select("*")
+        .eq("tenant_id", tid)
+        .order("date", desc=True)
+        .limit(14)
+        .execute()
+        .data
     )
 
     core = [t for t in week_tasks if t["category"] == "core"]
@@ -494,8 +538,10 @@ async def _get_status(inp: dict, sb: SupabaseClient, tid: str) -> dict:
 
     return {
         "week_progress": {
-            "core_completed": core_done, "core_total": len(core),
-            "flex_completed": flex_done, "flex_total": len(flex),
+            "core_completed": core_done,
+            "core_total": len(core),
+            "flex_completed": flex_done,
+            "flex_total": len(flex),
         },
         "velocity_trend": trend,
         "velocity_weeks": velocity_weeks,
@@ -511,9 +557,12 @@ async def _get_status(inp: dict, sb: SupabaseClient, tid: str) -> dict:
 async def _get_goals(inp: dict, sb: SupabaseClient, tid: str) -> dict:
     status = inp.get("status", "active")
     result = (
-        sb.table("goals").select("*")
-        .eq("tenant_id", tid).eq("status", status)
-        .order("created_at", desc=True).execute()
+        sb.table("goals")
+        .select("*")
+        .eq("tenant_id", tid)
+        .eq("status", status)
+        .order("created_at", desc=True)
+        .execute()
     )
     return {"goals": result.data}
 
@@ -539,7 +588,15 @@ async def _add_task(inp: dict, sb: SupabaseClient, tid: str) -> dict:
     }
     if inp.get("scheduled_day"):
         day = inp["scheduled_day"]
-        if day.lower() in ("monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"):
+        if day.lower() in (
+            "monday",
+            "tuesday",
+            "wednesday",
+            "thursday",
+            "friday",
+            "saturday",
+            "sunday",
+        ):
             row["scheduled_day"] = _day_name_to_date(day, week_start)
         else:
             row["scheduled_day"] = day
@@ -553,14 +610,25 @@ async def _add_task(inp: dict, sb: SupabaseClient, tid: str) -> dict:
 async def _move_task(inp: dict, sb: SupabaseClient, tid: str) -> dict:
     week_start = _current_week_start()
     new_day = inp["new_day"]
-    if new_day.lower() in ("monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"):
+    if new_day.lower() in (
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday",
+        "sunday",
+    ):
         target = _day_name_to_date(new_day, week_start)
     else:
         target = new_day
 
     result = (
-        sb.table("tasks").update({"scheduled_day": target})
-        .eq("id", inp["task_id"]).eq("tenant_id", tid).execute()
+        sb.table("tasks")
+        .update({"scheduled_day": target})
+        .eq("id", inp["task_id"])
+        .eq("tenant_id", tid)
+        .execute()
     )
     if result.data:
         return {"status": "moved", "task": result.data[0]}
@@ -576,18 +644,24 @@ async def _get_history(inp: dict, sb: SupabaseClient, tid: str) -> dict:
     days = inp.get("days", 7)
     start = (date.today() - timedelta(days=days)).isoformat()
     result = (
-        sb.table("tracker_entries").select("*")
-        .eq("tenant_id", tid).gte("date", start)
-        .order("date", desc=True).execute()
+        sb.table("tracker_entries")
+        .select("*")
+        .eq("tenant_id", tid)
+        .gte("date", start)
+        .order("date", desc=True)
+        .execute()
     )
     return {"entries": result.data}
 
 
 async def _get_adaptations(inp: dict, sb: SupabaseClient, tid: str) -> dict:
     result = (
-        sb.table("adaptations").select("*")
-        .eq("tenant_id", tid).eq("active", True)
-        .order("detected_at", desc=True).execute()
+        sb.table("adaptations")
+        .select("*")
+        .eq("tenant_id", tid)
+        .eq("active", True)
+        .order("detected_at", desc=True)
+        .execute()
     )
     return {"adaptations": result.data}
 
@@ -609,8 +683,12 @@ async def _update_monthly_targets(inp: dict, sb: SupabaseClient, tid: str) -> di
     new_targets = inp["targets"]
 
     existing = (
-        sb.table("monthly_plans").select("*")
-        .eq("tenant_id", tid).eq("month", m).eq("year", y).execute()
+        sb.table("monthly_plans")
+        .select("*")
+        .eq("tenant_id", tid)
+        .eq("month", m)
+        .eq("year", y)
+        .execute()
     )
     if existing.data:
         plan_id = existing.data[0]["id"]
@@ -618,9 +696,18 @@ async def _update_monthly_targets(inp: dict, sb: SupabaseClient, tid: str) -> di
         merged = {**current, **new_targets}
         result = sb.table("monthly_plans").update({"targets": merged}).eq("id", plan_id).execute()
     else:
-        result = sb.table("monthly_plans").insert({
-            "tenant_id": tid, "month": m, "year": y, "targets": new_targets,
-        }).execute()
+        result = (
+            sb.table("monthly_plans")
+            .insert(
+                {
+                    "tenant_id": tid,
+                    "month": m,
+                    "year": y,
+                    "targets": new_targets,
+                }
+            )
+            .execute()
+        )
 
     return {"status": "updated", "plan": result.data[0]}
 
@@ -630,14 +717,23 @@ async def _get_weekly_review(inp: dict, sb: SupabaseClient, tid: str) -> dict:
     week_end = (date.fromisoformat(week_start) + timedelta(days=6)).isoformat()
 
     tasks_data = (
-        sb.table("tasks").select("*")
-        .eq("tenant_id", tid).eq("week_start", week_start)
-        .order("sort_order").execute().data
+        sb.table("tasks")
+        .select("*")
+        .eq("tenant_id", tid)
+        .eq("week_start", week_start)
+        .order("sort_order")
+        .execute()
+        .data
     )
     entries = (
-        sb.table("tracker_entries").select("*")
-        .eq("tenant_id", tid).gte("date", week_start).lte("date", week_end)
-        .order("date", desc=True).execute().data
+        sb.table("tracker_entries")
+        .select("*")
+        .eq("tenant_id", tid)
+        .gte("date", week_start)
+        .lte("date", week_end)
+        .order("date", desc=True)
+        .execute()
+        .data
     )
 
     core = [t for t in tasks_data if t["category"] == "core"]
@@ -651,8 +747,10 @@ async def _get_weekly_review(inp: dict, sb: SupabaseClient, tid: str) -> dict:
 
     return {
         "planned_vs_actual": {
-            "core_planned": len(core), "core_completed": len(core_done),
-            "flex_planned": len(flex), "flex_completed": len(flex_done),
+            "core_planned": len(core),
+            "core_completed": len(core_done),
+            "flex_planned": len(flex),
+            "flex_completed": len(flex_done),
         },
         "completion_rate": {"core_pct": core_rate, "flex_pct": flex_rate},
         "what_worked": [t["title"] for t in core_done + flex_done],
@@ -666,9 +764,12 @@ async def _get_weekly_review(inp: dict, sb: SupabaseClient, tid: str) -> dict:
 
 
 async def _get_schedule(inp: dict, sb: SupabaseClient, tid: str) -> dict:
-    result = sb.table("tenants").select(
-        "morning_hour, morning_minute, review_day, timezone"
-    ).eq("id", tid).execute()
+    result = (
+        sb.table("tenants")
+        .select("morning_hour, morning_minute, review_day, timezone")
+        .eq("id", tid)
+        .execute()
+    )
     if not result.data:
         return {"error": "Tenant not found"}
     t = result.data[0]
@@ -714,18 +815,23 @@ async def _update_schedule(inp: dict, sb: SupabaseClient, tid: str) -> dict:
 
 # ── Memory Tool Executors ────────────────────────────────────────
 
+
 async def _core_memory_read(inp: dict, sb: SupabaseClient, tid: str) -> dict:
     from cascade_api.dependencies import get_memory_client
+
     scoped = get_memory_client().for_tenant(tid)
     content, _ = await scoped.core.read()
     if not content:
-        return {"content": "(empty — no core memory yet)", "hint": "Use core_memory_append to start building the user's profile."}
+        return {
+            "content": "(empty — no core memory yet)",
+            "hint": "Use core_memory_append to start building the user's profile.",
+        }
     return {"content": content}
 
 
 async def _core_memory_append(inp: dict, sb: SupabaseClient, tid: str) -> dict:
     from cascade_api.dependencies import get_memory_client
-    from cascade_memory.errors import StoreLimitError
+    from cascade_api.memory.errors import StoreLimitError
 
     scoped = get_memory_client().for_tenant(tid)
     try:
@@ -737,14 +843,21 @@ async def _core_memory_append(inp: dict, sb: SupabaseClient, tid: str) -> dict:
 
 async def _core_memory_replace(inp: dict, sb: SupabaseClient, tid: str) -> dict:
     from cascade_api.dependencies import get_memory_client
-    from cascade_memory.errors import StoreLimitError
+    from cascade_api.memory.errors import StoreLimitError
 
     scoped = get_memory_client().for_tenant(tid)
     try:
         version = await scoped.core.replace(inp["old_text"], inp["new_text"])
-        return {"status": "replaced", "old": inp["old_text"], "new": inp["new_text"], "version": version}
+        return {
+            "status": "replaced",
+            "old": inp["old_text"],
+            "new": inp["new_text"],
+            "version": version,
+        }
     except ValueError:
-        return {"error": f"Could not find '{inp['old_text']}' in core memory. Use core_memory_read to check current content."}
+        return {
+            "error": f"Could not find '{inp['old_text']}' in core memory. Use core_memory_read to check current content."
+        }
     except StoreLimitError as e:
         return {"error": str(e)}
 

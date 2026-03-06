@@ -38,4 +38,5 @@ def app(mock_supabase):
     """Create a FastAPI TestClient with mocked Supabase."""
     with patch("cascade_api.dependencies.get_supabase", return_value=mock_supabase):
         from cascade_api.main import app
+
         yield TestClient(app)

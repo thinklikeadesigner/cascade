@@ -21,9 +21,7 @@ def is_user_active(tenant: dict) -> bool:
         past_due_since = tenant.get("past_due_since")
         if past_due_since:
             if isinstance(past_due_since, str):
-                past_due_since = datetime.fromisoformat(
-                    past_due_since.replace("Z", "+00:00")
-                )
+                past_due_since = datetime.fromisoformat(past_due_since.replace("Z", "+00:00"))
             if past_due_since + timedelta(days=7) > datetime.now(timezone.utc):
                 return True
     return False

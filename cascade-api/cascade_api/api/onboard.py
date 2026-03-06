@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
 from pydantic import BaseModel
 from fastapi import APIRouter, HTTPException
 import structlog
@@ -49,26 +48,42 @@ async def create_goal(req: GoalRequest):
         if result.data:
             tenant = result.data[0]
         else:
-            tenant = supabase.table("tenants").insert({
-                "user_id": req.user_id,
-                "core_hours": req.core_hours,
-                "flex_hours": req.flex_hours,
-                "onboarding_status": "signed_up",
-            }).execute().data[0]
+            tenant = (
+                supabase.table("tenants")
+                .insert(
+                    {
+                        "user_id": req.user_id,
+                        "core_hours": req.core_hours,
+                        "flex_hours": req.flex_hours,
+                        "onboarding_status": "signed_up",
+                    }
+                )
+                .execute()
+                .data[0]
+            )
 
         # Create goal
-        goal = supabase.table("goals").insert({
-            "tenant_id": tenant["id"],
-            "title": req.title,
-            "description": f"{req.description}\n\nCurrent state: {req.current_state}",
-            "success_criteria": req.success_criteria,
-            "target_date": req.target_date,
-        }).execute().data[0]
+        goal = (
+            supabase.table("goals")
+            .insert(
+                {
+                    "tenant_id": tenant["id"],
+                    "title": req.title,
+                    "description": f"{req.description}\n\nCurrent state: {req.current_state}",
+                    "success_criteria": req.success_criteria,
+                    "target_date": req.target_date,
+                }
+            )
+            .execute()
+            .data[0]
+        )
 
         # Update onboarding status
-        supabase.table("tenants").update({
-            "onboarding_status": "goal_set",
-        }).eq("id", tenant["id"]).execute()
+        supabase.table("tenants").update(
+            {
+                "onboarding_status": "goal_set",
+            }
+        ).eq("id", tenant["id"]).execute()
 
         track_event(req.user_id, "goal_defined", {"goal_title": req.title})
 
@@ -88,10 +103,12 @@ async def connect_telegram(req: TelegramConnectRequest):
         raise HTTPException(status_code=404, detail="Tenant not found")
 
     tenant = result.data[0]
-    supabase.table("tenants").update({
-        "telegram_id": req.telegram_id,
-        "onboarding_status": "tg_connected",
-    }).eq("id", tenant["id"]).execute()
+    supabase.table("tenants").update(
+        {
+            "telegram_id": req.telegram_id,
+            "onboarding_status": "tg_connected",
+        }
+    ).eq("id", tenant["id"]).execute()
 
     track_event(req.user_id, "telegram_connected", {"telegram_id": req.telegram_id})
 
@@ -127,17 +144,23 @@ async def set_schedule(req: SetScheduleRequest):
         raise HTTPException(status_code=404, detail="Tenant not found")
 
     tenant = result.data[0]
-    supabase.table("tenants").update({
-        "morning_hour": req.morning_hour,
-        "morning_minute": req.morning_minute,
-        "review_day": req.review_day,
-        "timezone": req.timezone,
-    }).eq("id", tenant["id"]).execute()
+    supabase.table("tenants").update(
+        {
+            "morning_hour": req.morning_hour,
+            "morning_minute": req.morning_minute,
+            "review_day": req.review_day,
+            "timezone": req.timezone,
+        }
+    ).eq("id", tenant["id"]).execute()
 
-    track_event(req.user_id, "schedule_set", {
-        "morning_hour": req.morning_hour,
-        "review_day": req.review_day,
-        "timezone": req.timezone,
-    })
+    track_event(
+        req.user_id,
+        "schedule_set",
+        {
+            "morning_hour": req.morning_hour,
+            "review_day": req.review_day,
+            "timezone": req.timezone,
+        },
+    )
 
     return {"status": "schedule_set", "tenant_id": tenant["id"]}

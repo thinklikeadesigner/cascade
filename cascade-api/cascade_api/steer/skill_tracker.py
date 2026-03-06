@@ -133,9 +133,9 @@ async def apply_decay(
         if new_proficiency == current:
             continue
 
-        supabase.table("user_skills").update(
-            {"proficiency": round(new_proficiency, 4)}
-        ).eq("id", row["id"]).execute()
+        supabase.table("user_skills").update({"proficiency": round(new_proficiency, 4)}).eq(
+            "id", row["id"]
+        ).execute()
         updated += 1
 
     log.info("skills.decay_applied", tenant_id=tenant_id, updated=updated)

@@ -5,12 +5,12 @@ from __future__ import annotations
 from datetime import date, timedelta
 
 import structlog
-from fastapi import HTTPException, Query
+from fastapi import Query
 from pydantic import BaseModel
 
 from cascade_api.api.router import api_router
 from cascade_api.db.client import get_supabase
-from cascade_api.db import tracker, tasks, adaptations, goals
+from cascade_api.db import tracker, tasks, adaptations
 
 log = structlog.get_logger()
 
@@ -100,7 +100,11 @@ async def get_status(tenant_id: str = Query(...)):
 
     # Monthly progress
     today = date.today()
-    days_in_month = (today.replace(month=today.month % 12 + 1, day=1) - timedelta(days=1)).day if today.month < 12 else 31
+    days_in_month = (
+        (today.replace(month=today.month % 12 + 1, day=1) - timedelta(days=1)).day
+        if today.month < 12
+        else 31
+    )
     days_elapsed = today.day
     pct_month_elapsed = round(days_elapsed / days_in_month * 100, 1)
 
@@ -121,7 +125,9 @@ async def get_status(tenant_id: str = Query(...)):
     if not week_tasks:
         coaching_line = "No tasks planned this week. Run plan to generate your weekly tasks."
     elif week_progress["core_rate"] >= 80:
-        coaching_line = f"Strong week — {core_done}/{len(core_tasks)} Core tasks done. Keep the pace."
+        coaching_line = (
+            f"Strong week — {core_done}/{len(core_tasks)} Core tasks done. Keep the pace."
+        )
     elif week_progress["core_rate"] >= 50:
         coaching_line = f"{core_done}/{len(core_tasks)} Core tasks done. Solid progress, but don't let the remaining ones slip."
     else:

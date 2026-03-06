@@ -21,10 +21,12 @@ async def checkpoint_approval(state: ReverseCascadeState) -> dict:
 
     # interrupt() pauses execution here.  The dict is metadata for the API layer.
     # When resumed, ``response`` contains the user's decision.
-    response = interrupt({
-        "level": level,
-        "message": state.get("checkpoint_message", ""),
-    })
+    response = interrupt(
+        {
+            "level": level,
+            "message": state.get("checkpoint_message", ""),
+        }
+    )
 
     # response comes back as a dict from Command(resume=...)
     if isinstance(response, dict):

@@ -23,10 +23,10 @@ def get_anthropic(api_key: str | None = None) -> anthropic.AsyncAnthropic:
 @lru_cache
 def get_memory_client():
     """Singleton MemoryClient wired to Supabase + Gemini + Claude Haiku."""
-    from cascade_memory import MemoryClient
-    from cascade_memory.stores.supabase import SupabaseStore
-    from cascade_memory.embedders.gemini import GeminiEmbedder
-    from cascade_memory.extractors.anthropic import AnthropicExtractor
+    from cascade_api.memory import MemoryClient
+    from cascade_api.memory.stores.supabase import SupabaseStore
+    from cascade_api.memory.embedders.gemini import GeminiEmbedder
+    from cascade_api.memory.extractors.anthropic import AnthropicExtractor
 
     store = SupabaseStore(get_supabase())
     embedder = GeminiEmbedder(api_key=settings.gemini_api_key)

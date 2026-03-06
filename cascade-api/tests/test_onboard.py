@@ -6,7 +6,6 @@ the full app (which pulls in langgraph and other heavy dependencies).
 
 from __future__ import annotations
 
-import sys
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -18,7 +17,9 @@ def _make_supabase_mock(*, tenant_exists: bool = False):
     """Build a mock Supabase client with configurable tenant lookup behavior."""
     sb = MagicMock()
 
-    existing_tenant = {"id": "tenant-1", "onboarding_status": "signed_up"} if tenant_exists else None
+    existing_tenant = (
+        {"id": "tenant-1", "onboarding_status": "signed_up"} if tenant_exists else None
+    )
     created_tenant = {"id": "tenant-1", "onboarding_status": "goal_set"}
     created_goal = {"id": "goal-1", "tenant_id": "tenant-1", "title": "Run a marathon"}
 
@@ -26,11 +27,15 @@ def _make_supabase_mock(*, tenant_exists: bool = False):
         mock_table = MagicMock()
         if table_name == "tenants":
             if existing_tenant:
-                mock_table.select.return_value.eq.return_value.execute.return_value.data = [existing_tenant]
+                mock_table.select.return_value.eq.return_value.execute.return_value.data = [
+                    existing_tenant
+                ]
             else:
                 mock_table.select.return_value.eq.return_value.execute.return_value.data = []
             mock_table.insert.return_value.execute.return_value.data = [created_tenant]
-            mock_table.update.return_value.eq.return_value.execute.return_value.data = [created_tenant]
+            mock_table.update.return_value.eq.return_value.execute.return_value.data = [
+                created_tenant
+            ]
         elif table_name == "goals":
             mock_table.insert.return_value.execute.return_value.data = [created_goal]
         return mock_table
@@ -44,6 +49,7 @@ def onboard_app():
     """Create a minimal FastAPI app with only the onboard router mounted."""
     with patch("cascade_api.api.onboard.track_event") as mock_track:
         from cascade_api.api.onboard import router
+
         app = FastAPI()
         app.include_router(router)
         yield app, mock_track
@@ -56,16 +62,19 @@ def test_create_goal_returns_goal_and_tenant(onboard_app):
 
     with patch("cascade_api.api.onboard.get_supabase", return_value=mock_supabase):
         client = TestClient(app)
-        response = client.post("/api/onboard/goal", json={
-            "user_id": "auth-user-123",
-            "title": "Run a marathon",
-            "description": "Complete a full 26.2 mile marathon",
-            "success_criteria": "Finish under 4 hours",
-            "target_date": "2026-10-01",
-            "current_state": "Can run 5K",
-            "core_hours": 8,
-            "flex_hours": 4,
-        })
+        response = client.post(
+            "/api/onboard/goal",
+            json={
+                "user_id": "auth-user-123",
+                "title": "Run a marathon",
+                "description": "Complete a full 26.2 mile marathon",
+                "success_criteria": "Finish under 4 hours",
+                "target_date": "2026-10-01",
+                "current_state": "Can run 5K",
+                "core_hours": 8,
+                "flex_hours": 4,
+            },
+        )
         assert response.status_code == 200
         data = response.json()
         assert data["tenant_id"] == "tenant-1"
@@ -80,16 +89,19 @@ def test_create_goal_reuses_existing_tenant(onboard_app):
 
     with patch("cascade_api.api.onboard.get_supabase", return_value=mock_supabase):
         client = TestClient(app)
-        response = client.post("/api/onboard/goal", json={
-            "user_id": "auth-user-123",
-            "title": "Run a marathon",
-            "description": "Complete a full 26.2 mile marathon",
-            "success_criteria": "Finish under 4 hours",
-            "target_date": "2026-10-01",
-            "current_state": "Can run 5K",
-            "core_hours": 8,
-            "flex_hours": 4,
-        })
+        response = client.post(
+            "/api/onboard/goal",
+            json={
+                "user_id": "auth-user-123",
+                "title": "Run a marathon",
+                "description": "Complete a full 26.2 mile marathon",
+                "success_criteria": "Finish under 4 hours",
+                "target_date": "2026-10-01",
+                "current_state": "Can run 5K",
+                "core_hours": 8,
+                "flex_hours": 4,
+            },
+        )
         assert response.status_code == 200
         data = response.json()
         assert data["tenant_id"] == "tenant-1"
@@ -102,10 +114,13 @@ def test_connect_telegram_success(onboard_app):
 
     with patch("cascade_api.api.onboard.get_supabase", return_value=mock_supabase):
         client = TestClient(app)
-        response = client.post("/api/onboard/connect-telegram", json={
-            "user_id": "auth-user-123",
-            "telegram_id": 123456789,
-        })
+        response = client.post(
+            "/api/onboard/connect-telegram",
+            json={
+                "user_id": "auth-user-123",
+                "telegram_id": 123456789,
+            },
+        )
         assert response.status_code == 200
         data = response.json()
         assert data["status"] == "tg_connected"
@@ -119,10 +134,13 @@ def test_connect_telegram_tenant_not_found(onboard_app):
 
     with patch("cascade_api.api.onboard.get_supabase", return_value=mock_supabase):
         client = TestClient(app)
-        response = client.post("/api/onboard/connect-telegram", json={
-            "user_id": "nonexistent-user",
-            "telegram_id": 123456789,
-        })
+        response = client.post(
+            "/api/onboard/connect-telegram",
+            json={
+                "user_id": "nonexistent-user",
+                "telegram_id": 123456789,
+            },
+        )
         assert response.status_code == 404
         assert response.json()["detail"] == "Tenant not found"
 
@@ -134,16 +152,19 @@ def test_create_goal_tracks_posthog_event(onboard_app):
 
     with patch("cascade_api.api.onboard.get_supabase", return_value=mock_supabase):
         client = TestClient(app)
-        client.post("/api/onboard/goal", json={
-            "user_id": "auth-user-123",
-            "title": "Run a marathon",
-            "description": "Complete a full 26.2 mile marathon",
-            "success_criteria": "Finish under 4 hours",
-            "target_date": "2026-10-01",
-            "current_state": "Can run 5K",
-            "core_hours": 8,
-            "flex_hours": 4,
-        })
+        client.post(
+            "/api/onboard/goal",
+            json={
+                "user_id": "auth-user-123",
+                "title": "Run a marathon",
+                "description": "Complete a full 26.2 mile marathon",
+                "success_criteria": "Finish under 4 hours",
+                "target_date": "2026-10-01",
+                "current_state": "Can run 5K",
+                "core_hours": 8,
+                "flex_hours": 4,
+            },
+        )
         mock_track.assert_called_once_with(
             "auth-user-123", "goal_defined", {"goal_title": "Run a marathon"}
         )
@@ -156,13 +177,16 @@ def test_set_schedule_success(onboard_app):
 
     with patch("cascade_api.api.onboard.get_supabase", return_value=mock_supabase):
         client = TestClient(app)
-        response = client.post("/api/onboard/set-schedule", json={
-            "user_id": "auth-user-123",
-            "morning_hour": 8,
-            "morning_minute": 30,
-            "review_day": 6,
-            "timezone": "America/Los_Angeles",
-        })
+        response = client.post(
+            "/api/onboard/set-schedule",
+            json={
+                "user_id": "auth-user-123",
+                "morning_hour": 8,
+                "morning_minute": 30,
+                "review_day": 6,
+                "timezone": "America/Los_Angeles",
+            },
+        )
         assert response.status_code == 200
         data = response.json()
         assert data["status"] == "schedule_set"
@@ -175,11 +199,14 @@ def test_set_schedule_tenant_not_found(onboard_app):
 
     with patch("cascade_api.api.onboard.get_supabase", return_value=mock_supabase):
         client = TestClient(app)
-        response = client.post("/api/onboard/set-schedule", json={
-            "user_id": "nonexistent-user",
-            "morning_hour": 8,
-            "morning_minute": 0,
-            "review_day": 0,
-            "timezone": "America/New_York",
-        })
+        response = client.post(
+            "/api/onboard/set-schedule",
+            json={
+                "user_id": "nonexistent-user",
+                "morning_hour": 8,
+                "morning_minute": 0,
+                "review_day": 0,
+                "timezone": "America/New_York",
+            },
+        )
         assert response.status_code == 404

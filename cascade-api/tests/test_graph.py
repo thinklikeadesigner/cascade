@@ -3,12 +3,11 @@
 from __future__ import annotations
 
 import json
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 
 from cascade_api.cascade.level_utils import (
-    CascadeLevel,
     LEVELS_ASCENDING,
     discover_files,
     file_to_level,
@@ -122,7 +121,9 @@ class TestGraphNodes:
 
         mock_response = json.dumps({"level": "week", "reasoning": "Task-level change"})
 
-        with patch("cascade_api.graph.nodes.detect_change_level.ask", new_callable=AsyncMock) as mock_ask:
+        with patch(
+            "cascade_api.graph.nodes.detect_change_level.ask", new_callable=AsyncMock
+        ) as mock_ask:
             mock_ask.return_value = mock_response
 
             from cascade_api.graph.nodes.detect_change_level import detect_change_level
@@ -142,14 +143,18 @@ class TestGraphNodes:
 
     @pytest.mark.asyncio
     async def test_analyze_impact(self):
-        mock_response = json.dumps({
-            "impactSummary": "Moved task to Wednesday",
-            "proposedContent": "# Updated week",
-            "requiresPropagation": False,
-            "reasoning": "Week-only change",
-        })
+        mock_response = json.dumps(
+            {
+                "impactSummary": "Moved task to Wednesday",
+                "proposedContent": "# Updated week",
+                "requiresPropagation": False,
+                "reasoning": "Week-only change",
+            }
+        )
 
-        with patch("cascade_api.graph.nodes.analyze_impact.ask", new_callable=AsyncMock) as mock_ask:
+        with patch(
+            "cascade_api.graph.nodes.analyze_impact.ask", new_callable=AsyncMock
+        ) as mock_ask:
             mock_ask.return_value = mock_response
 
             from cascade_api.graph.nodes.analyze_impact import analyze_impact

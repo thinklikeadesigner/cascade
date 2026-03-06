@@ -27,9 +27,7 @@ def is_above(a: CascadeLevel, b: CascadeLevel) -> bool:
     return LEVELS_ASCENDING.index(a) > LEVELS_ASCENDING.index(b)
 
 
-_MONTH_PATTERN = re.compile(
-    r"^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)-\d{4}\.md$"
-)
+_MONTH_PATTERN = re.compile(r"^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)-\d{4}\.md$")
 _QUARTER_PATTERN = re.compile(r"^q\d-")
 _YEAR_PATTERN = re.compile(r"^\d{4}-goals\.md$")
 

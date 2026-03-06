@@ -46,17 +46,23 @@ async def generate_cascade(
         supabase = get_supabase()
 
     goal = supabase.table("goals").select("*").eq("id", goal_id).execute().data[0]
-    tenant = supabase.table("tenants").select("core_hours, flex_hours").eq("id", tenant_id).execute().data[0]
+    tenant = (
+        supabase.table("tenants")
+        .select("core_hours, flex_hours")
+        .eq("id", tenant_id)
+        .execute()
+        .data[0]
+    )
 
     prompt = CASCADE_SYSTEM_PROMPT.format(
         core_hours=tenant["core_hours"],
         flex_hours=tenant["flex_hours"],
     )
 
-    user_msg = f"""Goal: {goal['title']}
-Success criteria: {goal['success_criteria']}
-Current state: {goal['description']}
-Target date: {goal['target_date']}
+    user_msg = f"""Goal: {goal["title"]}
+Success criteria: {goal["success_criteria"]}
+Current state: {goal["description"]}
+Target date: {goal["target_date"]}
 Today: {date.today().isoformat()}"""
 
     result = await ask(
@@ -78,43 +84,59 @@ Today: {date.today().isoformat()}"""
     # Mark as plan_drafted BEFORE writing plan data to DB.
     # If the DB writes below fail, the user stays in plan_drafted (not plan_approved
     # with missing data).
-    supabase.table("tenants").update({
-        "onboarding_status": "plan_drafted",
-    }).eq("id", tenant_id).execute()
+    supabase.table("tenants").update(
+        {
+            "onboarding_status": "plan_drafted",
+        }
+    ).eq("id", tenant_id).execute()
 
     # Store quarterly plans
     today = date.today()
     current_quarter = (today.month - 1) // 3 + 1
     for qm in plan.get("quarterly_milestones", []):
-        supabase.table("quarterly_plans").upsert({
-            "goal_id": goal_id,
-            "quarter": qm.get("quarter", current_quarter),
-            "year": today.year,
-            "milestones": qm,
-        }, on_conflict="goal_id,quarter,year").execute()
+        supabase.table("quarterly_plans").upsert(
+            {
+                "goal_id": goal_id,
+                "quarter": qm.get("quarter", current_quarter),
+                "year": today.year,
+                "milestones": qm,
+            },
+            on_conflict="goal_id,quarter,year",
+        ).execute()
 
     # Store monthly plan
-    supabase.table("monthly_plans").upsert({
-        "tenant_id": tenant_id,
-        "month": today.month,
-        "year": today.year,
-        "targets": plan.get("monthly_targets", []),
-    }, on_conflict="tenant_id,month,year").execute()
+    supabase.table("monthly_plans").upsert(
+        {
+            "tenant_id": tenant_id,
+            "month": today.month,
+            "year": today.year,
+            "targets": plan.get("monthly_targets", []),
+        },
+        on_conflict="tenant_id,month,year",
+    ).execute()
 
     # Store weekly plan + tasks
     week_start = today - timedelta(days=today.weekday())  # Monday
     week_end = week_start + timedelta(days=6)
 
-    wp = supabase.table("weekly_plans").upsert({
-        "tenant_id": tenant_id,
-        "week_start": week_start.isoformat(),
-        "week_end": week_end.isoformat(),
-    }, on_conflict="tenant_id,week_start").execute().data[0]
+    supabase.table("weekly_plans").upsert(
+        {
+            "tenant_id": tenant_id,
+            "week_start": week_start.isoformat(),
+            "week_end": week_end.isoformat(),
+        },
+        on_conflict="tenant_id,week_start",
+    ).execute().data[0]
 
     # Map day names to dates for this week
     day_map = {
-        "monday": 0, "tuesday": 1, "wednesday": 2, "thursday": 3,
-        "friday": 4, "saturday": 5, "sunday": 6,
+        "monday": 0,
+        "tuesday": 1,
+        "wednesday": 2,
+        "thursday": 3,
+        "friday": 4,
+        "saturday": 5,
+        "sunday": 6,
     }
 
     def resolve_day(raw_day):
@@ -133,30 +155,36 @@ Today: {date.today().isoformat()}"""
 
     weekly = plan.get("weekly_tasks", {})
     for task in weekly.get("core", []):
-        supabase.table("tasks").insert({
-            "tenant_id": tenant_id,
-            "goal_id": goal_id,
-            "week_start": week_start.isoformat(),
-            "title": task["title"],
-            "category": "core",
-            "estimated_minutes": task.get("estimated_minutes"),
-            "scheduled_day": resolve_day(task.get("scheduled_day")),
-        }).execute()
+        supabase.table("tasks").insert(
+            {
+                "tenant_id": tenant_id,
+                "goal_id": goal_id,
+                "week_start": week_start.isoformat(),
+                "title": task["title"],
+                "category": "core",
+                "estimated_minutes": task.get("estimated_minutes"),
+                "scheduled_day": resolve_day(task.get("scheduled_day")),
+            }
+        ).execute()
 
     for task in weekly.get("flex", []):
-        supabase.table("tasks").insert({
-            "tenant_id": tenant_id,
-            "goal_id": goal_id,
-            "week_start": week_start.isoformat(),
-            "title": task["title"],
-            "category": "flex",
-            "estimated_minutes": task.get("estimated_minutes"),
-        }).execute()
+        supabase.table("tasks").insert(
+            {
+                "tenant_id": tenant_id,
+                "goal_id": goal_id,
+                "week_start": week_start.isoformat(),
+                "title": task["title"],
+                "category": "flex",
+                "estimated_minutes": task.get("estimated_minutes"),
+            }
+        ).execute()
 
     # All plan data written successfully — now mark as plan_approved
-    supabase.table("tenants").update({
-        "onboarding_status": "plan_approved",
-    }).eq("id", tenant_id).execute()
+    supabase.table("tenants").update(
+        {
+            "onboarding_status": "plan_approved",
+        }
+    ).eq("id", tenant_id).execute()
 
     track_event(tenant_id, "plan_approved", {"goal_id": goal_id})
 
@@ -171,6 +199,14 @@ async def generate_plan_endpoint(req: CascadePlanRequest):
         return {"status": "plan_approved", "plan": plan}
     except Exception as e:
         import traceback
-        log.error("generate_plan.failed", error=str(e), traceback=traceback.format_exc(), tenant_id=req.tenant_id, goal_id=req.goal_id)
+
+        log.error(
+            "generate_plan.failed",
+            error=str(e),
+            traceback=traceback.format_exc(),
+            tenant_id=req.tenant_id,
+            goal_id=req.goal_id,
+        )
         from fastapi import HTTPException
+
         raise HTTPException(status_code=500, detail=str(e))

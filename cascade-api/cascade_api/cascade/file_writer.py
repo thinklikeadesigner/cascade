@@ -21,9 +21,7 @@ def backup_file(file_path: str, thread_id: str, data_dir: str) -> None:
         shutil.copy2(file_path, backup_path)
 
 
-def write_cascade_file(
-    file_path: str, content: str, thread_id: str, data_dir: str
-) -> None:
+def write_cascade_file(file_path: str, content: str, thread_id: str, data_dir: str) -> None:
     """Write new content to a cascade file, creating a backup first."""
     backup_file(file_path, thread_id, data_dir)
     Path(file_path).write_text(content, encoding="utf-8")

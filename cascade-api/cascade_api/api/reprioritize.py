@@ -29,6 +29,7 @@ _graph = build_graph()
 # Request / Response models
 # ---------------------------------------------------------------------------
 
+
 class StartRequest(BaseModel):
     chat_jid: str
     user_request: str
@@ -80,6 +81,7 @@ class CancelResponse(BaseModel):
 # ---------------------------------------------------------------------------
 # Endpoints
 # ---------------------------------------------------------------------------
+
 
 @api_router.post("/api/reprioritize", response_model=StartResponse)
 async def start_reprioritize(body: StartRequest):
@@ -166,10 +168,9 @@ async def respond_to_checkpoint(thread_id: str, body: RespondRequest):
         return RespondResponse(
             thread_id=thread_id,
             status="completed",
-            applied_changes=[
-                {"level": c.level, "summary": c.summary}
-                for c in applied
-            ] if applied else None,
+            applied_changes=[{"level": c.level, "summary": c.summary} for c in applied]
+            if applied
+            else None,
         )
 
     return RespondResponse(

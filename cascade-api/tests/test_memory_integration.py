@@ -58,8 +58,13 @@ class TestMemoryIntegration:
         from cascade_api.agent.tools import TOOLS, _EXECUTORS
 
         memory_tools = [
-            "core_memory_read", "core_memory_append", "core_memory_replace",
-            "save_memory", "recall", "update_memory", "forget_memory",
+            "core_memory_read",
+            "core_memory_append",
+            "core_memory_replace",
+            "save_memory",
+            "recall",
+            "update_memory",
+            "forget_memory",
             "get_current_datetime",
         ]
         tool_names = {t["name"] for t in TOOLS}
@@ -88,7 +93,7 @@ class TestMemoryIntegration:
     async def test_core_memory_append_limit_error(self):
         """core_memory_append returns error when limit exceeded."""
         from cascade_api.agent.tools import execute_tool
-        from cascade_memory.errors import StoreLimitError
+        from cascade_api.memory.errors import StoreLimitError
 
         mock_sb = MagicMock()
         client = _mock_memory_client()
@@ -109,7 +114,7 @@ class TestMemoryIntegration:
         """Verify cascade_memory.decay.calculate_decay works."""
         from datetime import datetime, timedelta, timezone
 
-        from cascade_memory.decay import calculate_decay
+        from cascade_api.memory.decay import calculate_decay
 
         now = datetime.now(timezone.utc)
         assert calculate_decay(now) > 0.99

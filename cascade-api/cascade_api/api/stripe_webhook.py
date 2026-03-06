@@ -29,54 +29,75 @@ def process_webhook_event(
         supabase = get_supabase()
 
     # Idempotency check
-    existing = supabase.table("stripe_events").select("id").eq("stripe_event_id", event_id).execute()
+    existing = (
+        supabase.table("stripe_events").select("id").eq("stripe_event_id", event_id).execute()
+    )
     if existing.data:
         return {"status": "already_processed"}
 
     # Record event
-    supabase.table("stripe_events").insert({
-        "stripe_event_id": event_id,
-        "event_type": event_type,
-    }).execute()
+    supabase.table("stripe_events").insert(
+        {
+            "stripe_event_id": event_id,
+            "event_type": event_type,
+        }
+    ).execute()
 
     if event_type == "checkout.session.completed":
         tenant_id = data.get("client_reference_id")
-        supabase.table("tenants").update({
-            "subscription_status": "active",
-            "paid_at": datetime.now(timezone.utc).isoformat(),
-            "stripe_customer_id": data.get("customer"),
-            "stripe_subscription_id": data.get("subscription"),
-        }).eq("id", tenant_id).execute()
+        supabase.table("tenants").update(
+            {
+                "subscription_status": "active",
+                "paid_at": datetime.now(timezone.utc).isoformat(),
+                "stripe_customer_id": data.get("customer"),
+                "stripe_subscription_id": data.get("subscription"),
+            }
+        ).eq("id", tenant_id).execute()
 
         track_event(tenant_id, "payment_completed", {})
 
     elif event_type == "customer.subscription.deleted":
         customer_id = data.get("customer")
-        result = supabase.table("tenants").select("id, user_id").eq("stripe_customer_id", customer_id).execute()
+        result = (
+            supabase.table("tenants")
+            .select("id, user_id")
+            .eq("stripe_customer_id", customer_id)
+            .execute()
+        )
         if result.data:
             t = result.data[0]
-            supabase.table("tenants").update({
-                "subscription_status": "canceled",
-            }).eq("id", t["id"]).execute()
+            supabase.table("tenants").update(
+                {
+                    "subscription_status": "canceled",
+                }
+            ).eq("id", t["id"]).execute()
             track_event(t.get("user_id", t["id"]), "churned", {})
 
     elif event_type == "invoice.payment_failed":
         customer_id = data.get("customer")
-        result = supabase.table("tenants").select("id").eq("stripe_customer_id", customer_id).execute()
+        result = (
+            supabase.table("tenants").select("id").eq("stripe_customer_id", customer_id).execute()
+        )
         if result.data:
-            supabase.table("tenants").update({
-                "subscription_status": "past_due",
-                "past_due_since": datetime.now(timezone.utc).isoformat(),
-            }).eq("id", result.data[0]["id"]).execute()
+            supabase.table("tenants").update(
+                {
+                    "subscription_status": "past_due",
+                    "past_due_since": datetime.now(timezone.utc).isoformat(),
+                }
+            ).eq("id", result.data[0]["id"]).execute()
 
     elif event_type == "invoice.paid":
         customer_id = data.get("customer")
-        result = supabase.table("tenants").select("id").eq("stripe_customer_id", customer_id).execute()
+        result = (
+            supabase.table("tenants").select("id").eq("stripe_customer_id", customer_id).execute()
+        )
         if result.data:
-            supabase.table("tenants").update({
-                "subscription_status": "active",
-                "past_due_since": None,
-            }).eq("id", result.data[0]["id"]).execute()
+            supabase.table("tenants").update(
+                {
+                    "subscription_status": "active",
+                    "past_due_since": None,
+                }
+            ).eq("id", result.data[0]["id"]).execute()
 
     return {"status": "processed"}
 
@@ -89,7 +110,9 @@ async def stripe_webhook(request: Request):
 
     try:
         event = stripe.Webhook.construct_event(
-            payload, sig_header, settings.stripe_webhook_secret,
+            payload,
+            sig_header,
+            settings.stripe_webhook_secret,
         )
     except (ValueError, stripe.error.SignatureVerificationError):
         raise HTTPException(status_code=400, detail="Invalid signature")

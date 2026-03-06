@@ -63,10 +63,12 @@ async def complete_task(
     """Mark a task as completed with a timestamp."""
     result = (
         supabase.table("tasks")
-        .update({
-            "completed": True,
-            "completed_at": datetime.now(timezone.utc).isoformat(),
-        })
+        .update(
+            {
+                "completed": True,
+                "completed_at": datetime.now(timezone.utc).isoformat(),
+            }
+        )
         .eq("id", task_id)
         .execute()
     )

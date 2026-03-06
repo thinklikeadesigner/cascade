@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-from datetime import date, timedelta
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -48,6 +47,7 @@ def client(mock_supabase):
         patch("cascade_api.api.reprioritize._graph", MagicMock()),
     ):
         from cascade_api.main import app
+
         yield TestClient(app)
 
 
@@ -89,6 +89,7 @@ class TestLogEndpoint:
 
         # First execute() = SELECT existing, second = INSERT tracker, third = INSERT conversation
         call_count = 0
+
         def mock_execute():
             nonlocal call_count
             call_count += 1
@@ -109,10 +110,13 @@ class TestLogEndpoint:
             mock_client.messages.create = AsyncMock(return_value=mock_msg)
             mock_get.return_value = mock_client
 
-            resp = client.post("/api/log", json={
-                "tenant_id": "test-tenant",
-                "text": "sent 5 DMs, had a great call, energy was high",
-            })
+            resp = client.post(
+                "/api/log",
+                json={
+                    "tenant_id": "test-tenant",
+                    "text": "sent 5 DMs, had a great call, energy was high",
+                },
+            )
 
         assert resp.status_code == 200
         data = resp.json()
@@ -125,7 +129,10 @@ class TestStatusEndpoint:
         resp = client.get("/api/status", params={"tenant_id": "test-tenant"})
         assert resp.status_code == 200
         data = resp.json()
-        assert data["coaching_line"] == "No tasks planned this week. Run plan to generate your weekly tasks."
+        assert (
+            data["coaching_line"]
+            == "No tasks planned this week. Run plan to generate your weekly tasks."
+        )
         assert data["rest_debt_days"] == 0
 
     def test_status_with_tasks(self, client, mock_supabase):
@@ -138,6 +145,7 @@ class TestStatusEndpoint:
         ]
 
         call_count = 0
+
         def mock_execute():
             nonlocal call_count
             call_count += 1
@@ -163,10 +171,13 @@ class TestReviewEndpoint:
 
 class TestPlanEndpoint:
     def test_plan_no_goals(self, client, mock_supabase):
-        resp = client.post("/api/plan", json={
-            "tenant_id": "test-tenant",
-            "api_key": "test-key",
-        })
+        resp = client.post(
+            "/api/plan",
+            json={
+                "tenant_id": "test-tenant",
+                "api_key": "test-key",
+            },
+        )
         assert resp.status_code == 404
         assert "No active goals" in resp.json()["detail"]
 
@@ -190,6 +201,7 @@ class TestSteerEndpoint:
         ]
 
         call_count = 0
+
         def mock_execute():
             nonlocal call_count
             call_count += 1
@@ -209,12 +221,15 @@ class TestSteerEndpoint:
             mock_client.messages.create = AsyncMock(return_value=mock_msg)
             mock_get.return_value = mock_client
 
-            resp = client.post("/api/steer", json={
-                "tenant_id": "test-tenant",
-                "goal_id": "test-goal",
-                "task_description": "Solve 10 LeetCode problems",
-                "api_key": "test-key",
-            })
+            resp = client.post(
+                "/api/steer",
+                json={
+                    "tenant_id": "test-tenant",
+                    "goal_id": "test-goal",
+                    "task_description": "Solve 10 LeetCode problems",
+                    "api_key": "test-key",
+                },
+            )
 
         assert resp.status_code == 200
         data = resp.json()

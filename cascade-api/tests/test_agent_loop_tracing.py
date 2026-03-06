@@ -43,11 +43,16 @@ async def test_run_agent_creates_langfuse_trace(mock_deps):
     with (
         patch("cascade_api.agent.loop.get_supabase", return_value=mock_sb),
         patch("cascade_api.agent.loop.anthropic.AsyncAnthropic", return_value=mock_client),
-        patch("cascade_api.agent.loop.build_system_prompt", new_callable=AsyncMock, return_value="system prompt"),
+        patch(
+            "cascade_api.agent.loop.build_system_prompt",
+            new_callable=AsyncMock,
+            return_value="system prompt",
+        ),
         patch("cascade_api.agent.loop.get_langfuse", return_value=mock_langfuse),
         patch("cascade_api.agent.loop.should_eval", return_value=False),
     ):
         from cascade_api.agent.loop import run_agent
+
         text, messages = await run_agent(
             tenant_id="tenant-123",
             user_message="How am I doing?",
@@ -77,11 +82,16 @@ async def test_run_agent_creates_generation_span(mock_deps):
     with (
         patch("cascade_api.agent.loop.get_supabase", return_value=mock_sb),
         patch("cascade_api.agent.loop.anthropic.AsyncAnthropic", return_value=mock_client),
-        patch("cascade_api.agent.loop.build_system_prompt", new_callable=AsyncMock, return_value="system prompt"),
+        patch(
+            "cascade_api.agent.loop.build_system_prompt",
+            new_callable=AsyncMock,
+            return_value="system prompt",
+        ),
         patch("cascade_api.agent.loop.get_langfuse", return_value=mock_langfuse),
         patch("cascade_api.agent.loop.should_eval", return_value=False),
     ):
         from cascade_api.agent.loop import run_agent
+
         await run_agent(
             tenant_id="tenant-123",
             user_message="status",
@@ -104,11 +114,16 @@ async def test_run_agent_works_without_langfuse(mock_deps):
     with (
         patch("cascade_api.agent.loop.get_supabase", return_value=mock_sb),
         patch("cascade_api.agent.loop.anthropic.AsyncAnthropic", return_value=mock_client),
-        patch("cascade_api.agent.loop.build_system_prompt", new_callable=AsyncMock, return_value="system prompt"),
+        patch(
+            "cascade_api.agent.loop.build_system_prompt",
+            new_callable=AsyncMock,
+            return_value="system prompt",
+        ),
         patch("cascade_api.agent.loop.get_langfuse", return_value=None),
         patch("cascade_api.agent.loop.should_eval", return_value=False),
     ):
         from cascade_api.agent.loop import run_agent
+
         text, messages = await run_agent(
             tenant_id="tenant-123",
             user_message="Hello",
@@ -160,12 +175,21 @@ async def test_run_agent_traces_tool_calls():
     with (
         patch("cascade_api.agent.loop.get_supabase", return_value=mock_sb),
         patch("cascade_api.agent.loop.anthropic.AsyncAnthropic", return_value=mock_client),
-        patch("cascade_api.agent.loop.build_system_prompt", new_callable=AsyncMock, return_value="system"),
+        patch(
+            "cascade_api.agent.loop.build_system_prompt",
+            new_callable=AsyncMock,
+            return_value="system",
+        ),
         patch("cascade_api.agent.loop.get_langfuse", return_value=mock_langfuse),
         patch("cascade_api.agent.loop.should_eval", return_value=False),
-        patch("cascade_api.agent.loop.execute_tool", new_callable=AsyncMock, return_value='{"memories": []}'),
+        patch(
+            "cascade_api.agent.loop.execute_tool",
+            new_callable=AsyncMock,
+            return_value='{"memories": []}',
+        ),
     ):
         from cascade_api.agent.loop import run_agent
+
         text, _ = await run_agent(
             tenant_id="tenant-123",
             user_message="What are my churn signals?",

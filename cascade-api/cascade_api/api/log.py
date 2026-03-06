@@ -76,7 +76,9 @@ async def log_progress(req: LogRequest):
         parsed = json.loads(cleaned.strip())
     except json.JSONDecodeError:
         log.error("parse.json_failed", raw=raw_text)
-        raise HTTPException(status_code=422, detail="Failed to parse progress text into structured data")
+        raise HTTPException(
+            status_code=422, detail="Failed to parse progress text into structured data"
+        )
     except Exception as exc:
         log.error("parse.failed", error=str(exc))
         raise HTTPException(status_code=502, detail="LLM parsing failed")
@@ -90,12 +92,14 @@ async def log_progress(req: LogRequest):
     # Store raw text in conversations table
     conv_result = (
         supabase.table("conversations")
-        .insert({
-            "tenant_id": req.tenant_id,
-            "raw_text": req.text,
-            "source": req.source,
-            "extracted_entities": parsed,
-        })
+        .insert(
+            {
+                "tenant_id": req.tenant_id,
+                "raw_text": req.text,
+                "source": req.source,
+                "extracted_entities": parsed,
+            }
+        )
         .execute()
     )
     conversation_id = conv_result.data[0]["id"]

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import calendar
-from datetime import datetime, timezone
+from datetime import datetime
 from zoneinfo import ZoneInfo
 
 from cascade_api.dependencies import get_memory_client
@@ -159,6 +159,7 @@ async def build_system_prompt(
     quarter_end_month = ((today.month - 1) // 3 + 1) * 3
     quarter_end_day = calendar.monthrange(today.year, quarter_end_month)[1]
     from datetime import date as date_type
+
     quarter_end = date_type(today.year, quarter_end_month, quarter_end_day)
     days_left_quarter = (quarter_end - today).days
 

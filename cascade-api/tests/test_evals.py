@@ -8,12 +8,14 @@ from unittest.mock import AsyncMock, MagicMock, patch
 @pytest.mark.asyncio
 async def test_score_trace_calls_haiku_and_posts_scores():
     """score_trace should call Haiku with the judge prompt and post scores to Langfuse."""
-    judge_response = json.dumps({
-        "signal_extraction": {"score": 0.8, "reason": "Correctly parsed churn and metric"},
-        "memory_grounding": {"score": 0.9, "reason": "Referenced 2 specific signals"},
-        "briefing_quality": {"score": None, "reason": "Not a briefing"},
-        "tool_efficiency": {"score": 0.7, "reason": "One redundant recall call"},
-    })
+    judge_response = json.dumps(
+        {
+            "signal_extraction": {"score": 0.8, "reason": "Correctly parsed churn and metric"},
+            "memory_grounding": {"score": 0.9, "reason": "Referenced 2 specific signals"},
+            "briefing_quality": {"score": None, "reason": "Not a briefing"},
+            "tool_efficiency": {"score": 0.7, "reason": "One redundant recall call"},
+        }
+    )
 
     mock_response = MagicMock()
     mock_response.content = [MagicMock(text=judge_response)]
@@ -68,9 +70,12 @@ async def test_score_trace_handles_malformed_json():
         from cascade_api.observability.evals import score_trace
 
         await score_trace(
-            trace_id="trace-abc", user_message="test",
-            agent_response="test response", tool_calls=[],
-            is_scheduled=False, api_key="sk-test",
+            trace_id="trace-abc",
+            user_message="test",
+            agent_response="test response",
+            tool_calls=[],
+            is_scheduled=False,
+            api_key="sk-test",
         )
 
 
@@ -81,9 +86,12 @@ async def test_score_trace_noop_without_langfuse():
         from cascade_api.observability.evals import score_trace
 
         await score_trace(
-            trace_id="trace-abc", user_message="test",
-            agent_response="test", tool_calls=[],
-            is_scheduled=False, api_key="sk-test",
+            trace_id="trace-abc",
+            user_message="test",
+            agent_response="test",
+            tool_calls=[],
+            is_scheduled=False,
+            api_key="sk-test",
         )
 
 

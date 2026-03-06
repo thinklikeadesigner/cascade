@@ -6,7 +6,6 @@ import hashlib
 from datetime import datetime, timedelta, timezone
 from unittest.mock import MagicMock
 
-import pytest
 
 from cascade_api.telegram.tokens import generate_token, verify_token
 
@@ -17,7 +16,9 @@ def _mock_supabase(token_rows=None):
     sb.table.return_value.insert.return_value.execute.return_value.data = [{}]
     sb.table.return_value.update.return_value.eq.return_value.execute.return_value.data = [{}]
     if token_rows is not None:
-        sb.table.return_value.select.return_value.eq.return_value.execute.return_value.data = token_rows
+        sb.table.return_value.select.return_value.eq.return_value.execute.return_value.data = (
+            token_rows
+        )
     else:
         sb.table.return_value.select.return_value.eq.return_value.execute.return_value.data = []
     return sb
@@ -59,13 +60,17 @@ def test_verify_token_returns_tenant_id():
     token_hash = hashlib.sha256(raw.encode()).hexdigest()
     expires = (datetime.now(timezone.utc) + timedelta(hours=1)).isoformat()
 
-    sb = _mock_supabase(token_rows=[{
-        "id": "tok-1",
-        "tenant_id": "tenant-42",
-        "token_hash": token_hash,
-        "expires_at": expires,
-        "used_at": None,
-    }])
+    sb = _mock_supabase(
+        token_rows=[
+            {
+                "id": "tok-1",
+                "tenant_id": "tenant-42",
+                "token_hash": token_hash,
+                "expires_at": expires,
+                "used_at": None,
+            }
+        ]
+    )
 
     result = verify_token(sb, raw)
     assert result == "tenant-42"
@@ -77,13 +82,17 @@ def test_verify_token_marks_as_used():
     token_hash = hashlib.sha256(raw.encode()).hexdigest()
     expires = (datetime.now(timezone.utc) + timedelta(hours=1)).isoformat()
 
-    sb = _mock_supabase(token_rows=[{
-        "id": "tok-1",
-        "tenant_id": "tenant-42",
-        "token_hash": token_hash,
-        "expires_at": expires,
-        "used_at": None,
-    }])
+    sb = _mock_supabase(
+        token_rows=[
+            {
+                "id": "tok-1",
+                "tenant_id": "tenant-42",
+                "token_hash": token_hash,
+                "expires_at": expires,
+                "used_at": None,
+            }
+        ]
+    )
 
     verify_token(sb, raw)
 
@@ -97,13 +106,17 @@ def test_verify_token_rejects_already_used():
     token_hash = hashlib.sha256(raw.encode()).hexdigest()
     expires = (datetime.now(timezone.utc) + timedelta(hours=1)).isoformat()
 
-    sb = _mock_supabase(token_rows=[{
-        "id": "tok-1",
-        "tenant_id": "tenant-42",
-        "token_hash": token_hash,
-        "expires_at": expires,
-        "used_at": datetime.now(timezone.utc).isoformat(),
-    }])
+    sb = _mock_supabase(
+        token_rows=[
+            {
+                "id": "tok-1",
+                "tenant_id": "tenant-42",
+                "token_hash": token_hash,
+                "expires_at": expires,
+                "used_at": datetime.now(timezone.utc).isoformat(),
+            }
+        ]
+    )
 
     result = verify_token(sb, raw)
     assert result is None
@@ -115,13 +128,17 @@ def test_verify_token_rejects_expired():
     token_hash = hashlib.sha256(raw.encode()).hexdigest()
     expires = (datetime.now(timezone.utc) - timedelta(hours=1)).isoformat()
 
-    sb = _mock_supabase(token_rows=[{
-        "id": "tok-1",
-        "tenant_id": "tenant-42",
-        "token_hash": token_hash,
-        "expires_at": expires,
-        "used_at": None,
-    }])
+    sb = _mock_supabase(
+        token_rows=[
+            {
+                "id": "tok-1",
+                "tenant_id": "tenant-42",
+                "token_hash": token_hash,
+                "expires_at": expires,
+                "used_at": None,
+            }
+        ]
+    )
 
     result = verify_token(sb, raw)
     assert result is None
@@ -140,13 +157,17 @@ def test_verify_token_handles_z_suffix_in_expires_at():
     token_hash = hashlib.sha256(raw.encode()).hexdigest()
     expires = (datetime.now(timezone.utc) + timedelta(hours=1)).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
 
-    sb = _mock_supabase(token_rows=[{
-        "id": "tok-1",
-        "tenant_id": "tenant-42",
-        "token_hash": token_hash,
-        "expires_at": expires,
-        "used_at": None,
-    }])
+    sb = _mock_supabase(
+        token_rows=[
+            {
+                "id": "tok-1",
+                "tenant_id": "tenant-42",
+                "token_hash": token_hash,
+                "expires_at": expires,
+                "used_at": None,
+            }
+        ]
+    )
 
     result = verify_token(sb, raw)
     assert result == "tenant-42"

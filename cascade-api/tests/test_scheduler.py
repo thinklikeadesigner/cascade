@@ -2,7 +2,7 @@
 
 import pytest
 from unittest.mock import MagicMock, AsyncMock, patch
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, datetime, timezone
 from zoneinfo import ZoneInfo
 
 
@@ -93,13 +93,11 @@ def _make_supabase_mock(tenants, deliveries=None):
             chain.select.return_value.not_.is_.return_value.execute.return_value.data = tenants
         elif table_name == "message_deliveries":
             # select().eq().eq().eq().execute() for _already_sent
-            chain.select.return_value.eq.return_value.eq.return_value \
-                .eq.return_value.execute.return_value.data = deliveries
+            chain.select.return_value.eq.return_value.eq.return_value.eq.return_value.execute.return_value.data = deliveries
             # insert().execute() for _record_delivery
             chain.insert.return_value.execute.return_value = MagicMock()
         elif table_name == "tasks":
-            chain.select.return_value.eq.return_value.eq.return_value \
-                .execute.return_value.data = []
+            chain.select.return_value.eq.return_value.eq.return_value.execute.return_value.data = []
         return chain
 
     mock.table.side_effect = table_router
@@ -140,15 +138,22 @@ async def test_send_daily_messages_respects_user_preferred_time():
     mock_supabase = _make_supabase_mock(tenants)
     mock_bot = AsyncMock()
 
-    with patch("cascade_api.telegram.scheduler.get_supabase", return_value=mock_supabase), \
-         patch("cascade_api.telegram.scheduler.datetime") as mock_dt, \
-         patch("cascade_api.telegram.scheduler._build_daily_message", new_callable=AsyncMock, return_value="Your tasks today") as mock_build, \
-         patch("cascade_api.telegram.scheduler.track_event"):
+    with (
+        patch("cascade_api.telegram.scheduler.get_supabase", return_value=mock_supabase),
+        patch("cascade_api.telegram.scheduler.datetime") as mock_dt,
+        patch(
+            "cascade_api.telegram.scheduler._build_daily_message",
+            new_callable=AsyncMock,
+            return_value="Your tasks today",
+        ),
+        patch("cascade_api.telegram.scheduler.track_event"),
+    ):
         mock_dt.now.return_value = utc_now
         mock_dt.fromisoformat = datetime.fromisoformat
         mock_dt.side_effect = lambda *a, **kw: datetime(*a, **kw)
 
         from cascade_api.telegram.scheduler import send_daily_messages
+
         result = await send_daily_messages(mock_bot)
 
     # t-early (7 AM) should have been sent (9:15 AM > 7:00 AM)
@@ -180,14 +185,17 @@ async def test_send_daily_messages_idempotent():
     mock_supabase = _make_supabase_mock(tenants, deliveries=[{"id": 1}])
     mock_bot = AsyncMock()
 
-    with patch("cascade_api.telegram.scheduler.get_supabase", return_value=mock_supabase), \
-         patch("cascade_api.telegram.scheduler.datetime") as mock_dt, \
-         patch("cascade_api.telegram.scheduler.track_event"):
+    with (
+        patch("cascade_api.telegram.scheduler.get_supabase", return_value=mock_supabase),
+        patch("cascade_api.telegram.scheduler.datetime") as mock_dt,
+        patch("cascade_api.telegram.scheduler.track_event"),
+    ):
         mock_dt.now.return_value = utc_now
         mock_dt.fromisoformat = datetime.fromisoformat
         mock_dt.side_effect = lambda *a, **kw: datetime(*a, **kw)
 
         from cascade_api.telegram.scheduler import send_daily_messages
+
         result = await send_daily_messages(mock_bot)
 
     assert result["sent"] == 0
@@ -213,14 +221,17 @@ async def test_trial_check_pull_idempotent():
     mock_supabase = _make_supabase_mock(tenants, deliveries=[{"id": 99}])
     mock_bot = AsyncMock()
 
-    with patch("cascade_api.telegram.scheduler.get_supabase", return_value=mock_supabase), \
-         patch("cascade_api.telegram.scheduler.datetime") as mock_dt, \
-         patch("cascade_api.telegram.scheduler.track_event"):
+    with (
+        patch("cascade_api.telegram.scheduler.get_supabase", return_value=mock_supabase),
+        patch("cascade_api.telegram.scheduler.datetime") as mock_dt,
+        patch("cascade_api.telegram.scheduler.track_event"),
+    ):
         mock_dt.now.return_value = utc_now
         mock_dt.fromisoformat = datetime.fromisoformat
         mock_dt.side_effect = lambda *a, **kw: datetime(*a, **kw)
 
         from cascade_api.telegram.scheduler import run_trial_check_pull
+
         result = await run_trial_check_pull(mock_bot)
 
     assert result["processed"] == 0

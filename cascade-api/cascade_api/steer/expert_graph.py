@@ -50,12 +50,7 @@ async def build_expert_graph(
     Any existing expert_skills for this goal_id are cleared first.
     """
     # Fetch the goal for context
-    goal_result = (
-        supabase.table("goals")
-        .select("title, description")
-        .eq("id", goal_id)
-        .execute()
-    )
+    goal_result = supabase.table("goals").select("title, description").eq("id", goal_id).execute()
     if not goal_result.data:
         raise ValueError(f"Goal {goal_id} not found")
 

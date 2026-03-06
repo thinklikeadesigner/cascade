@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from datetime import date, timedelta
 
 import structlog
 from supabase import Client as SupabaseClient
@@ -29,12 +28,7 @@ async def log_entry(
         # Merge: keep existing values, overwrite with new non-None values
         row_id = existing.data[0]["id"]
         merged = {k: v for k, v in data.items() if v is not None}
-        result = (
-            supabase.table("tracker_entries")
-            .update(merged)
-            .eq("id", row_id)
-            .execute()
-        )
+        result = supabase.table("tracker_entries").update(merged).eq("id", row_id).execute()
         log.info("tracker_entry.updated", tenant_id=tenant_id, date=date_str)
     else:
         row = {"tenant_id": tenant_id, "date": date_str, **data}

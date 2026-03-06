@@ -51,7 +51,11 @@ async def lifespan(app):
                     )
                     log.info("telegram.webhook_set", url=settings.telegram_webhook_url)
                 except Exception as e:
-                    log.error("telegram.webhook_set_failed", error=str(e), url=settings.telegram_webhook_url)
+                    log.error(
+                        "telegram.webhook_set_failed",
+                        error=str(e),
+                        url=settings.telegram_webhook_url,
+                    )
             else:
                 log.warning("telegram.no_webhook_url")
     except Exception as e:

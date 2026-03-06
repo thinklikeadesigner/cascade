@@ -66,32 +66,37 @@ def _get_daily_message_type(today: date, review_day: int) -> str:
 
 def _get_active_tenants(supabase) -> list[dict]:
     """Return tenants with a telegram_id that are active (paying or in trial)."""
-    tenants = supabase.table("tenants").select("*") \
-        .not_.is_("telegram_id", "null") \
-        .execute().data
+    tenants = supabase.table("tenants").select("*").not_.is_("telegram_id", "null").execute().data
     return [t for t in tenants if is_user_active(t)]
 
 
 def _already_sent(supabase, tenant_id: str, message_type: str, today: date) -> bool:
     """Check message_deliveries for an existing record."""
-    rows = supabase.table("message_deliveries").select("id") \
-        .eq("tenant_id", tenant_id) \
-        .eq("message_type", message_type) \
-        .eq("scheduled_for", today.isoformat()) \
-        .execute().data
+    rows = (
+        supabase.table("message_deliveries")
+        .select("id")
+        .eq("tenant_id", tenant_id)
+        .eq("message_type", message_type)
+        .eq("scheduled_for", today.isoformat())
+        .execute()
+        .data
+    )
     return len(rows) > 0
 
 
 def _record_delivery(supabase, tenant_id: str, message_type: str, today: date):
     """Insert a delivery record (idempotent via UNIQUE constraint)."""
-    supabase.table("message_deliveries").insert({
-        "tenant_id": tenant_id,
-        "message_type": message_type,
-        "scheduled_for": today.isoformat(),
-    }).execute()
+    supabase.table("message_deliveries").insert(
+        {
+            "tenant_id": tenant_id,
+            "message_type": message_type,
+            "scheduled_for": today.isoformat(),
+        }
+    ).execute()
 
 
 # ── Message builders (agent loop powered) ──────────────────────────
+
 
 async def _build_daily_message(tenant_id: str, today: date, message_type: str) -> str:
     """Generate the daily message via agent loop with context based on day type."""
@@ -151,6 +156,7 @@ async def _build_daily_message(tenant_id: str, today: date, message_type: str) -
 
 # ── Pull-based send function (called by cron endpoint) ─────────────
 
+
 async def send_daily_messages(bot: Bot):
     """Send 1 daily message to each eligible tenant at their preferred time.
 
@@ -199,13 +205,19 @@ async def send_daily_messages(bot: Bot):
             # Increment weekly review counter when review is included
             if message_type in ("weekly_review", "monday_review"):
                 reviews = tenant.get("completed_weekly_reviews", 0)
-                supabase.table("tenants").update({
-                    "completed_weekly_reviews": reviews + 1,
-                }).eq("id", tenant_id).execute()
+                supabase.table("tenants").update(
+                    {
+                        "completed_weekly_reviews": reviews + 1,
+                    }
+                ).eq("id", tenant_id).execute()
 
-            track_event(tenant.get("user_id", tenant_id), "daily_message_sent", {
-                "message_type": message_type,
-            })
+            track_event(
+                tenant.get("user_id", tenant_id),
+                "daily_message_sent",
+                {
+                    "message_type": message_type,
+                },
+            )
             log.info("scheduled.sent", tenant_id=tenant_id, type=message_type)
             sent += 1
         except Exception as e:
@@ -226,9 +238,7 @@ async def run_trial_check_pull(bot: Bot):
     utc_now = datetime.now(timezone.utc)
 
     # Get ALL tenants with telegram (not just active — we need to reach trial-ended users)
-    tenants = supabase.table("tenants").select("*") \
-        .not_.is_("telegram_id", "null") \
-        .execute().data
+    tenants = supabase.table("tenants").select("*").not_.is_("telegram_id", "null").execute().data
 
     actions = get_trial_actions(tenants)
     processed = 0
@@ -256,9 +266,13 @@ async def run_trial_check_pull(bot: Bot):
                 ),
             )
             _record_delivery(supabase, tenant_id, "trial_reminder", today)
-            track_event(tenant.get("user_id", tenant_id), "payment_link_sent", {
-                "completed_reviews": tenant.get("completed_weekly_reviews", 0),
-            })
+            track_event(
+                tenant.get("user_id", tenant_id),
+                "payment_link_sent",
+                {
+                    "completed_reviews": tenant.get("completed_weekly_reviews", 0),
+                },
+            )
             processed += 1
         except Exception as e:
             log.error("trial_check.failed", tenant_id=tenant_id, error=str(e))

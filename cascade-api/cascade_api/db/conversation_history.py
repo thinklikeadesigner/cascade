@@ -38,10 +38,12 @@ async def save_turn(
     content: str,
 ) -> None:
     """Save a single conversation turn."""
-    supabase.table("conversations").insert({
-        "tenant_id": tenant_id,
-        "role": role,
-        "raw_text": content if isinstance(content, str) else json.dumps(content),
-        "content": content,
-        "source": "agent_history",
-    }).execute()
+    supabase.table("conversations").insert(
+        {
+            "tenant_id": tenant_id,
+            "role": role,
+            "raw_text": content if isinstance(content, str) else json.dumps(content),
+            "content": content,
+            "source": "agent_history",
+        }
+    ).execute()

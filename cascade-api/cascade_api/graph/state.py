@@ -14,6 +14,7 @@ from cascade_api.cascade.level_utils import CascadeLevel
 # Pydantic models for structured data inside the state
 # ---------------------------------------------------------------------------
 
+
 class FileChange(BaseModel):
     level: CascadeLevel
     file_path: str
@@ -37,6 +38,7 @@ class ApprovalResponse(BaseModel):
 # ---------------------------------------------------------------------------
 # LangGraph state — TypedDict with Annotated reducer for appliedChanges
 # ---------------------------------------------------------------------------
+
 
 class ReverseCascadeState(TypedDict, total=False):
     # Input

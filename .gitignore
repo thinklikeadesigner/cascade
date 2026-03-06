@@ -20,6 +20,9 @@ node_modules/
 # Build artifacts
 outputs/
 
+# Local tools
+tools/
+
 # Product research
 product-research/
 cascade-research/
@@ -50,10 +53,8 @@ dist/
 # Claude Code
 .claude/
 
-# cascade-memory has its own repo
+# cascade-memory (now part of cascade-api)
 /cascade-memory/
-# but allow the vendored copy inside cascade-api
-!cascade-api/cascade-memory/
 
 # Supabase local
 supabase/.temp/

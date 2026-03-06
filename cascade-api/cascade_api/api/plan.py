@@ -91,17 +91,30 @@ async def generate_plan(req: PlanRequest):
     # Monthly entries for context
     month_start = date.today().replace(day=1).isoformat()
     month_entries = await tracker.get_entries(
-        supabase, req.tenant_id, start_date=month_start,
+        supabase,
+        req.tenant_id,
+        start_date=month_start,
     )
 
     if not active_goals:
-        raise HTTPException(status_code=404, detail="No active goals found. Run cascade setup first.")
+        raise HTTPException(
+            status_code=404, detail="No active goals found. Run cascade setup first."
+        )
 
     # Build context for Claude
     context = {
         "week_start": week_start,
-        "days": [(date.fromisoformat(week_start) + timedelta(days=i)).isoformat() for i in range(7)],
-        "goals": [{"title": g["title"], "description": g.get("description"), "target_date": g.get("target_date")} for g in active_goals],
+        "days": [
+            (date.fromisoformat(week_start) + timedelta(days=i)).isoformat() for i in range(7)
+        ],
+        "goals": [
+            {
+                "title": g["title"],
+                "description": g.get("description"),
+                "target_date": g.get("target_date"),
+            }
+            for g in active_goals
+        ],
         "velocity_last_4_weeks": velocity,
         "current_week_tasks": [
             {"title": t["title"], "category": t["category"], "completed": t["completed"]}
@@ -110,8 +123,7 @@ async def generate_plan(req: PlanRequest):
         "monthly_entries_count": len(month_entries),
         "days_left_in_month": (date.fromisoformat(_current_month_end()) - date.today()).days,
         "active_adaptations": [
-            {"type": a["pattern_type"], "description": a["description"]}
-            for a in active_adapts
+            {"type": a["pattern_type"], "description": a["description"]} for a in active_adapts
         ],
     }
 

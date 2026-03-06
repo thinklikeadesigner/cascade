@@ -13,13 +13,17 @@ log = structlog.get_logger()
 try:
     from langfuse import Langfuse
     from langfuse.decorators import observe, langfuse_context
+
     HAS_LANGFUSE = True
 except ImportError:
     HAS_LANGFUSE = False
+
     def observe(**kwargs):
         def decorator(fn):
             return fn
+
         return decorator
+
     langfuse_context = None
     Langfuse = None
 

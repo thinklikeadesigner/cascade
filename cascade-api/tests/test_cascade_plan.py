@@ -13,7 +13,11 @@ SAMPLE_PLAN = {
     "year_plan": "Train progressively from 5K to marathon distance over 8 months",
     "quarterly_milestones": [
         {"quarter": 1, "description": "Build base fitness", "key_results": ["Run 10K comfortably"]},
-        {"quarter": 2, "description": "Half marathon prep", "key_results": ["Complete half marathon"]},
+        {
+            "quarter": 2,
+            "description": "Half marathon prep",
+            "key_results": ["Complete half marathon"],
+        },
     ],
     "monthly_targets": [
         {"month": 3, "targets": ["Run 3x per week", "Complete 10K distance"]},
@@ -101,8 +105,7 @@ def test_generate_cascade_stores_quarterly_plans():
 
         # Should have called table("quarterly_plans") for each milestone
         quarterly_calls = [
-            call for call in mock_supabase.table.call_args_list
-            if call.args == ("quarterly_plans",)
+            call for call in mock_supabase.table.call_args_list if call.args == ("quarterly_plans",)
         ]
         assert len(quarterly_calls) == 2  # Two quarterly milestones in SAMPLE_PLAN
 
@@ -122,8 +125,7 @@ def test_generate_cascade_stores_tasks():
 
         # Should have called table("tasks") for each task (2 core + 1 flex = 3)
         task_calls = [
-            call for call in mock_supabase.table.call_args_list
-            if call.args == ("tasks",)
+            call for call in mock_supabase.table.call_args_list if call.args == ("tasks",)
         ]
         assert len(task_calls) == 3
 
@@ -167,11 +169,14 @@ def test_generate_plan_endpoint_returns_200():
         from fastapi.testclient import TestClient
 
         client = TestClient(app)
-        response = client.post("/api/onboard/generate-plan", json={
-            "tenant_id": "tenant-1",
-            "goal_id": "goal-1",
-            "api_key": "sk-test",
-        })
+        response = client.post(
+            "/api/onboard/generate-plan",
+            json={
+                "tenant_id": "tenant-1",
+                "goal_id": "goal-1",
+                "api_key": "sk-test",
+            },
+        )
         assert response.status_code == 200
         data = response.json()
         assert data["status"] == "plan_approved"

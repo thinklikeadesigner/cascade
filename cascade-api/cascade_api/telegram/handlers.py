@@ -47,16 +47,18 @@ async def handle_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     tenant = result.data[0]
 
     # Link Telegram ID
-    supabase.table("tenants").update({
-        "telegram_id": telegram_id,
-        "onboarding_status": "tg_connected",
-    }).eq("id", tenant_id).execute()
+    supabase.table("tenants").update(
+        {
+            "telegram_id": telegram_id,
+            "onboarding_status": "tg_connected",
+        }
+    ).eq("id", tenant_id).execute()
 
     track_event(tenant["user_id"], "telegram_connected", {"telegram_id": telegram_id})
 
     await update.message.reply_text(
         f"You're set, {name}. I'll send your first tasks tomorrow morning.\n\n"
-        "You can text me anytime to log progress. Try: \"finished 2 tasks, energy was high\""
+        'You can text me anytime to log progress. Try: "finished 2 tasks, energy was high"'
     )
 
 
@@ -72,7 +74,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Find tenant
     result = supabase.table("tenants").select("*").eq("telegram_id", telegram_id).execute()
     if not result.data:
-        await update.message.reply_text("I don't recognize this account. Sign up at our website first.")
+        await update.message.reply_text(
+            "I don't recognize this account. Sign up at our website first."
+        )
         return
 
     tenant = result.data[0]
@@ -108,7 +112,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text(response_text, parse_mode="HTML")
         else:
             for i in range(0, len(response_text), 4096):
-                await update.message.reply_text(response_text[i:i + 4096], parse_mode="HTML")
+                await update.message.reply_text(response_text[i : i + 4096], parse_mode="HTML")
 
         track_event(tenant.get("user_id", tenant_id), "message_processed", {"intent": "agent_loop"})
 
@@ -117,11 +121,15 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             from cascade_api.dependencies import get_memory_client
 
             # Get the conversation ID from the saved turn
-            recent = supabase.table("conversations").select("id").eq(
-                "tenant_id", tenant_id
-            ).eq("source", "agent_history").order(
-                "created_at", desc=True
-            ).limit(1).execute()
+            recent = (
+                supabase.table("conversations")
+                .select("id")
+                .eq("tenant_id", tenant_id)
+                .eq("source", "agent_history")
+                .order("created_at", desc=True)
+                .limit(1)
+                .execute()
+            )
             conv_id = recent.data[0]["id"] if recent.data else None
 
             # Build transcript from the exchange

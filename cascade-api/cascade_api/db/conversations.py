@@ -114,6 +114,4 @@ async def store_and_extract(
 ) -> dict:
     """Convenience: store a conversation and run entity extraction in one call."""
     conversation = await store_conversation(supabase, tenant_id, raw_text, source)
-    return await extract_entities(
-        supabase, conversation["id"], raw_text, api_key
-    )
+    return await extract_entities(supabase, conversation["id"], raw_text, api_key)

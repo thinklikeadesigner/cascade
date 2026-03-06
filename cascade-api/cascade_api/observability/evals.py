@@ -25,12 +25,18 @@ def build_judge_prompt(
     if tool_calls:
         tool_lines = []
         for tc in tool_calls:
-            tool_lines.append(f"- {tc['tool']}({json.dumps(tc.get('input', {}), default=str)[:200]})")
+            tool_lines.append(
+                f"- {tc['tool']}({json.dumps(tc.get('input', {}), default=str)[:200]})"
+            )
         tool_summary = "\n".join(tool_lines)
     else:
         tool_summary = "(no tool calls)"
 
-    briefing_note = "This is a scheduled briefing — score briefing_quality." if is_scheduled else "This is NOT a scheduled briefing — set briefing_quality score to null."
+    briefing_note = (
+        "This is a scheduled briefing — score briefing_quality."
+        if is_scheduled
+        else "This is NOT a scheduled briefing — set briefing_quality score to null."
+    )
 
     return f"""You are an eval judge for Cascade, a strategic co-pilot for founders. Score the agent's response on 4 criteria.
 

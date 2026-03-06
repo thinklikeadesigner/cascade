@@ -26,6 +26,7 @@ def client_with_secret(mock_bot_app):
         patch("cascade_api.config.settings.telegram_bot_token", "fake-token"),
     ):
         from cascade_api.main import app
+
         app.state.bot_app = mock_bot_app
         yield TestClient(app)
 
@@ -39,6 +40,7 @@ def client_no_secret(mock_bot_app):
         patch("cascade_api.config.settings.telegram_bot_token", "fake-token"),
     ):
         from cascade_api.main import app
+
         app.state.bot_app = mock_bot_app
         yield TestClient(app)
 
@@ -116,6 +118,7 @@ class TestWebhookEndpoint:
             patch("cascade_api.config.settings.telegram_bot_token", ""),
         ):
             from cascade_api.main import app
+
             app.state.bot_app = None
 
             client = TestClient(app)

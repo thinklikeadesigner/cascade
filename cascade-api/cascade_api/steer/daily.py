@@ -77,9 +77,7 @@ async def generate_daily_tasks(
     for deficit in all_deficits:
         if deficit.get("skill_name"):
             # Find matching skill weight
-            matching = [
-                g for g in all_gaps if g["skill_name"] == deficit["skill_name"]
-            ]
+            matching = [g for g in all_gaps if g["skill_name"] == deficit["skill_name"]]
             skill_weight = matching[0]["required_weight"] if matching else 0.5
         else:
             skill_weight = 0.5
@@ -90,6 +88,7 @@ async def generate_daily_tasks(
             # Handle both string and date types
             if isinstance(due, str):
                 from datetime import datetime
+
                 due_date = datetime.strptime(due, "%Y-%m-%d").date()
             else:
                 due_date = due
@@ -115,21 +114,25 @@ async def generate_daily_tasks(
     existing_titles = [t["title"] for t in existing_result.data]
 
     # Build prompt context
-    gaps_text = "\n".join(
-        f"- {g['skill_name']}: weight={g['required_weight']}, "
-        f"proficiency={g['current_proficiency']}, gap={g['gap']}"
-        for g in all_gaps[:8]
-    ) or "No skill gaps — expert graph may not be built yet."
+    gaps_text = (
+        "\n".join(
+            f"- {g['skill_name']}: weight={g['required_weight']}, "
+            f"proficiency={g['current_proficiency']}, gap={g['gap']}"
+            for g in all_gaps[:8]
+        )
+        or "No skill gaps — expert graph may not be built yet."
+    )
 
-    deficits_text = "\n".join(
-        f"- {d['title']}: deficit={d['deficit']} {d.get('unit') or 'units'}, "
-        f"leverage={d['leverage_score']}"
-        for d in all_deficits[:6]
-    ) or "No indicator deficits."
+    deficits_text = (
+        "\n".join(
+            f"- {d['title']}: deficit={d['deficit']} {d.get('unit') or 'units'}, "
+            f"leverage={d['leverage_score']}"
+            for d in all_deficits[:6]
+        )
+        or "No indicator deficits."
+    )
 
-    existing_text = "\n".join(
-        f"- {t}" for t in existing_titles[:10]
-    ) or "None"
+    existing_text = "\n".join(f"- {t}" for t in existing_titles[:10]) or "None"
 
     # Ask Claude (Haiku — fast/cheap for task generation)
     client = get_anthropic(api_key)

@@ -35,6 +35,7 @@ async def cron_daily(request: Request):
 
     # Memory decay — update scores daily
     from cascade_api.dependencies import get_memory_client
+
     try:
         decay_updated = await get_memory_client().run_decay()
         result["decay_updated"] = decay_updated

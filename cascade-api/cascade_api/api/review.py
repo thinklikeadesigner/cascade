@@ -53,7 +53,10 @@ async def weekly_review(req: ReviewRequest):
 
     # Get tracker data for the week
     entries = await tracker.get_entries(
-        supabase, req.tenant_id, start_date=week_start, end_date=week_end,
+        supabase,
+        req.tenant_id,
+        start_date=week_start,
+        end_date=week_end,
     )
 
     # Planned vs actual
@@ -74,9 +77,9 @@ async def weekly_review(req: ReviewRequest):
     # Completion rates
     core_rate = round(len(core_done) / len(core_tasks) * 100, 1) if core_tasks else 0
     flex_rate = round(len(flex_done) / len(flex_tasks) * 100, 1) if flex_tasks else 0
-    total_rate = round(
-        (len(core_done) + len(flex_done)) / len(week_tasks) * 100, 1
-    ) if week_tasks else 0
+    total_rate = (
+        round((len(core_done) + len(flex_done)) / len(week_tasks) * 100, 1) if week_tasks else 0
+    )
 
     completion_rate = {
         "core_pct": core_rate,
@@ -104,19 +107,21 @@ async def weekly_review(req: ReviewRequest):
     adjustments: list[str] = []
 
     if core_rate < 50:
-        adjustments.append(
-            f"Core completion at {core_rate}% — consider reducing scope next week."
-        )
+        adjustments.append(f"Core completion at {core_rate}% — consider reducing scope next week.")
     elif core_rate < 75:
         adjustments.append(
             f"Core at {core_rate}%. Close but not hitting target. Check what blocked the remaining tasks."
         )
 
     if flex_tasks and len(flex_done) == 0:
-        adjustments.append("Zero Flex tasks completed. Consider dropping Flex or making them smaller.")
+        adjustments.append(
+            "Zero Flex tasks completed. Consider dropping Flex or making them smaller."
+        )
 
     if energy_assessment["average"] and energy_assessment["average"] < 2.5:
-        adjustments.append("Low average energy this week. Consider lighter scheduling or more rest.")
+        adjustments.append(
+            "Low average energy this week. Consider lighter scheduling or more rest."
+        )
 
     if energy_assessment["low_days"] >= 3:
         adjustments.append(

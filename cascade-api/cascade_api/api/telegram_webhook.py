@@ -84,9 +84,13 @@ async def telegram_webhook(request: Request):
     body = await request.json()
     update = Update.de_json(body, bot_app.bot)
     user_id = str(update.effective_user.id) if update.effective_user else "unknown"
-    track_event(user_id, "telegram_message_received", {
-        "chat_type": update.effective_chat.type if update.effective_chat else None,
-    })
+    track_event(
+        user_id,
+        "telegram_message_received",
+        {
+            "chat_type": update.effective_chat.type if update.effective_chat else None,
+        },
+    )
     await bot_app.process_update(update)
 
     return {"ok": True}

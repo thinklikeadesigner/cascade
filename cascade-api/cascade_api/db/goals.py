@@ -53,11 +53,6 @@ async def update_goal(
     **updates,
 ) -> dict:
     """Update a goal by ID."""
-    result = (
-        supabase.table("goals")
-        .update(updates)
-        .eq("id", goal_id)
-        .execute()
-    )
+    result = supabase.table("goals").update(updates).eq("id", goal_id).execute()
     log.info("goal.updated", goal_id=goal_id, fields=list(updates.keys()))
     return result.data[0]
