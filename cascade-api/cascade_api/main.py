@@ -11,6 +11,7 @@ from cascade_api.config import settings
 from cascade_api.api.router import api_router
 from cascade_api.telegram.bot import create_bot
 from cascade_api.observability.posthog_client import get_posthog
+from cascade_api.observability.langfuse_client import flush_langfuse
 
 if settings.sentry_dsn:
     sentry_sdk.init(
@@ -59,6 +60,7 @@ async def lifespan(app):
     app.state.bot_app = bot_app
     log.info("app.started")
     yield
+    flush_langfuse()
     ph = get_posthog()
     if ph:
         ph.flush()

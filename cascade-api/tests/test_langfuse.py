@@ -1,36 +1,56 @@
+"""Tests for Langfuse tracing helpers."""
+
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import MagicMock, patch
 
 
-@pytest.mark.asyncio
-async def test_traced_ask_calls_langfuse_and_returns_response():
-    """Traced ask should create a Langfuse generation and return Claude's response."""
-    mock_anthropic = AsyncMock()
-    mock_anthropic.messages.create.return_value = MagicMock(
-        content=[MagicMock(text="test response")],
-        usage=MagicMock(input_tokens=10, output_tokens=5),
-    )
+def test_get_langfuse_returns_none_when_not_configured():
+    """get_langfuse returns None when keys are not set."""
+    with patch("cascade_api.observability.langfuse_client.settings") as mock_settings:
+        mock_settings.langfuse_public_key = ""
+        from cascade_api.observability.langfuse_client import get_langfuse
+        get_langfuse.cache_clear()
+        result = get_langfuse()
+        assert result is None
 
+
+def test_get_langfuse_returns_client_when_configured():
+    """get_langfuse returns a Langfuse instance when keys are set."""
+    mock_lf_instance = MagicMock()
     with (
-        patch("cascade_api.observability.langfuse_client.get_langfuse") as mock_lf,
-        patch("cascade_api.observability.langfuse_client.anthropic.AsyncAnthropic", return_value=mock_anthropic),
+        patch("cascade_api.observability.langfuse_client.settings") as mock_settings,
+        patch("cascade_api.observability.langfuse_client.HAS_LANGFUSE", True),
+        patch("cascade_api.observability.langfuse_client.Langfuse", return_value=mock_lf_instance) as mock_cls,
     ):
-        mock_trace = MagicMock()
-        mock_generation = MagicMock()
-        mock_trace.generation.return_value = mock_generation
-        mock_lf.return_value.trace.return_value = mock_trace
-
-        from cascade_api.observability.langfuse_client import traced_ask
-
-        result = await traced_ask(
-            system_prompt="You are helpful.",
-            user_message="Hello",
-            api_key="sk-test",
-            user_id="user-123",
-            context="morning_message",
+        mock_settings.langfuse_public_key = "pk-test"
+        mock_settings.langfuse_secret_key = "sk-test"
+        mock_settings.langfuse_host = "https://cloud.langfuse.com"
+        from cascade_api.observability.langfuse_client import get_langfuse
+        get_langfuse.cache_clear()
+        result = get_langfuse()
+        assert result is mock_lf_instance
+        mock_cls.assert_called_once_with(
+            public_key="pk-test",
+            secret_key="sk-test",
+            host="https://cloud.langfuse.com",
         )
 
-        assert result == "test response"
-        mock_lf.return_value.trace.assert_called_once()
-        mock_trace.generation.assert_called_once()
-        mock_generation.end.assert_called_once()
+
+def test_should_eval_skips_trivial():
+    """Trivial single-word messages should not be evaluated."""
+    from cascade_api.observability.langfuse_client import should_eval
+    assert should_eval("status", is_scheduled=False) is False
+    assert should_eval("tasks", is_scheduled=False) is False
+
+
+def test_should_eval_always_evals_scheduled():
+    """Scheduled messages are always evaluated."""
+    from cascade_api.observability.langfuse_client import should_eval
+    assert should_eval("status", is_scheduled=True) is True
+
+
+def test_should_eval_samples_normal_messages():
+    """Normal messages are sampled at the configured rate."""
+    from cascade_api.observability.langfuse_client import should_eval
+    assert should_eval("Tell me about my churn signals", is_scheduled=False, sample_rate=1.0) is True
+    assert should_eval("Tell me about my churn signals", is_scheduled=False, sample_rate=0.0) is False

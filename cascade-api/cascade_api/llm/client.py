@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from cascade_api.observability.langfuse_client import traced_ask
+import anthropic
 
 
 async def ask(
@@ -12,10 +12,11 @@ async def ask(
     user_id: str | None = None,
     context: str | None = None,
 ) -> str:
-    return await traced_ask(
-        system_prompt=system_prompt,
-        user_message=user_message,
-        api_key=api_key,
-        user_id=user_id,
-        context=context,
+    client = anthropic.AsyncAnthropic(api_key=api_key)
+    response = await client.messages.create(
+        model="claude-sonnet-4-20250514",
+        max_tokens=4096,
+        system=system_prompt,
+        messages=[{"role": "user", "content": user_message}],
     )
+    return response.content[0].text

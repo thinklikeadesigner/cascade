@@ -10,6 +10,7 @@ import anthropic
 from cascade_api.agent.tools import TOOLS, execute_tool
 from cascade_api.agent.system_prompt import SYSTEM_PROMPT, build_system_prompt
 from cascade_api.dependencies import get_supabase
+from cascade_api.observability.langfuse_client import get_langfuse, should_eval, flush_langfuse
 
 log = structlog.get_logger()
 
@@ -26,20 +27,17 @@ async def run_agent(
     api_key: str,
     is_scheduled: bool = False,
     scheduled_context: str | None = None,
+    scheduled_model: str | None = None,
 ) -> tuple[str, list[dict]]:
-    """Run the agent loop. Returns (response_text, updated_history).
+    """Run the agent loop with optional Langfuse tracing.
 
-    For scheduled messages, pass is_scheduled=True and scheduled_context
-    with instructions. These go into a system prompt addendum, not the
-    user message — avoids the [SCHEDULED: ...] prefix hack leaking into
-    Claude's reasoning or response.
+    Returns (response_text, updated_history).
     """
-
     client = anthropic.AsyncAnthropic(api_key=api_key)
     supabase = get_supabase()
+    lf = get_langfuse()
 
-    # Build system prompt — dynamic with date context + core memory
-    # Fetch tenant for timezone and schedule info
+    # Build system prompt
     tenant_result = supabase.table("tenants").select(
         "timezone, morning_hour, morning_minute, review_day"
     ).eq("id", tenant_id).execute()
@@ -50,14 +48,44 @@ async def run_agent(
         scheduled_context=scheduled_context,
     )
 
-    # Build messages: history + new user message
     messages = list(conversation_history)
     messages.append({"role": "user", "content": user_message})
 
-    # Pick model — default Sonnet, Haiku only for scheduled/trivial
-    model = _pick_model(user_message, is_scheduled=is_scheduled)
+    model = scheduled_model if scheduled_model else _pick_model(user_message, is_scheduled=is_scheduled)
 
-    for _ in range(MAX_TOOL_ROUNDS):
+    # --- Langfuse trace (root) ---
+    trace = None
+    if lf:
+        try:
+            trace = lf.trace(
+                name="agent_loop",
+                user_id=tenant_id,
+                metadata={
+                    "tenant_id": tenant_id,
+                    "is_scheduled": is_scheduled,
+                    "initial_model": model,
+                },
+                input=user_message,
+            )
+        except Exception as e:
+            log.warning("langfuse.trace_failed", error=str(e))
+            trace = None
+
+    tool_calls_log = []  # collect for evals
+
+    for round_num in range(MAX_TOOL_ROUNDS):
+        # --- Langfuse generation span ---
+        generation = None
+        if trace:
+            try:
+                generation = trace.generation(
+                    name=f"llm_call_{round_num}",
+                    model=model,
+                    input=messages,
+                )
+            except Exception:
+                generation = None
+
         response = await client.messages.create(
             model=model,
             max_tokens=1024,
@@ -66,20 +94,73 @@ async def run_agent(
             messages=messages,
         )
 
-        # Check if Claude wants to use tools
+        # End generation span
+        if generation:
+            try:
+                generation.end(
+                    output=response.content,
+                    usage={
+                        "input": response.usage.input_tokens,
+                        "output": response.usage.output_tokens,
+                    },
+                    metadata={"stop_reason": response.stop_reason},
+                )
+            except Exception:
+                pass
+
         tool_use_blocks = [b for b in response.content if b.type == "tool_use"]
 
         if not tool_use_blocks:
-            # Claude produced a final text response
             text = "".join(b.text for b in response.content if b.type == "text")
             messages.append({"role": "assistant", "content": response.content})
+
+            # --- Finalize trace ---
+            if trace:
+                try:
+                    trace.update(output=text)
+                except Exception:
+                    pass
+
+            # --- Trigger evals (fire-and-forget) ---
+            if trace and should_eval(user_message, is_scheduled):
+                try:
+                    import asyncio
+                    from cascade_api.observability.evals import score_trace
+                    asyncio.create_task(score_trace(
+                        trace_id=trace.id,
+                        user_message=user_message,
+                        agent_response=text,
+                        tool_calls=tool_calls_log,
+                        is_scheduled=is_scheduled,
+                        api_key=api_key,
+                    ))
+                except Exception as e:
+                    log.warning("langfuse.eval_trigger_failed", error=str(e))
+
+            if lf:
+                try:
+                    lf.flush()
+                except Exception:
+                    pass
+
             return text, messages
 
-        # Execute tool calls and feed results back
+        # Execute tool calls
         messages.append({"role": "assistant", "content": response.content})
-
         tool_results = []
+
         for tool_block in tool_use_blocks:
+            # --- Langfuse tool span ---
+            tool_span = None
+            if trace:
+                try:
+                    tool_span = trace.span(
+                        name=f"tool_{tool_block.name}",
+                        input=tool_block.input,
+                    )
+                except Exception:
+                    tool_span = None
+
             try:
                 result = await execute_tool(
                     tool_block.name, tool_block.input, supabase, tenant_id,
@@ -89,40 +170,60 @@ async def run_agent(
                     "tool_use_id": tool_block.id,
                     "content": result,
                 })
+                tool_calls_log.append({
+                    "tool": tool_block.name,
+                    "input": tool_block.input,
+                    "output": result,
+                })
+
+                if tool_span:
+                    try:
+                        tool_span.end(output=result)
+                    except Exception:
+                        pass
+
             except Exception as e:
                 log.error("tool.failed", tool=tool_block.name, error=str(e))
+                error_result = json.dumps({"error": str(e)})
                 tool_results.append({
                     "type": "tool_result",
                     "tool_use_id": tool_block.id,
-                    "content": json.dumps({"error": str(e)}),
+                    "content": error_result,
                     "is_error": True,
                 })
 
+                if tool_span:
+                    try:
+                        tool_span.end(output=error_result, level="ERROR")
+                    except Exception:
+                        pass
+
         messages.append({"role": "user", "content": tool_results})
 
-        # Upgrade to complex model if tool use is getting multi-step
         if len(tool_use_blocks) > 1:
             model = COMPLEX_MODEL
+            if trace:
+                try:
+                    trace.event(name="model_upgrade", metadata={"new_model": COMPLEX_MODEL})
+                except Exception:
+                    pass
 
     # Safety: max rounds exceeded
+    if trace:
+        try:
+            trace.update(output="max_rounds_exceeded", metadata={"error": True})
+            lf.flush()
+        except Exception:
+            pass
+
     return "I hit my reasoning limit. Can you try rephrasing?", messages
 
 
 def _pick_model(message: str, is_scheduled: bool = False) -> str:
-    """Route to cheap or expensive model based on context.
-
-    Default to Sonnet. Haiku only for scheduled messages and trivially short
-    factual queries. The per-message cost difference is fractions of a cent —
-    not worth risking bad responses on misrouted complex messages.
-    """
+    """Route to cheap or expensive model based on context."""
     if is_scheduled:
         return SIMPLE_MODEL
-
-    # Only use Haiku for very short, single-intent messages
     msg_lower = message.strip().lower()
-    if len(msg_lower) < 20 and msg_lower in (
-        "status", "tasks", "today", "review",
-    ):
+    if len(msg_lower) < 20 and msg_lower in ("status", "tasks", "today", "review"):
         return SIMPLE_MODEL
-
     return COMPLEX_MODEL

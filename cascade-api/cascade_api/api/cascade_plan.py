@@ -9,7 +9,7 @@ from fastapi import APIRouter
 import structlog
 
 from cascade_api.dependencies import get_supabase
-from cascade_api.observability.langfuse_client import traced_ask
+from cascade_api.llm.client import ask
 from cascade_api.observability.posthog_client import track_event
 
 log = structlog.get_logger()
@@ -59,7 +59,7 @@ Current state: {goal['description']}
 Target date: {goal['target_date']}
 Today: {date.today().isoformat()}"""
 
-    result = await traced_ask(
+    result = await ask(
         system_prompt=prompt,
         user_message=user_msg,
         api_key=api_key,

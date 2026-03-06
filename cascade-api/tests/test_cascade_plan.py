@@ -70,7 +70,7 @@ def test_generate_cascade_returns_all_levels():
     """generate_cascade should return year, quarter, month, and week plans."""
     mock_supabase = _make_supabase_mock()
 
-    with patch("cascade_api.api.cascade_plan.traced_ask", new_callable=AsyncMock) as mock_ask:
+    with patch("cascade_api.api.cascade_plan.ask", new_callable=AsyncMock) as mock_ask:
         mock_ask.return_value = json.dumps(SAMPLE_PLAN)
 
         from cascade_api.api.cascade_plan import generate_cascade
@@ -90,7 +90,7 @@ def test_generate_cascade_stores_quarterly_plans():
     """generate_cascade should insert quarterly milestones into Supabase."""
     mock_supabase = _make_supabase_mock()
 
-    with patch("cascade_api.api.cascade_plan.traced_ask", new_callable=AsyncMock) as mock_ask:
+    with patch("cascade_api.api.cascade_plan.ask", new_callable=AsyncMock) as mock_ask:
         mock_ask.return_value = json.dumps(SAMPLE_PLAN)
 
         from cascade_api.api.cascade_plan import generate_cascade
@@ -111,7 +111,7 @@ def test_generate_cascade_stores_tasks():
     """generate_cascade should insert core and flex tasks into Supabase."""
     mock_supabase = _make_supabase_mock()
 
-    with patch("cascade_api.api.cascade_plan.traced_ask", new_callable=AsyncMock) as mock_ask:
+    with patch("cascade_api.api.cascade_plan.ask", new_callable=AsyncMock) as mock_ask:
         mock_ask.return_value = json.dumps(SAMPLE_PLAN)
 
         from cascade_api.api.cascade_plan import generate_cascade
@@ -133,7 +133,7 @@ def test_generate_cascade_updates_onboarding_status():
     mock_supabase = _make_supabase_mock()
 
     with (
-        patch("cascade_api.api.cascade_plan.traced_ask", new_callable=AsyncMock) as mock_ask,
+        patch("cascade_api.api.cascade_plan.ask", new_callable=AsyncMock) as mock_ask,
         patch("cascade_api.api.cascade_plan.track_event") as mock_track,
     ):
         mock_ask.return_value = json.dumps(SAMPLE_PLAN)
@@ -158,7 +158,7 @@ def test_generate_plan_endpoint_returns_200():
     with (
         patch("cascade_api.dependencies.get_supabase", return_value=mock_supabase),
         patch("cascade_api.api.cascade_plan.get_supabase", return_value=mock_supabase),
-        patch("cascade_api.api.cascade_plan.traced_ask", new_callable=AsyncMock) as mock_ask,
+        patch("cascade_api.api.cascade_plan.ask", new_callable=AsyncMock) as mock_ask,
         patch("cascade_api.api.cascade_plan.track_event"),
     ):
         mock_ask.return_value = json.dumps(SAMPLE_PLAN)
