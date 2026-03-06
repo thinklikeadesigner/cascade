@@ -352,6 +352,12 @@ export async function POST(request) {
 
   const systemPrompt = buildSystemPrompt(cascade_state, plan_data, timezone);
 
+  // Detect if this message is a revision request
+  const lastUserMsg = sanitizedMessages[sanitizedMessages.length - 1]?.content || "";
+  const isRevision = lastUserMsg.includes("[REVISION:");
+  const revisionTarget = isRevision ? lastUserMsg.match(/\[REVISION:\s*(\w+)\]/)?.[1] || null : null;
+  const turnNumber = sanitizedMessages.filter((m) => m.role === "user").length;
+
   const stream = new ReadableStream({
     async start(controller) {
       const encoder = new TextEncoder();
@@ -366,10 +372,20 @@ export async function POST(request) {
             name: "onboarding-chat",
             userId: user_id || rateLimitKey,
             input: sanitizedMessages,
-            metadata: { cascade_state },
+            metadata: {
+              cascade_state,
+              turn_number: turnNumber,
+              is_revision: isRevision,
+              revision_target: revisionTarget,
+            },
+            tags: [
+              `state:${cascade_state}`,
+              ...(isRevision ? ["revision"] : []),
+            ],
           });
 
           const tools = ONBOARDING_TOOLS;
+          const toolsCalled = []; // Track which tools fire for trace metadata
 
           // Claude call — may loop if tool calls need handling
           let currentMessages = [...sanitizedMessages];
@@ -431,6 +447,8 @@ export async function POST(request) {
             const toolResults = [];
 
             for (const toolBlock of toolBlocks) {
+              toolsCalled.push(toolBlock.name);
+
               if (PLAN_TOOL_NAMES.includes(toolBlock.name)) {
                 // Plan tool — send card to browser
                 send({
@@ -486,7 +504,16 @@ export async function POST(request) {
             ];
           }
 
-          trace.update({ output: "completed" });
+          trace.update({
+            output: "completed",
+            metadata: {
+              cascade_state,
+              tools_called: toolsCalled,
+              loops: loopCount,
+              is_revision: isRevision,
+              revision_target: revisionTarget,
+            },
+          });
         });
 
         // Flush spans to Langfuse before the serverless function terminates

@@ -1,4 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { startActiveObservation, startObservation, updateActiveTrace } from "@langfuse/tracing";
+import { getLangfuseSpanProcessor } from "@/instrumentation";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
@@ -144,6 +146,10 @@ export async function POST(request) {
     return new Response("Invalid messages", { status: 400 });
   }
 
+  // Extract the user's goal text (first user message) for metadata
+  const firstUserMessage = sanitizedMessages.find((m) => m.role === "user")?.content || "";
+  const turnNumber = sanitizedMessages.filter((m) => m.role === "user").length;
+
   const stream = new ReadableStream({
     async start(controller) {
       const encoder = new TextEncoder();
@@ -153,77 +159,129 @@ export async function POST(request) {
       }
 
       try {
-        // Call 1: Claude analyzes goal and may call tool
-        const stream1 = client.messages.stream({
-          model: "claude-haiku-4-5-20251001",
-          max_tokens: 1000,
-          system: SYSTEM_PROMPT,
-          messages: sanitizedMessages,
-          tools: [TOOL],
-          tool_choice: { type: "auto" },
-        });
-
-        // Stream text deltas in real-time
-        stream1.on("text", (delta) => {
-          send({ type: "text_delta", text: delta });
-        });
-
-        const finalMessage = await stream1.finalMessage();
-
-        // If no tool use, we're done (text-only response)
-        if (finalMessage.stop_reason === "end_turn") {
-          send({ type: "done" });
-          controller.close();
-          return;
-        }
-
-        // Extract tool_use block
-        const toolBlock = finalMessage.content.find(
-          (block) => block.type === "tool_use"
-        );
-
-        if (!toolBlock) {
-          send({ type: "done" });
-          controller.close();
-          return;
-        }
-
-        // Send breakdown to client
-        send({ type: "breakdown", phases: toolBlock.input.phases });
-
-        // Call 2: Send tool_result back to Claude for the nudge
-        const stream2 = client.messages.stream({
-          model: "claude-haiku-4-5-20251001",
-          max_tokens: 300,
-          system: SYSTEM_PROMPT,
-          messages: [
-            ...sanitizedMessages,
-            { role: "assistant", content: finalMessage.content },
-            {
-              role: "user",
-              content: [
-                {
-                  type: "tool_result",
-                  tool_use_id: toolBlock.id,
-                  content: "Breakdown displayed to user. Now give a brief coaching nudge.",
-                },
-              ],
+        await startActiveObservation("demo-chat", async (trace) => {
+          updateActiveTrace({
+            name: "demo-chat",
+            userId: ip,
+            input: sanitizedMessages,
+            metadata: {
+              goal_text: firstUserMessage.slice(0, 200),
+              turn_number: turnNumber,
             },
-          ],
-          tools: [TOOL],
-          tool_choice: { type: "none" },
+          });
+
+          // Call 1: Claude analyzes goal and may call tool
+          const gen1 = startObservation(
+            "demo-analysis",
+            {
+              model: "claude-haiku-4-5-20251001",
+              input: sanitizedMessages,
+              metadata: { turn_number: turnNumber },
+            },
+            { asType: "generation" }
+          );
+
+          const stream1 = client.messages.stream({
+            model: "claude-haiku-4-5-20251001",
+            max_tokens: 1000,
+            system: SYSTEM_PROMPT,
+            messages: sanitizedMessages,
+            tools: [TOOL],
+            tool_choice: { type: "auto" },
+          });
+
+          // Stream text deltas in real-time
+          stream1.on("text", (delta) => {
+            send({ type: "text_delta", text: delta });
+          });
+
+          const finalMessage = await stream1.finalMessage();
+          const toolFired = finalMessage.content.some((b) => b.type === "tool_use");
+
+          gen1.update({
+            output: finalMessage.content,
+            usageDetails: {
+              input: finalMessage.usage?.input_tokens,
+              output: finalMessage.usage?.output_tokens,
+            },
+            metadata: { tool_fired: toolFired },
+          }).end();
+
+          // If no tool use, we're done (text-only response)
+          if (finalMessage.stop_reason === "end_turn") {
+            trace.update({ output: "text_only", metadata: { tool_fired: false } });
+            return;
+          }
+
+          // Extract tool_use block
+          const toolBlock = finalMessage.content.find(
+            (block) => block.type === "tool_use"
+          );
+
+          if (!toolBlock) {
+            trace.update({ output: "no_tool", metadata: { tool_fired: false } });
+            return;
+          }
+
+          // Send breakdown to client
+          send({ type: "breakdown", phases: toolBlock.input.phases });
+
+          // Call 2: Send tool_result back to Claude for the nudge
+          const gen2 = startObservation(
+            "demo-nudge",
+            {
+              model: "claude-haiku-4-5-20251001",
+              metadata: { turn_number: turnNumber },
+            },
+            { asType: "generation" }
+          );
+
+          const stream2 = client.messages.stream({
+            model: "claude-haiku-4-5-20251001",
+            max_tokens: 300,
+            system: SYSTEM_PROMPT,
+            messages: [
+              ...sanitizedMessages,
+              { role: "assistant", content: finalMessage.content },
+              {
+                role: "user",
+                content: [
+                  {
+                    type: "tool_result",
+                    tool_use_id: toolBlock.id,
+                    content: "Breakdown displayed to user. Now give a brief coaching nudge.",
+                  },
+                ],
+              },
+            ],
+            tools: [TOOL],
+            tool_choice: { type: "none" },
+          });
+
+          stream2.on("text", (delta) => {
+            send({ type: "text_delta", text: delta });
+          });
+
+          const nudgeMessage = await stream2.finalMessage();
+
+          gen2.update({
+            output: nudgeMessage.content,
+            usageDetails: {
+              input: nudgeMessage.usage?.input_tokens,
+              output: nudgeMessage.usage?.output_tokens,
+            },
+          }).end();
+
+          trace.update({ output: "breakdown_shown", metadata: { tool_fired: true } });
         });
 
-        stream2.on("text", (delta) => {
-          send({ type: "text_delta", text: delta });
-        });
-
-        await stream2.finalMessage();
+        await getLangfuseSpanProcessor()?.forceFlush();
 
         send({ type: "done" });
         controller.close();
       } catch (error) {
         console.error("Chat API error:", error);
+        await getLangfuseSpanProcessor()?.forceFlush().catch(() => {});
         send({
           type: "error",
           message: "Something went wrong. Please try again.",

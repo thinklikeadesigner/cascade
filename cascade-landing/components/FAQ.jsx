@@ -9,19 +9,19 @@ const faqData = [
   },
   {
     q: "What does it cost?",
-    a: "The CLI is open source and free. The hosted WhatsApp execution system is $49/month, all-in. No API keys, no setup. That\u2019s less than a single hour with a human coach ($234/hr average) for daily accountability that actually adapts to your results.",
+    a: "The CLI is open source and free. The hosted Telegram coaching system is $49/month, all-in. No API keys, no setup. That\u2019s less than a single hour with a human coach ($234/hr average) for daily accountability that actually adapts to your results.",
   },
   {
     q: "What\u2019s an API key? Do I need one?",
-    a: "Not for the WhatsApp agent \u2014 that\u2019s all-in at $49/month. The open source CLI version uses your own Anthropic API key (bring your own key). If you just want daily execution tracking via text, you don\u2019t need to know what an API key is.",
+    a: "Not for the Telegram agent \u2014 that\u2019s all-in at $49/month. The open source CLI version uses your own Anthropic API key (bring your own key). If you just want daily execution tracking via Telegram, you don\u2019t need to know what an API key is.",
   },
   {
     q: "Do I need to download an app?",
-    a: "No. Cascade runs in your terminal or over text messages. You text what you did, it texts back tomorrow\u2019s tasks. That\u2019s it.",
+    a: "Cascade runs over Telegram. If you already have Telegram, there\u2019s nothing to install \u2014 you message what you did, it messages back tomorrow\u2019s tasks. The open source CLI version runs in your terminal.",
   },
   {
     q: "What kinds of goals does it work for?",
-    a: "Anything that takes months and has a number attached. SaaS revenue targets, race finish times, side project launches, content milestones. If you can measure it weekly, Cascade can track it. Works best if WhatsApp is your daily driver.",
+    a: "Anything that takes months and has a number attached. SaaS revenue targets, race finish times, side project launches, content milestones. If you can measure it weekly, Cascade can track it.",
   },
 ];
 

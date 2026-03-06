@@ -41,7 +41,7 @@ export default function Home() {
                 <circle cx="100" cy="225" r="12" fill="#F87171" />
               </svg>
               <h1>Your yearly goals die by March. Cascade makes them <span className="accent">survive.</span></h1>
-              <p className="hero-sub">Text your goal. Get today{"\u2019"}s action. Cascade watches what you actually do and rewrites next week{"\u2019"}s plan based on this week{"\u2019"}s results.</p>
+              <p className="hero-sub">Message your goal on Telegram. Get today{"\u2019"}s action. Cascade watches what you actually do and rewrites next week{"\u2019"}s plan based on this week{"\u2019"}s results.</p>
               <WaitlistForm id="hero">
                 <div className="social-proof">
                   <a href="https://github.com/thinklikeadesigner/cascade" target="_blank" rel="noopener noreferrer" className="proof-badge">
@@ -56,7 +56,7 @@ export default function Home() {
             </div>
 
             {/* RIGHT: Phone mockup */}
-            <div className="hero-phone fade-in" role="img" aria-label="Phone showing a conversation with Cascade about setting a $5k MRR goal">
+            <div className="hero-phone fade-in" role="img" aria-label="Phone showing a Telegram conversation with Cascade about setting a $5k MRR goal">
               <div className="phone-frame" aria-hidden="true">
                 <div className="phone-island"></div>
                 <div className="phone-statusbar">
@@ -89,11 +89,11 @@ export default function Home() {
                     </div>
                   </div></div>
                   <div className="msg-u"><div>yes do it</div></div>
-                  <div className="msg-c"><div>Done. I{"\u2019"}ll text you every morning with today{"\u2019"}s tasks. Nothing random.</div></div>
+                  <div className="msg-c"><div>Done. I{"\u2019"}ll message you every morning with today{"\u2019"}s tasks. Nothing random.</div></div>
                 </div>
                 <div className="phone-input">
                   <div className="phone-input-row">
-                    <span className="phone-input-text">Text Cascade...</span>
+                    <span className="phone-input-text">Message Cascade...</span>
                     <div className="phone-send"><svg width="11" height="11" viewBox="0 0 14 14"><path d="M2 12L12 7L2 2V5.5L8 7L2 8.5V12Z" fill="#fff"/></svg></div>
                   </div>
                 </div>
@@ -195,18 +195,18 @@ export default function Home() {
           <div className="steps-grid stagger-in">
             <div className="step">
               <div className="step-num">1</div>
-              <div className="step-title">Text your goal</div>
-              <div className="step-desc">Tell Cascade your goal and your deadline. It breaks that down into what you should do this week and today.</div>
+              <div className="step-title">Message your goal</div>
+              <div className="step-desc">Tell Cascade your goal and your deadline on Telegram. It breaks that down into what you should do this week and today.</div>
             </div>
             <div className="step">
               <div className="step-num">2</div>
               <div className="step-title">Get daily actions</div>
-              <div className="step-desc">Every morning you get a text with today{"\u2019"}s tasks. They all connect to your yearly goal, no busywork.</div>
+              <div className="step-desc">Every morning you get a Telegram message with today{"\u2019"}s tasks. They all connect to your yearly goal, no busywork.</div>
             </div>
             <div className="step">
               <div className="step-num">3</div>
-              <div className="step-title">Text back when done</div>
-              <div className="step-desc">Log progress by texting. Cascade sees what{"\u2019"}s working, what{"\u2019"}s not, and adjusts next week{"\u2019"}s plan.</div>
+              <div className="step-title">Reply when done</div>
+              <div className="step-desc">Log progress by replying. Cascade sees what{"\u2019"}s working, what{"\u2019"}s not, and adjusts next week{"\u2019"}s plan.</div>
             </div>
           </div>
         </div>
@@ -216,22 +216,8 @@ export default function Home() {
       <section className="anti-app">
         <div className="container">
           <div className="fade-in">
-            <p className="anti-app-headline">No app. No dashboard. <span className="accent">No login.</span></p>
-            <p className="anti-app-body">You already have 14 tabs open and 6 productivity apps you don{"\u2019"}t use. Cascade lives in the app you check 100 times a day. Your texts.</p>
-            <div className="anti-app-stats">
-              <div className="anti-app-stat">
-                <div className="anti-app-stat-num">98%</div>
-                <div className="anti-app-stat-label">text open rate</div>
-              </div>
-              <div className="anti-app-stat">
-                <div className="anti-app-stat-num">3 min</div>
-                <div className="anti-app-stat-label">avg response time</div>
-              </div>
-              <div className="anti-app-stat">
-                <div className="anti-app-stat-num">0</div>
-                <div className="anti-app-stat-label">apps to download</div>
-              </div>
-            </div>
+            <p className="anti-app-headline">No new app. No dashboard. <span className="accent">Just Telegram.</span></p>
+            <p className="anti-app-body">You already have 14 tabs open and 6 productivity apps you don{"\u2019"}t use. Cascade lives in Telegram {"\u2014"} the app that{"\u2019"}s already on your phone.</p>
           </div>
         </div>
       </section>
@@ -325,12 +311,12 @@ export default function Home() {
       <section className="demo" id="demo">
         <div className="demo-inner">
           <p className="section-label fade-in">A Day With Cascade</p>
-          <p className="demo-sub fade-in">Your goals, broken down to today{"\u2019"}s tasks. Delivered by text.</p>
+          <p className="demo-sub fade-in">Your goals, broken down to today{"\u2019"}s tasks. Delivered on Telegram.</p>
           <div className="phones-grid-wrapper">
           <div className="phones-grid fade-in">
 
             {/* Phone 1: Morning Check-in */}
-            <div className="phone-wrapper" role="img" aria-label="Phone showing Cascade sending morning tasks and tracking completion via text">
+            <div className="phone-wrapper" role="img" aria-label="Phone showing Cascade sending morning tasks and tracking completion via Telegram">
               <div className="phone-frame" aria-hidden="true">
                 <div className="phone-island"></div>
                 <div className="phone-statusbar">
@@ -385,7 +371,7 @@ export default function Home() {
                 </div>
                 <div className="phone-input">
                   <div className="phone-input-row">
-                    <span className="phone-input-text">Text Cascade...</span>
+                    <span className="phone-input-text">Message Cascade...</span>
                     <div className="phone-send"><svg width="11" height="11" viewBox="0 0 14 14"><path d="M2 12L12 7L2 2V5.5L8 7L2 8.5V12Z" fill="#fff"/></svg></div>
                   </div>
                 </div>
@@ -394,7 +380,7 @@ export default function Home() {
             </div>
 
             {/* Phone 3: Accountability Nudge */}
-            <div className="phone-wrapper" role="img" aria-label="Phone showing Cascade giving honest feedback when you get off track">
+            <div className="phone-wrapper" role="img" aria-label="Phone showing Cascade giving honest feedback on Telegram when you get off track">
               <div className="phone-frame" aria-hidden="true">
                 <div className="phone-island"></div>
                 <div className="phone-statusbar">
@@ -442,7 +428,7 @@ export default function Home() {
                 </div>
                 <div className="phone-input">
                   <div className="phone-input-row">
-                    <span className="phone-input-text">Text Cascade...</span>
+                    <span className="phone-input-text">Message Cascade...</span>
                     <div className="phone-send"><svg width="11" height="11" viewBox="0 0 14 14"><path d="M2 12L12 7L2 2V5.5L8 7L2 8.5V12Z" fill="#fff"/></svg></div>
                   </div>
                 </div>
@@ -452,7 +438,7 @@ export default function Home() {
 
           </div>
           </div>
-          <p className="demo-bottom fade-in">It{"\u2019"}s just text messages. No app, no dashboard.</p>
+          <p className="demo-bottom fade-in">It{"\u2019"}s just Telegram messages. No app to learn, no dashboard to check.</p>
         </div>
       </section>
 

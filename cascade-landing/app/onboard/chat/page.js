@@ -222,7 +222,7 @@ export default function OnboardChatPage() {
             <ul style={{ color: "#94A3B8", fontSize: 14, lineHeight: 2, listStyle: "none", padding: 0, margin: 0 }}>
               <li>Every morning: your Core tasks for the day</li>
               <li>Weekly: review with stats and coaching</li>
-              <li>Text anytime to log progress or check status</li>
+              <li>Message anytime to log progress or check status</li>
             </ul>
           </div>
         </div>
