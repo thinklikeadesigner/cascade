@@ -1,0 +1,480 @@
+.dash-container {
+  --bg: #0a0a0b;
+  --card: #111113;
+  --border: #1e1e22;
+  --text: #e4e4e7;
+  --muted: #63636e;
+  --accent: #ef4444;
+  --accent-dim: rgba(239, 68, 68, 0.15);
+  --green: #22c55e;
+  --mono: "SF Mono", "Cascadia Code", "Fira Code", ui-monospace, monospace;
+
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  padding: 24px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+/* Header */
+.dash-header {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 32px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.dash-header h1 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  margin: 0;
+}
+
+.dash-tag {
+  font-size: 0.65rem;
+  font-family: var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  background: var(--accent-dim);
+  padding: 2px 8px;
+  border-radius: 3px;
+}
+
+/* Tabs */
+.dash-tabs {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.dash-tab {
+  font-size: 0.7rem;
+  font-family: var(--mono);
+  letter-spacing: 0.04em;
+  padding: 5px 14px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.dash-tab:hover {
+  color: var(--text);
+  border-color: #2a2a30;
+}
+
+.dash-tab-active {
+  background: var(--accent-dim);
+  color: var(--accent);
+  border-color: transparent;
+}
+
+/* PostHog embed */
+.dash-posthog {
+  margin-top: 8px;
+}
+
+.dash-posthog-frame {
+  width: 100%;
+  height: calc(100vh - 100px);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.dash-posthog-empty {
+  text-align: center;
+  padding: 80px 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.dash-posthog-empty code {
+  font-family: var(--mono);
+  background: var(--card);
+  border: 1px solid var(--border);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.75rem;
+}
+
+/* Cards */
+.dash-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.dash-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.dash-card h2,
+.dash-section h2 {
+  font-size: 0.7rem;
+  font-family: var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin: 0 0 12px;
+}
+
+.dash-card-stats {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+/* Stat */
+.dash-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dash-stat-value {
+  font-size: 1.35rem;
+  font-weight: 700;
+  font-family: var(--mono);
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.dash-stat-value.dash-accent {
+  color: var(--accent);
+}
+
+.dash-stat-label {
+  font-size: 0.65rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.dash-stat-sub {
+  font-size: 0.6rem;
+  font-family: var(--mono);
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+/* Sections */
+.dash-section {
+  margin-bottom: 32px;
+}
+
+.dash-section-sub {
+  font-size: 0.7rem;
+  color: var(--muted);
+  margin: -8px 0 12px;
+}
+
+/* Two column layout */
+.dash-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* Funnel */
+.dash-funnel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dash-funnel-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dash-funnel-label {
+  font-size: 0.7rem;
+  font-family: var(--mono);
+  color: var(--muted);
+  width: 80px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.dash-funnel-track {
+  flex: 1;
+  height: 22px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.dash-funnel-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 3px;
+  transition: width 0.4s ease;
+  opacity: 0.85;
+}
+
+.dash-funnel-count {
+  font-size: 0.75rem;
+  font-family: var(--mono);
+  font-weight: 600;
+  color: var(--text);
+  width: 28px;
+  text-align: right;
+}
+
+.dash-funnel-drop {
+  font-size: 0.6rem;
+  font-family: var(--mono);
+  color: var(--accent);
+  width: 28px;
+  opacity: 0.7;
+}
+
+/* Bar chart */
+.dash-bar-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 140px;
+  padding: 8px 0;
+}
+
+.dash-bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  gap: 4px;
+}
+
+.dash-bar-val {
+  font-size: 0.6rem;
+  font-family: var(--mono);
+  color: var(--muted);
+  min-height: 14px;
+}
+
+.dash-bar-track {
+  flex: 1;
+  width: 100%;
+  max-width: 48px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+}
+
+.dash-bar-fill {
+  width: 100%;
+  background: var(--accent);
+  border-radius: 3px;
+  min-height: 2px;
+  transition: height 0.4s ease;
+}
+
+.dash-bar-label {
+  font-size: 0.65rem;
+  font-family: var(--mono);
+  color: var(--text);
+}
+
+.dash-bar-sub {
+  font-size: 0.55rem;
+  font-family: var(--mono);
+  color: var(--muted);
+}
+
+/* Models */
+.dash-models {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.dash-model {
+  font-size: 0.75rem;
+  font-family: var(--mono);
+  background: var(--card);
+  border: 1px solid var(--border);
+  padding: 6px 12px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dash-model-count {
+  font-size: 0.65rem;
+  background: var(--accent-dim);
+  color: var(--accent);
+  padding: 1px 6px;
+  border-radius: 3px;
+}
+
+/* Table */
+.dash-table-wrap {
+  overflow-x: auto;
+}
+
+.dash-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+.dash-table th {
+  text-align: left;
+  font-size: 0.65rem;
+  font-family: var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.dash-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.dash-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.dash-mono {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+}
+
+.dash-muted {
+  color: var(--muted);
+}
+
+/* State badges */
+.dash-state {
+  font-size: 0.65rem;
+  font-family: var(--mono);
+  padding: 2px 8px;
+  border-radius: 3px;
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+
+.dash-state-completed,
+.dash-state-schedule {
+  background: rgba(34, 197, 94, 0.12);
+  color: var(--green);
+}
+
+.dash-state-exploring {
+  background: rgba(250, 204, 21, 0.1);
+  color: #facc15;
+}
+
+/* Goals list */
+.dash-goals {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dash-goal {
+  font-size: 0.8rem;
+  font-family: var(--mono);
+  color: var(--text);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  padding: 8px 12px;
+  border-radius: 2px 4px 4px 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dash-goal-cell {
+  max-width: 260px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.75rem;
+}
+
+/* Revision badge */
+.dash-state-revision {
+  background: rgba(250, 204, 21, 0.1);
+  color: #facc15;
+}
+
+/* Loading */
+.dash-loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: center;
+  padding: 80px 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.dash-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.dash-error {
+  color: var(--accent);
+  text-align: center;
+  padding: 80px 0;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+}
+
+/* Responsive */
+@media (max-width: 700px) {
+  .dash-container {
+    padding: 16px;
+  }
+  .dash-cards {
+    grid-template-columns: 1fr;
+  }
+  .dash-two-col {
+    grid-template-columns: 1fr;
+  }
+  .dash-card-stats {
+    gap: 16px;
+  }
+  .dash-funnel-label {
+    width: 60px;
+    font-size: 0.6rem;
+  }
+}

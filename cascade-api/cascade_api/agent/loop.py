@@ -121,21 +121,20 @@ async def run_agent(
                 except Exception:
                     pass
 
-            # --- Trigger evals (fire-and-forget) ---
+            # --- Trigger evals ---
             if trace and should_eval(user_message, is_scheduled):
                 try:
-                    import asyncio
                     from cascade_api.observability.evals import score_trace
-                    asyncio.create_task(score_trace(
+                    await score_trace(
                         trace_id=trace.id,
                         user_message=user_message,
                         agent_response=text,
                         tool_calls=tool_calls_log,
                         is_scheduled=is_scheduled,
                         api_key=api_key,
-                    ))
+                    )
                 except Exception as e:
-                    log.warning("langfuse.eval_trigger_failed", error=str(e))
+                    log.warning("langfuse.eval_failed", error=str(e))
 
             if lf:
                 try:
