@@ -13,7 +13,7 @@ from cascade_api.multi_bot import run_all_bots
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(name)s] %(message)s")
 logger = logging.getLogger(__name__)
 
-DATA_DIR = Path(__file__).parent / "data"
+DATA_DIR = Path(__file__).parent.parent / "data"
 
 PERSONA_DIRS = {
     "p01": DATA_DIR / "persona_p01",
