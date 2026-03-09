@@ -1,3 +1,73 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## BUILD & RUN
+
+```bash
+# Setup (from cascade-api/)
+cd cascade-api
+uv venv && source .venv/bin/activate
+uv pip install -e ".[dev]"
+
+# Ollama models (required for local inference)
+ollama pull qwen3:8b
+ollama pull nomic-embed-text
+
+# Run the multi-bot demo
+python main.py
+
+# Run the FastAPI server
+python -m uvicorn cascade_api.main:app --reload --port 8000
+
+# Tests
+pytest tests/ -v                          # all tests
+pytest tests/test_integration_demo.py -v  # single file
+
+# Lint
+ruff check . --fix
+ruff format .
+```
+
+Environment: copy `.env.example` to `.env`. Required: `TELEGRAM_BOT_TOKEN_{JORDAN,MAYA,THEO,YOU}`, `TELEGRAM_OWNER_CHAT_ID`. Optional: Supabase, Anthropic, Stripe, observability keys.
+
+## ARCHITECTURE
+
+Two systems share this repo:
+
+### 1. Cascade Planning System
+Goal-execution engine (year → quarter → month → week → day). FastAPI endpoints in `cascade_api/api/`, Telegram webhook handlers in `cascade_api/telegram/`, LangGraph agent in `cascade_api/graph/`.
+
+### 2. Cascade Memory System (hackathon demo)
+Portable, permission-gated personal memory with 4 Telegram bots (Jordan, Maya, Theo, You) querying a unified knowledge graph.
+
+**Data flow:** JSONL persona files → `ingest.py` (classify sensitivity, embed, link) → `InMemoryStore` (pickle-cached) → Telegram query → `handlers.py` (recall → permission filter → synthesize → extract)
+
+**Key components:**
+- `memory/client.py` — `MemoryClient` wraps store + embedder + extractor. `TenantScopedClient` for multi-tenant isolation
+- `memory/stores/memory.py` — Dict-backed vector store with cosine similarity (demo). `stores/supabase.py` for production (pgvector)
+- `handlers.py` — Message handler: determines context (group/dm_owner/dm_stranger), recalls memories, filters by permissions, synthesizes via Ollama
+- `permissions.py` — Source-based sensitivity (bank/ai_chat → private, social/files → public) + tag-based (therapy, finance, salary → private)
+- `consent.py` — Per-tenant, per-source sharing levels
+- `multi_bot.py` — Creates Telegram Application per bot, runs all concurrently in polling mode
+- `config.py` — Loads bot configs from env vars (`TELEGRAM_BOT_TOKEN_{NAME}`)
+- `synthesize.py` — Ollama qwen3:8b answer synthesis with source attribution
+- `ollama_embedder.py` — Local embeddings via nomic-embed-text (768-dim)
+- `ollama_extractor.py` — Local fact extraction via qwen3:8b
+
+**Two entry points:**
+- `cascade-api/main.py` — Demo orchestrator (ingest personas, cache to pickle, run all bots)
+- `cascade-api/cascade_api/main.py` — Production FastAPI app with webhook support
+
+**Protocols** in `memory/protocols/` define plugin interfaces: `MemoryStore`, `Embedder`, `MemoryExtractor`. Implement these for custom backends.
+
+**Graph visualization:** `static/graph.html` — D3.js force-directed graph loading exported JSON memory data.
+
+### Known Issues
+- None currently — all hackathon tests pass (23/23)
+
+---
+
 # Cascade
 
 ## ROLE

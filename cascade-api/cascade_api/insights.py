@@ -6,16 +6,14 @@ computes weekly stats, and detects cross-source correlations.
 
 import json
 import logging
+import os
 import re
 from datetime import datetime, timezone
 from pathlib import Path
 
-import aiohttp
+import anthropic
 
 logger = logging.getLogger(__name__)
-
-OLLAMA_URL = "http://localhost:11434/api/chat"
-OLLAMA_MODEL = "qwen3:8b"
 
 STRESS_TAGS = {"anxiety", "mental_health", "therapy", "deadline", "overwork"}
 
@@ -145,14 +143,17 @@ def detect_patterns(stats: list[dict]) -> list[dict]:
 
     avg_disc = sum(s["discretionary_spend"] for s in stats) / len(stats) if stats else 0
     avg_events = sum(s["cal_events"] for s in stats) / len(stats) if stats else 0
-    avg_neg = sum(s["negative_mood"] for s in stats) / len(stats) if stats else 0
+
+    # Only consider "busy" weeks that have at least 3 events (absolute floor)
+    busy_threshold = max(avg_events * 1.5, 3)
 
     # stress_spending: discretionary spending >1.3x avg in week after 2+ stress events
+    stress_spend_hits = []
     for i in range(len(stats) - 1):
         if stats[i]["stress_events"] >= 2:
             next_disc = stats[i + 1]["discretionary_spend"]
             if avg_disc > 0 and next_disc > avg_disc * 1.3:
-                patterns.append({
+                stress_spend_hits.append({
                     "type": "stress_spending",
                     "week": stats[i + 1]["week"],
                     "detail": (
@@ -161,11 +162,14 @@ def detect_patterns(stats: list[dict]) -> list[dict]:
                         f"stress events in {stats[i]['week']}"
                     ),
                 })
+    # Keep top 3 by most relevant
+    patterns.extend(stress_spend_hits[:3])
 
-    # social_withdrawal: 0 social posts during weeks with >1.3x avg events
+    # social_withdrawal: 0 social posts during genuinely busy weeks
+    social_hits = []
     for s in stats:
-        if avg_events > 0 and s["cal_events"] > avg_events * 1.3 and s["social_posts"] == 0:
-            patterns.append({
+        if s["cal_events"] >= busy_threshold and s["social_posts"] == 0:
+            social_hits.append({
                 "type": "social_withdrawal",
                 "week": s["week"],
                 "detail": (
@@ -173,11 +177,13 @@ def detect_patterns(stats: list[dict]) -> list[dict]:
                     f"with {s['cal_events']} events (avg {avg_events:.1f})"
                 ),
             })
+    patterns.extend(social_hits[:3])
 
-    # overload_mood: 2+ negative lifelog entries in weeks with >1.2x avg events
+    # overload_mood: 2+ negative lifelog entries in busy weeks
+    mood_hits = []
     for s in stats:
-        if avg_events > 0 and s["cal_events"] > avg_events * 1.2 and s["negative_mood"] >= 2:
-            patterns.append({
+        if s["cal_events"] >= busy_threshold and s["negative_mood"] >= 2:
+            mood_hits.append({
                 "type": "overload_mood",
                 "week": s["week"],
                 "detail": (
@@ -185,6 +191,7 @@ def detect_patterns(stats: list[dict]) -> list[dict]:
                     f"with {s['cal_events']} events (avg {avg_events:.1f})"
                 ),
             })
+    patterns.extend(mood_hits[:3])
 
     # stress_spending_trend: avg spending in high-stress vs calm weeks
     high_stress_weeks = [s for s in stats if s["stress_events"] >= 2]
@@ -192,7 +199,7 @@ def detect_patterns(stats: list[dict]) -> list[dict]:
     if high_stress_weeks and calm_weeks:
         high_avg = sum(s["discretionary_spend"] for s in high_stress_weeks) / len(high_stress_weeks)
         calm_avg = sum(s["discretionary_spend"] for s in calm_weeks) / len(calm_weeks)
-        if calm_avg > 0:
+        if calm_avg > 0 and high_avg > calm_avg * 1.15:
             patterns.append({
                 "type": "stress_spending_trend",
                 "week": "overall",
@@ -210,7 +217,7 @@ def detect_patterns(stats: list[dict]) -> list[dict]:
         second_half = stats[mid:]
         first_neg_rate = sum(s["negative_mood"] for s in first_half) / len(first_half)
         second_neg_rate = sum(s["negative_mood"] for s in second_half) / len(second_half)
-        if first_neg_rate > 0 and second_neg_rate > first_neg_rate * 1.2:
+        if first_neg_rate > 0 and second_neg_rate > first_neg_rate * 1.3:
             patterns.append({
                 "type": "mood_decline",
                 "week": "trend",
@@ -219,7 +226,7 @@ def detect_patterns(stats: list[dict]) -> list[dict]:
                     f"to {second_neg_rate:.1f}/week (second half)"
                 ),
             })
-        elif second_neg_rate > 0 and first_neg_rate > second_neg_rate * 1.2:
+        elif second_neg_rate > 0 and first_neg_rate > second_neg_rate * 1.3:
             patterns.append({
                 "type": "mood_improvement",
                 "week": "trend",
@@ -233,43 +240,46 @@ def detect_patterns(stats: list[dict]) -> list[dict]:
 
 
 async def synthesize_insights(persona_name: str, patterns: list[dict], stats: list[dict]) -> str:
-    """Use Ollama to write a human-readable insight report."""
+    """Use Claude to write a human-readable insight report."""
     if not patterns:
         return f"No significant cross-source patterns detected for {persona_name}."
+
+    api_key = os.environ.get("ANTHROPIC_API_KEY")
+    logger.info(f"ANTHROPIC_API_KEY present: {bool(api_key)}, len={len(api_key) if api_key else 0}")
+    if not api_key:
+        # Fallback to raw patterns if no API key
+        lines = [f"Cross-source insights for {persona_name}:\n"]
+        for p in patterns:
+            lines.append(f"- {p['detail']}")
+        return "\n".join(lines)
 
     pattern_text = "\n".join(f"- [{p['type']}] {p['detail']}" for p in patterns)
     total_weeks = len(stats)
     avg_events = sum(s["cal_events"] for s in stats) / total_weeks if total_weeks else 0
     avg_spend = sum(s["discretionary_spend"] for s in stats) / total_weeks if total_weeks else 0
 
-    prompt = f"""Analyze these cross-source patterns for {persona_name} and write 3-5 bullet points as a personal insight report. Cite the data sources (calendar, bank, lifelog, social) in each bullet. Be specific with numbers.
+    prompt = f"""Analyze these cross-source patterns for {persona_name} and write 3-5 bullet points as a personal insight report. Each insight must cite which data sources revealed it (calendar, bank, lifelog, social). Be specific with numbers. These insights should feel like things only possible by connecting data across sources — not obvious from any single source alone.
 
 Summary: {total_weeks} weeks of data, avg {avg_events:.1f} calendar events/week, avg ${avg_spend:.0f} discretionary spending/week.
 
 Detected patterns:
 {pattern_text}
 
-Write concise, actionable insights. No preamble. /no_think"""
+Write concise, actionable insights. No preamble — just the bullet points."""
 
     try:
-        async with aiohttp.ClientSession() as session:
-            async with session.post(
-                OLLAMA_URL,
-                json={
-                    "model": OLLAMA_MODEL,
-                    "messages": [{"role": "user", "content": prompt}],
-                    "stream": False,
-                },
-                timeout=aiohttp.ClientTimeout(total=60),
-            ) as resp:
-                resp.raise_for_status()
-                data = await resp.json()
-                return data["message"]["content"]
+        client = anthropic.AsyncAnthropic(api_key=api_key)
+        response = await client.messages.create(
+            model="claude-sonnet-4-20250514",
+            max_tokens=1024,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        return response.content[0].text
     except Exception as e:
-        logger.warning(f"Ollama synthesis failed, returning raw patterns: {e}")
+        logger.error(f"Claude synthesis failed: {type(e).__name__}: {e}")
         lines = [f"Cross-source insights for {persona_name}:\n"]
         for p in patterns:
-            lines.append(f"- [{p['type']}] {p['detail']}")
+            lines.append(f"- {p['detail']}")
         return "\n".join(lines)
 
 

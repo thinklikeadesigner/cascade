@@ -305,7 +305,7 @@
   #legend {
     position: fixed;
     bottom: 16px;
-    left: 24px;
+    right: 24px;
     z-index: 100;
     display: flex;
     gap: 16px;
@@ -330,7 +330,7 @@
 
   #branding {
     position: fixed;
-    bottom: 16px;
+    bottom: 46px;
     right: 24px;
     z-index: 100;
     font-size: 11px;
@@ -366,7 +366,7 @@
 
   #consent-panel {
     position: fixed;
-    bottom: 56px;
+    bottom: 24px;
     left: 24px;
     z-index: 100;
     background: #11151C;
@@ -503,7 +503,7 @@
 
 <script>
 const PRIVATE_COLOR = '#0F1219';
-const SENSITIVE_TAGS = new Set(['therapy','anxiety','mental_health','finance','salary','debt']);
+const SENSITIVE_TAGS = new Set(['therapy','anxiety','mental_health','finance','salary','debt','health','personal','family','relationship']);
 
 let consentConfig = null;
 let viewMode = 'owner';
@@ -515,7 +515,7 @@ const SOURCE_COLORS = {
   lifelog:  '#D2A6FF',  // ayu dark purple
   ai_chat:  '#F07178',  // ayu dark red
   social:   '#95E6CB',  // ayu dark cyan
-  files:    '#E6B450',  // ayu dark yellow
+  files:    '#E6D74C',  // yellow
   bank:     '#FFB454',  // ayu dark orange
 };
 
@@ -1022,7 +1022,10 @@ function buildConsentPanel(consentSources) {
   container.innerHTML = '';
   panel.style.display = 'block';
 
-  Object.keys(consentSources).forEach(source => {
+  // Only show actual data sources, not extracted memory types
+  const DATA_SOURCES = new Set(['calendar', 'email', 'social', 'lifelog', 'bank', 'finance', 'ai_chat', 'files']);
+
+  Object.keys(consentSources).filter(s => DATA_SOURCES.has(s)).forEach(source => {
     const isPublic = consentSources[source] === 'public';
     const row = document.createElement('div');
     row.className = 'consent-slider-row';

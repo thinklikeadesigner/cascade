@@ -27,7 +27,7 @@ async def create_bot_app(
     """Create a Telegram bot Application for a single persona."""
     app = Application.builder().token(config.token).build()
 
-    message_handler = make_message_handler(config, memory_client)
+    message_handler = make_message_handler(config, memory_client, persona_dir=persona_dir)
     export_handler = make_export_handler(config, memory_client)
     privacy_handler = make_privacy_handler(config)
     forget_handler = make_forget_handler(config, memory_client)

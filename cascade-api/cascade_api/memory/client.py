@@ -124,6 +124,8 @@ class MemoryClient:
         tenant_id: str,
         conversation_text: str,
         source_id: str | None = None,
+        link_threshold: float = 0.4,
+        max_links_per_memory: int = 3,
     ) -> list[str]:
         if not self.extractor:
             raise RuntimeError("No extractor configured")
@@ -153,7 +155,29 @@ class MemoryClient:
             )
             for e, emb in zip(extracted, embeddings)
         ]
-        return await self.store.save_batch(tenant_id, records)
+        saved_ids = await self.store.save_batch(tenant_id, records)
+
+        # Auto-link: find related existing memories for each new memory
+        for saved_id, emb in zip(saved_ids, embeddings):
+            if emb is None:
+                continue
+            try:
+                similar = await self.store.search(
+                    tenant_id, emb, count=max_links_per_memory + 1, threshold=link_threshold
+                )
+                for result in similar:
+                    if result.memory.id != saved_id and result.memory.id not in saved_ids:
+                        await self.store.add_link(
+                            tenant_id, saved_id, result.memory.id, "related"
+                        )
+                        logger.info(
+                            "Auto-linked %s -> %s (sim=%.2f)",
+                            saved_id[:8], result.memory.id[:8], result.similarity,
+                        )
+            except Exception as e:
+                logger.warning("Auto-linking failed for %s: %s", saved_id[:8], e)
+
+        return saved_ids
 
 
 class TenantScopedClient:

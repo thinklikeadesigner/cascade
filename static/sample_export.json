@@ -1,0 +1,53 @@
+{
+  "tenant_id": "p01",
+  "persona_name": "Jordan",
+  "core_memory": {
+    "content": "## Profile\n- Name: Jordan Lee\n- Age: 32\n- Location: Austin, TX\n- Job: Senior Product Manager\n\n## Goals\n- Get promoted to Director of Product within 18 months\n- Improve sleep and reduce anxiety\n- Save $30k for house down payment\n- Run a half marathon\n- Be more present with partner Alex\n\n## Personality\n- Communication: direct but warm",
+    "version": 7
+  },
+  "memories": [
+    {"id": "m001", "content": "Back-to-back meetings from 9 to 4. No lunch break. Grabbed a granola bar at 3pm. This is not sustainable.", "memory_type": "public_lifelog", "tags": ["work", "health"], "confidence": 1.0, "decay_score": 0.95, "source_id": "ll_0001", "created_at": "2024-01-08T01:40:00-05:00"},
+    {"id": "m002", "content": "USER: I keep waking up at 3am thinking about work. How do I stop? ASSISTANT: That 3am wake-up is often your brain processing incomplete loops.", "memory_type": "private_ai_chat", "tags": ["sleep", "anxiety", "work"], "confidence": 1.0, "decay_score": 0.92, "source_id": "c_0001", "created_at": "2024-01-14T22:15:00-05:00"},
+    {"id": "m003", "content": "$85.00 - Easy Tiger - social", "memory_type": "private_finance", "tags": ["social", "dining"], "confidence": 1.0, "decay_score": 0.88, "source_id": "t_0001", "created_at": "2024-01-05T17:00:00-05:00"},
+    {"id": "m004", "content": "From: jordan@company.com | To: team@company.com | Subject: Sprint recap + what's next", "memory_type": "public_email", "tags": ["work", "team", "leadership"], "confidence": 1.0, "decay_score": 0.97, "source_id": "e_0001", "created_at": "2024-01-10T09:44:00-05:00"},
+    {"id": "m005", "content": "Director promo conversation with Sarah (30m)", "memory_type": "public_calendar", "tags": ["career", "promotion"], "confidence": 1.0, "decay_score": 0.93, "source_id": "cal_0001", "created_at": "2024-01-10T16:00:00-05:00"},
+    {"id": "m006", "content": "The roadmap is never done. The roadmap is a living document. The roadmap will outlive us all. #productmanager", "memory_type": "public_social", "tags": ["work", "humor"], "confidence": 1.0, "decay_score": 0.91, "source_id": "s_0001", "created_at": "2024-01-15T23:00:00-05:00"},
+    {"id": "m007", "content": "Therapy session - talked about imposter syndrome since the reorg", "memory_type": "private_calendar", "tags": ["therapy", "mental_health"], "confidence": 1.0, "decay_score": 0.89, "source_id": "cal_0012", "created_at": "2024-02-05T14:00:00-05:00"},
+    {"id": "m008", "content": "Feeling really good about the analytics dashboard launch. Team crushed it.", "memory_type": "public_lifelog", "tags": ["work", "achievement"], "confidence": 1.0, "decay_score": 0.94, "source_id": "ll_0015", "created_at": "2024-02-10T18:00:00-05:00"},
+    {"id": "m009", "content": "$42.00 - DoorDash - late night comfort food after a brutal day", "memory_type": "private_finance", "tags": ["dining", "stress"], "confidence": 1.0, "decay_score": 0.85, "source_id": "t_0023", "created_at": "2024-02-12T23:30:00-05:00"},
+    {"id": "m010", "content": "USER: Alex and I haven't had a real date night in 3 weeks. I feel guilty. ASSISTANT: The guilt itself is a signal you care.", "memory_type": "private_ai_chat", "tags": ["relationship", "guilt"], "confidence": 1.0, "decay_score": 0.87, "source_id": "c_0004", "created_at": "2024-02-15T21:00:00-05:00"},
+    {"id": "m011", "content": "Ran 5K for the first time! Slow but finished. Half marathon feels possible.", "memory_type": "public_lifelog", "tags": ["fitness", "achievement"], "confidence": 1.0, "decay_score": 0.96, "source_id": "ll_0028", "created_at": "2024-03-02T08:00:00-05:00"},
+    {"id": "m012", "content": "$1200.00 - Savings transfer - house down payment fund", "memory_type": "private_finance", "tags": ["savings", "housing"], "confidence": 1.0, "decay_score": 0.99, "source_id": "t_0045", "created_at": "2024-03-01T10:00:00-05:00"},
+    {"id": "m013", "content": "1:1 with Sarah - she hinted the director role might open in Q3", "memory_type": "public_calendar", "tags": ["career", "promotion"], "confidence": 1.0, "decay_score": 0.92, "source_id": "cal_0025", "created_at": "2024-03-10T11:00:00-05:00"},
+    {"id": "m014", "content": "Just shipped our biggest feature this quarter. Sometimes this job is actually fun.", "memory_type": "public_social", "tags": ["work", "achievement"], "confidence": 1.0, "decay_score": 0.90, "source_id": "s_0018", "created_at": "2024-03-15T17:00:00-05:00"},
+    {"id": "m015", "content": "USER: I think I need to start saying no to meetings. I'm in 6 hours of calls today. ASSISTANT: You're describing a classic PM trap.", "memory_type": "private_ai_chat", "tags": ["work", "boundaries"], "confidence": 1.0, "decay_score": 0.86, "source_id": "c_0006", "created_at": "2024-03-20T12:00:00-05:00"},
+    {"id": "m016", "content": "Date night with Alex - finally! Went to Uchi. Really needed this.", "memory_type": "private_lifelog", "tags": ["relationship", "dining"], "confidence": 1.0, "decay_score": 0.93, "source_id": "ll_0042", "created_at": "2024-03-22T20:00:00-05:00"},
+    {"id": "m017", "content": "$185.00 - Uchi - date night", "memory_type": "private_finance", "tags": ["dining", "relationship"], "confidence": 1.0, "decay_score": 0.91, "source_id": "t_0058", "created_at": "2024-03-22T22:00:00-05:00"},
+    {"id": "m018", "content": "From: sarah@company.com | Subject: Director role - let's talk next week", "memory_type": "public_email", "tags": ["career", "promotion"], "confidence": 1.0, "decay_score": 0.98, "source_id": "e_0055", "created_at": "2024-04-01T09:00:00-05:00"},
+    {"id": "m019", "content": "Woke up at 3am again. Brain won't stop.", "memory_type": "private_lifelog", "tags": ["sleep", "anxiety"], "confidence": 1.0, "decay_score": 0.84, "source_id": "ll_0055", "created_at": "2024-04-05T03:00:00-05:00"},
+    {"id": "m020", "content": "Weekly team standup - Q2 planning kickoff", "memory_type": "public_calendar", "tags": ["work", "planning"], "confidence": 1.0, "decay_score": 0.90, "source_id": "cal_0040", "created_at": "2024-04-08T10:00:00-05:00"},
+    {"id": "m021", "content": "Resume_2024_updated.docx - refreshed for director application", "memory_type": "private_files", "tags": ["career", "promotion"], "confidence": 1.0, "decay_score": 0.88, "source_id": "f_0012", "created_at": "2024-04-10T14:00:00-05:00"},
+    {"id": "m022", "content": "$65.00 - DoorDash - stress eating again, third time this week", "memory_type": "private_finance", "tags": ["dining", "stress"], "confidence": 1.0, "decay_score": 0.82, "source_id": "t_0072", "created_at": "2024-04-12T23:45:00-05:00"},
+    {"id": "m023", "content": "Learning to delegate more. Handed off the metrics dashboard to Jamie.", "memory_type": "public_lifelog", "tags": ["work", "growth"], "confidence": 1.0, "decay_score": 0.95, "source_id": "ll_0068", "created_at": "2024-05-01T16:00:00-05:00"},
+    {"id": "m024", "content": "Half marathon training plan - week 1 done!", "memory_type": "public_social", "tags": ["fitness", "achievement"], "confidence": 1.0, "decay_score": 0.94, "source_id": "s_0032", "created_at": "2024-05-10T07:00:00-05:00"}
+  ],
+  "links": [
+    {"source_id": "m002", "target_id": "m001", "link_type": "cross_reference"},
+    {"source_id": "m002", "target_id": "m019", "link_type": "related"},
+    {"source_id": "m005", "target_id": "m013", "link_type": "follow_up"},
+    {"source_id": "m013", "target_id": "m018", "link_type": "follow_up"},
+    {"source_id": "m018", "target_id": "m021", "link_type": "cross_reference"},
+    {"source_id": "m003", "target_id": "m009", "link_type": "related"},
+    {"source_id": "m009", "target_id": "m022", "link_type": "related"},
+    {"source_id": "m001", "target_id": "m015", "link_type": "related"},
+    {"source_id": "m010", "target_id": "m016", "link_type": "follow_up"},
+    {"source_id": "m016", "target_id": "m017", "link_type": "cross_reference"},
+    {"source_id": "m008", "target_id": "m014", "link_type": "related"},
+    {"source_id": "m011", "target_id": "m024", "link_type": "follow_up"},
+    {"source_id": "m007", "target_id": "m002", "link_type": "related"},
+    {"source_id": "m004", "target_id": "m008", "link_type": "cross_reference"},
+    {"source_id": "m019", "target_id": "m022", "link_type": "related"},
+    {"source_id": "m005", "target_id": "m004", "link_type": "cross_reference"},
+    {"source_id": "m023", "target_id": "m015", "link_type": "follow_up"}
+  ]
+}

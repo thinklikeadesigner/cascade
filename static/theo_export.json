@@ -1,0 +1,1381 @@
+{
+  "tenant_id": "p05",
+  "persona_name": "Theo",
+  "core_memory": {
+    "content": "## Profile\n- Name: Theo Nakamura\n- Age: 23\n- Location: Austin, TX\n- Job: Freelance Graphic Designer + Part-time Barista\n\n## Goals\n- Make freelancing full-time within 2 years\n- Build a recognizable design brand/portfolio\n- Pay off $6k in credit card debt\n- Learn motion design and 3D tools\n- Figure out what city feels like home long-term\n\n## Personality\n- Communication: informal, uses humor, sometimes self-deprecating",
+    "version": 10
+  },
+  "memories": [
+    {
+      "id": "119728ad-47e6-4495-8f11-8b46fbf53af9",
+      "content": "Skated to Barton Springs with roommates. Didn't think about work for four hours. Rare and necessary.",
+      "memory_type": "private_lifelog",
+      "tags": [
+        "social",
+        "self_care",
+        "austin"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "ll_0001",
+      "created_at": "2026-03-07T07:30:30.034559+00:00"
+    },
+    {
+      "id": "248f2d23-0c3c-4cbd-8f15-e1f26e3127fa",
+      "content": "Used Claude to draft three proposal emails in 20 minutes. Sent all three. That would've taken me half a day of avoidance otherwise.",
+      "memory_type": "private_lifelog",
+      "tags": [
+        "ai_use",
+        "freelance",
+        "productivity"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "ll_0003",
+      "created_at": "2026-03-07T07:30:30.084487+00:00"
+    },
+    {
+      "id": "be0e8346-0d9b-49cc-b9ac-dd1ab548b1ef",
+      "content": "Wondering if Austin is where I want to stay long-term. Cost of living is creeping up. But the community here is real.",
+      "memory_type": "private_lifelog",
+      "tags": [
+        "future",
+        "identity",
+        "austin"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "ll_0004",
+      "created_at": "2026-03-07T07:30:30.109384+00:00"
+    },
+    {
+      "id": "31fe0136-caa3-4eca-bbc3-e5b44f6c4041",
+      "content": "Morning shift at the coffee shop. A customer left a $10 tip on a $5 drink and said 'keep being creative.' I thought about it all day.",
+      "memory_type": "public_lifelog",
+      "tags": [
+        "work",
+        "barista",
+        "motivation"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "ll_0005",
+      "created_at": "2026-03-07T07:30:30.137290+00:00"
+    },
+    {
+      "id": "35645d68-926f-4e52-9b30-2d958a57bdff",
+      "content": "Pulled an all-nighter finishing a brand identity project I quoted too low. Delivered it. Client loved it. Charged $600. Should've been $2,200.",
+      "memory_type": "public_lifelog",
+      "tags": [
+        "work",
+        "freelance",
+        "money"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "ll_0008",
+      "created_at": "2026-03-07T07:30:30.224687+00:00"
+    },
+    {
+      "id": "959b5731-b157-4b71-b05b-ca0c18ef598a",
+      "content": "Spent Sunday learning Blender. Made a donut. It looks exactly like the tutorial donut. Starting somewhere.",
+      "memory_type": "private_lifelog",
+      "tags": [
+        "skills",
+        "learning",
+        "3d_design"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "ll_0010",
+      "created_at": "2026-03-07T07:30:30.272866+00:00"
+    },
+    {
+      "id": "fbf09a29-d4bd-4365-a83d-40ada30cb8aa",
+      "content": "Went to a design meetup downtown. Knew nobody. Awkward for the first hour. Left with two business cards and one real conversation.",
+      "memory_type": "private_lifelog",
+      "tags": [
+        "social",
+        "networking",
+        "design"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "ll_0012",
+      "created_at": "2026-03-07T07:30:30.318376+00:00"
+    },
+    {
+      "id": "d7ad1e7c-6fe3-4ff5-b84a-fc5dd0720bd6",
+      "content": "Looked at my credit card balance: $5,840. Paid the minimum. Hate that I paid the minimum.",
+      "memory_type": "private_lifelog",
+      "tags": [
+        "finances",
+        "debt",
+        "anxiety"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "ll_0013",
+      "created_at": "2026-03-07T07:30:30.345158+00:00"
+    },
+    {
+      "id": "cb29823e-915e-4cf7-8112-83f2590264c3",
+      "content": "Client asked for 'just a few changes' on a logo. 12 rounds of revisions later I want to retire. I need a revision policy. I keep saying I'll write one.",
+      "memory_type": "private_lifelog",
+      "tags": [
+        "freelance",
+        "clients",
+        "boundaries"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "ll_0015",
+      "created_at": "2026-03-07T07:30:30.403049+00:00"
+    },
+    {
+      "id": "5dd85855-1633-47e4-9c5d-5d739915f71d",
+      "content": "I think my ADHD is actually kind of useful for creative work. The hyperfocus when I find the right brief is unlike anything. It's the boring admin that wrecks me.",
+      "memory_type": "private_lifelog",
+      "tags": [
+        "adhd",
+        "self_awareness",
+        "freelance"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "ll_0016",
+      "created_at": "2026-03-07T07:30:30.436626+00:00"
+    },
+    {
+      "id": "50fdd2be-6439-4533-a5b3-84d2c151fde1",
+      "content": "Finished a rebrand project I'm actually proud of. Put it on Instagram. Seven designers I follow liked it. One commented. I screenshotted it.",
+      "memory_type": "private_lifelog",
+      "tags": [
+        "design",
+        "milestone",
+        "portfolio"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "ll_0017",
+      "created_at": "2026-03-07T07:30:30.468742+00:00"
+    },
+    {
+      "id": "01e202ce-c2ed-410a-97eb-27e0a5f6444c",
+      "content": "Tried to do taxes. Got overwhelmed. Closed the tab. Opened it again. Got through the first form. Victory.",
+      "memory_type": "private_lifelog",
+      "tags": [
+        "finances",
+        "adhd",
+        "adulting"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "ll_0019",
+      "created_at": "2026-03-07T07:30:30.529391+00:00"
+    },
+    {
+      "id": "1d43880e-8a77-41e9-aac0-c90fd9fb6ed0",
+      "content": "Opened Figma to work on a personal project. Fell into a rabbit hole of font comparisons for two hours. Did not open the project.",
+      "memory_type": "private_lifelog",
+      "tags": [
+        "adhd",
+        "productivity",
+        "design"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "ll_0025",
+      "created_at": "2026-03-07T07:30:30.686253+00:00"
+    },
+    {
+      "id": "31b914bf-a647-4ce8-89f8-8ce9855845a5",
+      "content": "Portfolio website hit 1,000 unique visitors in a month. First time. Mostly organic from an Instagram post that randomly did numbers.",
+      "memory_type": "private_lifelog",
+      "tags": [
+        "portfolio",
+        "milestone",
+        "social_media"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "ll_0026",
+      "created_at": "2026-03-07T07:30:30.713332+00:00"
+    },
+    {
+      "id": "544d171c-d40c-41a7-ad1d-feca195ca898",
+      "content": "Long bike ride through East Austin. The murals on 6th are unreal. Made a note to reach out to the building owners about a collab.",
+      "memory_type": "private_lifelog",
+      "tags": [
+        "austin",
+        "creativity",
+        "community"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "ll_0028",
+      "created_at": "2026-03-07T07:30:30.771035+00:00"
+    },
+    {
+      "id": "331cdd06-d577-4fb7-81ea-0b1a868c2589",
+      "content": "One of my roommates got a 'real job' at a startup. Base salary, health insurance, 401k. We celebrated. I felt proud and also weird about it.",
+      "memory_type": "private_lifelog",
+      "tags": [
+        "comparison",
+        "finances",
+        "identity"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "ll_0031",
+      "created_at": "2026-03-07T07:30:30.844944+00:00"
+    },
+    {
+      "id": "6d4e7769-6f46-4872-9e40-d09728dcf9f8",
+      "content": "Got referred to a new client by someone I did work for eight months ago. First time a referral has led directly to a contract. This is how it's supposed to work.",
+      "memory_type": "private_lifelog",
+      "tags": [
+        "freelance",
+        "milestone",
+        "business"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "ll_0032",
+      "created_at": "2026-03-07T07:30:30.871988+00:00"
+    },
+    {
+      "id": "b3bea7c8-44f5-40f4-ba46-24e75f28d3b6",
+      "content": "First month where freelance income covered all my expenses without the coffee shop shifts. Small but monumental.",
+      "memory_type": "private_lifelog",
+      "tags": [
+        "freelance",
+        "finances",
+        "milestone"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "ll_0058",
+      "created_at": "2026-03-07T07:30:31.565736+00:00"
+    },
+    {
+      "id": "3342d76a-f65a-4fc6-abc1-facb6e8bf688",
+      "content": "Spent an afternoon at the UT library working. Something about being around students makes me focus. Borrowed their energy.",
+      "memory_type": "private_lifelog",
+      "tags": [
+        "productivity",
+        "learning"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "ll_0059",
+      "created_at": "2026-03-07T07:30:31.587241+00:00"
+    },
+    {
+      "id": "086f972c-0956-4e78-b4bb-bae4f33905b6",
+      "content": "Raised my rate for the first time. New clients: $85/hour. Old rate was $55. Said it out loud for the first time on a call and didn't die.",
+      "memory_type": "private_lifelog",
+      "tags": [
+        "freelance",
+        "confidence",
+        "money"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "ll_0067",
+      "created_at": "2026-03-07T07:30:31.744338+00:00"
+    },
+    {
+      "id": "79ab156d-986d-47a8-bccd-aec2bf0c0bb2",
+      "content": "USER: I undercharged a client again. $600 for a brand identity that took 40 hours. How do I stop doing this? ASSISTANT: Pricing anxiety is almost always the root cause. The fix isn't a rate card \u2014 it's building the muscle of saying numbers out loud before they feel comfortable. Try this: before your next proposal call, write the number on paper and say it aloud three times. Then on the call, say it and stop talking. Silence feels like rejection but it's usually just processing. What does $2,200 mean to you \u2014 does it feel like 'too much to ask'?",
+      "memory_type": "private_ai_chat",
+      "tags": [
+        "freelance",
+        "pricing",
+        "confidence"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "c_0001",
+      "created_at": "2026-03-07T07:30:33.899197+00:00"
+    },
+    {
+      "id": "04a15ef8-9dec-4ead-a5e1-4afd20a3d9cf",
+      "content": "USER: I have ADHD and I'm struggling to finish projects. Any strategies that actually work? ASSISTANT: A few things that work specifically for ADHD: body doubling (work alongside someone, even on video), 25-minute Pomodoros with hard stops, and 'minimum viable progress' \u2014 define the smallest possible next step rather than the full task. Finishing is a separate skill from starting. What's the project you're most stuck on right now?",
+      "memory_type": "private_ai_chat",
+      "tags": [
+        "adhd",
+        "productivity",
+        "freelance"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "c_0002",
+      "created_at": "2026-03-07T07:30:33.930280+00:00"
+    },
+    {
+      "id": "d03c49be-3e48-4569-acbd-7fa2ad69f302",
+      "content": "USER: I want to build a following on Instagram for my design work. Where do I start? ASSISTANT: The fastest path is process content \u2014 show how you think, not just what you make. Behind-the-scenes sketches, revision rounds, before-and-after comparisons. Design Twitter/Instagram follows people who explain their decisions, not just people who have beautiful feeds. Post consistently for 60 days before evaluating. What kind of work do you want to attract more of?",
+      "memory_type": "private_ai_chat",
+      "tags": [
+        "social_media",
+        "design",
+        "business",
+        "portfolio"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "c_0003",
+      "created_at": "2026-03-07T07:30:33.956195+00:00"
+    },
+    {
+      "id": "d59300ab-899b-4e90-9057-f98e44f24cf7",
+      "content": "USER: I want to learn motion design. What's the fastest path given I already know Figma? ASSISTANT: After Effects is the industry standard \u2014 your Figma skills translate well since you already think in layers and frames. Start with: School of Motion free content, then Motion Design School for structured learning. Your first project should be animating your own logo \u2014 familiar subject, contained scope. Budget 3-4 months of 2 hours/week to get employable basics. Have you looked at Rive for web-based motion \u2014 it's closer to Figma's paradigm and increasingly in demand.",
+      "memory_type": "private_ai_chat",
+      "tags": [
+        "design",
+        "skills",
+        "learning"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "c_0004",
+      "created_at": "2026-03-07T07:30:33.983865+00:00"
+    },
+    {
+      "id": "490825f9-9b30-40b2-89a3-9e2acffc94c5",
+      "content": "USER: I'm comparing myself to people my age who have full-time jobs and benefits. It's messing with my head. ASSISTANT: This is real and it's worth sitting with rather than deflecting. What specifically feels harder \u2014 the financial security, the social validation, the sense of a clear path? Comparison is usually pointing at something you actually want. But it's also worth asking: in 5 years, which version of your life would you be prouder of? You're building something. That has a cost and a payoff.",
+      "memory_type": "private_ai_chat",
+      "tags": [
+        "comparison",
+        "identity",
+        "freelance",
+        "mental_health"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "c_0005",
+      "created_at": "2026-03-07T07:30:34.018707+00:00"
+    },
+    {
+      "id": "8e6b6d4c-056e-41e6-9e4a-c1add0608d62",
+      "content": "USER: A client wants 12 rounds of revisions on a logo. We agreed on 3. What do I do? ASSISTANT: You're not being difficult by enforcing the scope \u2014 you're running a business. Email draft: 'Hi [client] \u2014 I'm glad you're engaged with the direction. Per our agreement, we've completed three rounds of revisions. Additional rounds are available at $[X]/round. Happy to continue once we confirm. Let me know how you'd like to proceed.' Then hold the line. If they push back, that's information about whether you want this client relationship long-term.",
+      "memory_type": "private_ai_chat",
+      "tags": [
+        "freelance",
+        "clients",
+        "boundaries"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "c_0006",
+      "created_at": "2026-03-07T07:30:34.048731+00:00"
+    },
+    {
+      "id": "7361ddd8-2152-4a65-ac47-4ecb8993a431",
+      "content": "USER: Help me write a cold email pitch to a startup I'd love to work with. ASSISTANT: Cold emails live or die on the opening line. Don't start with 'I.' Start with them: 'Your rebrand around the Series A was smart \u2014 the new mark is cleaner, but I think there's a packaging opportunity you haven't addressed yet.' Then: one line on you, one specific piece of work relevant to them, and a low-friction ask: 'Would a 20-minute call make sense?' Keep it under 100 words. Want to share the company and I'll write a draft?",
+      "memory_type": "private_ai_chat",
+      "tags": [
+        "freelance",
+        "business_development",
+        "writing"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "c_0007",
+      "created_at": "2026-03-07T07:30:34.077280+00:00"
+    },
+    {
+      "id": "e1832dbf-775a-4264-a96a-eb4a98c19f0b",
+      "content": "USER: Looking back at this year, what did I actually learn? Help me figure that out. ASSISTANT: Let's map it. What did you try this year that scared you? What did you avoid and why? What did you finish that surprised you? Who did you help? What do you know about yourself at 23 that you didn't know at 22? Answers to those usually reveal the real learning underneath the events. Take a pass at one and I'll help you dig deeper.",
+      "memory_type": "private_ai_chat",
+      "tags": [
+        "reflection",
+        "personal_growth",
+        "year_end"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "c_0008",
+      "created_at": "2026-03-07T07:30:34.101433+00:00"
+    },
+    {
+      "id": "7e0691d8-54ba-4405-a09e-802a3412a5ef",
+      "content": "From: client@startupco.com | To: theo@theonakamura.com | Subject: Love the first draft! | Body summary: Theo \u2014 this is really strong. A few notes: can we explore a warmer color palette? And can the wordmark be a bit bolder? Otherwise exactly the direction.",
+      "memory_type": "public_email",
+      "tags": [
+        "client",
+        "work",
+        "design"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "e_0001",
+      "created_at": "2026-03-07T07:30:34.123560+00:00"
+    },
+    {
+      "id": "1d03b633-6917-40e8-b806-fd518a026efe",
+      "content": "From: chase@creditcard.com | To: theo@theonakamura.com | Subject: Statement ready \u2014 balance $5,840 | Body summary: Minimum payment due: $116. Available credit: $1,160.",
+      "memory_type": "private_email",
+      "tags": [
+        "finances",
+        "debt"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "e_0003",
+      "created_at": "2026-03-07T07:30:34.166983+00:00"
+    },
+    {
+      "id": "6befbd67-7447-40ab-94a6-f0e4dc8655fb",
+      "content": "From: theo@theonakamura.com | To: client@startupco.com | Subject: Invoice #018 | Body summary: Hi \u2014 attached is invoice #018 for the brand identity project, $2,200 due net-15. Thank you for the great collaboration.",
+      "memory_type": "private_email",
+      "tags": [
+        "finances",
+        "freelance"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "e_0004",
+      "created_at": "2026-03-07T07:30:34.190099+00:00"
+    },
+    {
+      "id": "e77ee548-bb7f-4d69-81df-e7dbe7c5b41a",
+      "content": "From: theo@theonakamura.com | To: referral.client@designneed.com | Subject: Following up on intro | Body summary: Hi \u2014 Jake mentioned you're working on a rebrand. I'd love to share some relevant work. Happy to jump on a 20-min call.",
+      "memory_type": "private_email",
+      "tags": [
+        "business_development",
+        "freelance"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "e_0006",
+      "created_at": "2026-03-07T07:30:34.234231+00:00"
+    },
+    {
+      "id": "dcb1548a-80a4-4c15-a178-af68c1b1263b",
+      "content": "From: schoolofmotion@email.com | To: theo@theonakamura.com | Subject: Your trial is ending | Body summary: Your free trial ends in 3 days. Ready to upgrade? Get full access to the motion design library.",
+      "memory_type": "private_email",
+      "tags": [
+        "learning",
+        "skills",
+        "design"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "e_0011",
+      "created_at": "2026-03-07T07:30:34.344930+00:00"
+    },
+    {
+      "id": "9390ae05-a3ce-4eff-bd09-777c90fa9640",
+      "content": "From: coffeeshop@caferowan.com | To: theo@theonakamura.com | Subject: Schedule next week | Body summary: Theo \u2014 you're on Tuesday 7-1 and Saturday 8-2. Let me know if there's a conflict.",
+      "memory_type": "public_email",
+      "tags": [
+        "work",
+        "barista",
+        "scheduling"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "e_0012",
+      "created_at": "2026-03-07T07:30:34.369445+00:00"
+    },
+    {
+      "id": "19a7721f-9589-4111-a98d-94d62791b99f",
+      "content": "From: roommate@gmail.com | To: theo@theonakamura.com | Subject: Rent due Friday | Body summary: Hey just a reminder! $875 each, Zelle is easiest.",
+      "memory_type": "private_email",
+      "tags": [
+        "finances",
+        "home"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "e_0022",
+      "created_at": "2026-03-07T07:30:34.595539+00:00"
+    },
+    {
+      "id": "258ad861-c35a-4326-a0b2-fdec1d62b77b",
+      "content": "Design meetup \u2014 Austin Creatives (2h) - Canopy",
+      "memory_type": "private_calendar",
+      "tags": [
+        "social",
+        "networking",
+        "design"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "cal_0001",
+      "created_at": "2026-03-07T07:30:36.378003+00:00"
+    },
+    {
+      "id": "e9509189-8f3c-454d-87b1-534e3d3f65ae",
+      "content": "New client onboarding call (45m) - Zoom",
+      "memory_type": "private_calendar",
+      "tags": [
+        "freelance",
+        "business_development"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "cal_0002",
+      "created_at": "2026-03-07T07:30:36.396030+00:00"
+    },
+    {
+      "id": "a35cf6f5-c080-4ca4-b44a-9b4dafab3385",
+      "content": "Portfolio shoot \u2014 product photos for case study (3h)",
+      "memory_type": "private_calendar",
+      "tags": [
+        "design",
+        "portfolio"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "cal_0003",
+      "created_at": "2026-03-07T07:30:36.414692+00:00"
+    },
+    {
+      "id": "2dbbc179-719e-4d3a-be53-3cf488e1ea7b",
+      "content": "Coffee shop shift (6h) - Caf\u00e9 Rowan",
+      "memory_type": "public_calendar",
+      "tags": [
+        "work",
+        "barista"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "cal_0004",
+      "created_at": "2026-03-07T07:30:36.433470+00:00"
+    },
+    {
+      "id": "f22fd3e9-b9ab-49ef-aaef-0fe38189a593",
+      "content": "Tax prep attempt (2h) - Coffee shop",
+      "memory_type": "private_calendar",
+      "tags": [
+        "finances",
+        "adulting"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "cal_0005",
+      "created_at": "2026-03-07T07:30:36.453581+00:00"
+    },
+    {
+      "id": "9c7f4288-bfb3-43b6-8ad5-969ef7a2073e",
+      "content": "Skate session with roommates (2h) - East Austin",
+      "memory_type": "private_calendar",
+      "tags": [
+        "social",
+        "self_care"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "cal_0006",
+      "created_at": "2026-03-07T07:30:36.472795+00:00"
+    },
+    {
+      "id": "c0d12f6b-eb40-45df-a77a-06448042af75",
+      "content": "Client presentation \u2014 brand concepts (1.5h) - Zoom",
+      "memory_type": "private_calendar",
+      "tags": [
+        "freelance",
+        "design",
+        "client"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "cal_0008",
+      "created_at": "2026-03-07T07:30:36.519704+00:00"
+    },
+    {
+      "id": "791a9b11-fbae-4fe3-b691-2a29254e20a3",
+      "content": "Invoice follow-up calls (1h)",
+      "memory_type": "private_calendar",
+      "tags": [
+        "freelance",
+        "finances"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "cal_0012",
+      "created_at": "2026-03-07T07:30:36.623583+00:00"
+    },
+    {
+      "id": "75149444-07d9-49c9-9f91-89970dd28340",
+      "content": "Motion design course module (2h) - Home",
+      "memory_type": "private_calendar",
+      "tags": [
+        "learning",
+        "skills"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "cal_0015",
+      "created_at": "2026-03-07T07:30:36.697671+00:00"
+    },
+    {
+      "id": "967d0470-dbde-42d5-a2c5-599935083959",
+      "content": "Figma + Blender learning session (3h) - Home studio",
+      "memory_type": "private_calendar",
+      "tags": [
+        "skills",
+        "learning",
+        "design"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "cal_0023",
+      "created_at": "2026-03-07T07:30:36.894943+00:00"
+    },
+    {
+      "id": "8fba017b-ce79-4542-8776-ba1f5602597b",
+      "content": "My ADHD brain is genuinely built for creative work. The hyperfocus is a superpower when pointed at the right thing. Still working on the admin part.",
+      "memory_type": "public_social",
+      "tags": [
+        "adhd",
+        "creativity",
+        "personal"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "s_0001",
+      "created_at": "2026-03-07T07:30:38.425554+00:00"
+    },
+    {
+      "id": "b2d450b4-568f-4d94-bd61-aa39f265ebeb",
+      "content": "Raised my hourly rate for the first time. Said it out loud on a call. Didn't die. Huge.",
+      "memory_type": "public_social",
+      "tags": [
+        "freelance",
+        "confidence",
+        "personal"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "s_0002",
+      "created_at": "2026-03-07T07:30:38.456231+00:00"
+    },
+    {
+      "id": "731438c8-01a6-4020-941b-e29a5e7b2e59",
+      "content": "New brand identity project just wrapped. Really happy with this one. Full case study on my site. #branding #graphicdesign #logodesign",
+      "memory_type": "public_social",
+      "tags": [
+        "design",
+        "portfolio",
+        "instagram"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "s_0003",
+      "created_at": "2026-03-07T07:30:38.485429+00:00"
+    },
+    {
+      "id": "2bba6c26-dfc6-4eed-ac9a-52489b93046f",
+      "content": "East Austin mural walk with my roommates. Art is everywhere here if you look for it. \ud83c\udfa8 #eastaustin #austin",
+      "memory_type": "public_social",
+      "tags": [
+        "austin",
+        "art",
+        "community"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "s_0004",
+      "created_at": "2026-03-07T07:30:38.512787+00:00"
+    },
+    {
+      "id": "a58843d4-47ff-498f-a88d-a3ffc9ed52f6",
+      "content": "Learning Blender. Made a donut. It is not a good donut but it is my donut and I made it.",
+      "memory_type": "public_social",
+      "tags": [
+        "skills",
+        "learning",
+        "3d_design",
+        "humor"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "s_0005",
+      "created_at": "2026-03-07T07:30:38.546637+00:00"
+    },
+    {
+      "id": "170fee22-069b-4978-91df-fddd4fcdc279",
+      "content": "Portfolio hit 1k visitors this month. Mostly from one Instagram post. The internet is wild.",
+      "memory_type": "public_social",
+      "tags": [
+        "portfolio",
+        "milestone",
+        "social_media"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "s_0010",
+      "created_at": "2026-03-07T07:30:38.696376+00:00"
+    },
+    {
+      "id": "895a17fd-627b-43da-9041-2d9eff4c4990",
+      "content": "PSA: If you're a designer undercharging, raise your rates. The clients who leave over price were not the clients you wanted.",
+      "memory_type": "public_social",
+      "tags": [
+        "freelance",
+        "design",
+        "linkedin"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "s_0016",
+      "created_at": "2026-03-07T07:30:38.867899+00:00"
+    },
+    {
+      "id": "b402a846-140f-4fa4-87e1-525f1f6b8a9f",
+      "content": "$9.99 - Figma - subscriptions",
+      "memory_type": "private_finance",
+      "tags": [
+        "subscriptions",
+        "work"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "t_0001",
+      "created_at": "2026-03-07T07:30:39.718047+00:00"
+    },
+    {
+      "id": "38f52322-c61f-4922-89b2-b454acc13067",
+      "content": "$55.00 - Whole Foods - groceries",
+      "memory_type": "private_finance",
+      "tags": [
+        "groceries"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "t_0002",
+      "created_at": "2026-03-07T07:30:39.746373+00:00"
+    },
+    {
+      "id": "bf3c0a65-d797-4aa7-9ff8-37296fa897ac",
+      "content": "$22.00 - skating gear - hobbies",
+      "memory_type": "private_finance",
+      "tags": [
+        "hobbies"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "t_0003",
+      "created_at": "2026-03-07T07:30:39.771039+00:00"
+    },
+    {
+      "id": "5f1ad09b-ae54-49d5-8c13-9568c780f8b7",
+      "content": "$14.50 - Veracruz tacos - food",
+      "memory_type": "private_finance",
+      "tags": [
+        "food",
+        "dining"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "t_0005",
+      "created_at": "2026-03-07T07:30:39.822100+00:00"
+    },
+    {
+      "id": "26838589-546d-4800-9fba-aa6df696e757",
+      "content": "$200.00 - School of Motion subscription - learning",
+      "memory_type": "private_finance",
+      "tags": [
+        "learning",
+        "subscriptions"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "t_0007",
+      "created_at": "2026-03-07T07:30:39.885327+00:00"
+    },
+    {
+      "id": "5fe57666-f9c8-4c13-8713-dd385dfcd7d2",
+      "content": "$600.00 - client invoice payment received - revenue",
+      "memory_type": "private_finance",
+      "tags": [
+        "revenue",
+        "freelance"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "t_0009",
+      "created_at": "2026-03-07T07:30:39.951899+00:00"
+    },
+    {
+      "id": "1e5f0dca-5df9-4f98-b013-023ab7d6bcbd",
+      "content": "$18.00 - Uber - transportation",
+      "memory_type": "private_finance",
+      "tags": [
+        "transportation"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "t_0018",
+      "created_at": "2026-03-07T07:30:40.198757+00:00"
+    },
+    {
+      "id": "e68d514b-2cf0-49b2-ae1c-7ccb62c785d5",
+      "content": "$116.00 - credit card minimum - debt",
+      "memory_type": "private_finance",
+      "tags": [
+        "debt",
+        "finances"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "t_0019",
+      "created_at": "2026-03-07T07:30:40.225477+00:00"
+    },
+    {
+      "id": "6e8e4480-04cf-485a-8c7f-f0bc36cbd18a",
+      "content": "$8.50 - coffee - food",
+      "memory_type": "private_finance",
+      "tags": [
+        "food"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "t_0021",
+      "created_at": "2026-03-07T07:30:40.275777+00:00"
+    },
+    {
+      "id": "ced7ca89-2c22-46f4-af8c-594bb6c7bc7c",
+      "content": "$875.00 - rent (roommate split) - housing",
+      "memory_type": "private_finance",
+      "tags": [
+        "rent",
+        "housing"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "t_0022",
+      "created_at": "2026-03-07T07:30:40.297210+00:00"
+    },
+    {
+      "id": "59f28d6d-c1ac-4223-9a3c-b12266def8cd",
+      "content": "$2,200.00 - client invoice payment received - revenue",
+      "memory_type": "private_finance",
+      "tags": [
+        "revenue",
+        "freelance",
+        "milestone"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "t_0029",
+      "created_at": "2026-03-07T07:30:40.469075+00:00"
+    },
+    {
+      "id": "1c6507f2-30a9-4ecc-8abe-d7d3b71528fa",
+      "content": "$12.99 - Adobe CC - subscriptions",
+      "memory_type": "private_finance",
+      "tags": [
+        "subscriptions",
+        "work"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "t_0041",
+      "created_at": "2026-03-07T07:30:40.787646+00:00"
+    },
+    {
+      "id": "b4729a7e-819d-4010-95d9-1c8cbe30d883",
+      "content": "credit_card_payoff_plan.xlsx \u2014 Spreadsheet: $5,840 balance, avalanche method, projected payoff date",
+      "memory_type": "public_files",
+      "tags": [
+        "finances",
+        "debt"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "f_0001",
+      "created_at": "2026-03-07T07:30:42.794054+00:00"
+    },
+    {
+      "id": "5520d93a-d32d-49a7-a367-19055201e85e",
+      "content": "motion_design_learning_notes.txt \u2014 Notes from School of Motion modules 1-4: keyframes, easing, timing principles",
+      "memory_type": "public_files",
+      "tags": [
+        "learning",
+        "design"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "f_0002",
+      "created_at": "2026-03-07T07:30:42.820260+00:00"
+    },
+    {
+      "id": "0e88c2d0-6758-4be5-83b1-a84b3d2f7bad",
+      "content": "theo_nakamura_portfolio_2024.pdf \u2014 Design portfolio: 12 case studies, brand identity, packaging, digital",
+      "memory_type": "public_files",
+      "tags": [
+        "portfolio",
+        "design",
+        "career"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "f_0005",
+      "created_at": "2026-03-07T07:30:42.890222+00:00"
+    },
+    {
+      "id": "b34fc18d-0919-460f-bc0e-f9ef6ae23ad8",
+      "content": "client_onboarding_template.docx \u2014 Proposal + contract template with revision policy, payment terms, scope definition",
+      "memory_type": "public_files",
+      "tags": [
+        "freelance",
+        "business"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "f_0006",
+      "created_at": "2026-03-07T07:30:42.919188+00:00"
+    },
+    {
+      "id": "7b3e3279-733c-423f-a25a-56acdb31ac88",
+      "content": "brand_identity_project_case_study.fig \u2014 Figma file: full brand system deliverable for tech startup client",
+      "memory_type": "public_files",
+      "tags": [
+        "design",
+        "work"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "f_0007",
+      "created_at": "2026-03-07T07:30:42.944431+00:00"
+    },
+    {
+      "id": "cb60e666-c97c-4518-b2e6-df0625126c81",
+      "content": "east_austin_mural_walk.jpg \u2014 Photo collage: 8 murals from weekend walk, South 1st to 6th Street",
+      "memory_type": "public_files",
+      "tags": [
+        "austin",
+        "art",
+        "photo"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "f_0009",
+      "created_at": "2026-03-07T07:30:43.006278+00:00"
+    },
+    {
+      "id": "9e74071d-9ff2-4905-872a-ff1c8d908c02",
+      "content": "rate_increase_email_template.txt \u2014 Draft email script for announcing new rates to existing clients",
+      "memory_type": "public_files",
+      "tags": [
+        "freelance",
+        "business"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "f_0015",
+      "created_at": "2026-03-07T07:30:43.176999+00:00"
+    },
+    {
+      "id": "8be04c46-caf1-4e56-89a5-cae8138102e4",
+      "content": "blender_donut_render_v3.png \u2014 3D render: tutorial donut, third iteration, actually looks like a donut now",
+      "memory_type": "public_files",
+      "tags": [
+        "skills",
+        "learning",
+        "photo"
+      ],
+      "confidence": 1.0,
+      "decay_score": 1.0,
+      "source_id": "f_0025",
+      "created_at": "2026-03-07T07:30:43.459482+00:00"
+    }
+  ],
+  "links": [
+    {
+      "source_id": "119728ad-47e6-4495-8f11-8b46fbf53af9",
+      "target_id": "9c7f4288-bfb3-43b6-8ad5-969ef7a2073e",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "248f2d23-0c3c-4cbd-8f15-e1f26e3127fa",
+      "target_id": "7361ddd8-2152-4a65-ac47-4ecb8993a431",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "248f2d23-0c3c-4cbd-8f15-e1f26e3127fa",
+      "target_id": "79ab156d-986d-47a8-bccd-aec2bf0c0bb2",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "31fe0136-caa3-4eca-bbc3-e5b44f6c4041",
+      "target_id": "35645d68-926f-4e52-9b30-2d958a57bdff",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "35645d68-926f-4e52-9b30-2d958a57bdff",
+      "target_id": "79ab156d-986d-47a8-bccd-aec2bf0c0bb2",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "35645d68-926f-4e52-9b30-2d958a57bdff",
+      "target_id": "6befbd67-7447-40ab-94a6-f0e4dc8655fb",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "35645d68-926f-4e52-9b30-2d958a57bdff",
+      "target_id": "50fdd2be-6439-4533-a5b3-84d2c151fde1",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "959b5731-b157-4b71-b05b-ca0c18ef598a",
+      "target_id": "8be04c46-caf1-4e56-89a5-cae8138102e4",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "959b5731-b157-4b71-b05b-ca0c18ef598a",
+      "target_id": "a58843d4-47ff-498f-a88d-a3ffc9ed52f6",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "959b5731-b157-4b71-b05b-ca0c18ef598a",
+      "target_id": "e1832dbf-775a-4264-a96a-eb4a98c19f0b",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "fbf09a29-d4bd-4365-a83d-40ada30cb8aa",
+      "target_id": "258ad861-c35a-4326-a0b2-fdec1d62b77b",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "d7ad1e7c-6fe3-4ff5-b84a-fc5dd0720bd6",
+      "target_id": "e68d514b-2cf0-49b2-ae1c-7ccb62c785d5",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "d7ad1e7c-6fe3-4ff5-b84a-fc5dd0720bd6",
+      "target_id": "1d03b633-6917-40e8-b806-fd518a026efe",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "d7ad1e7c-6fe3-4ff5-b84a-fc5dd0720bd6",
+      "target_id": "b4729a7e-819d-4010-95d9-1c8cbe30d883",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "cb29823e-915e-4cf7-8112-83f2590264c3",
+      "target_id": "8e6b6d4c-056e-41e6-9e4a-c1add0608d62",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "cb29823e-915e-4cf7-8112-83f2590264c3",
+      "target_id": "50fdd2be-6439-4533-a5b3-84d2c151fde1",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "5dd85855-1633-47e4-9c5d-5d739915f71d",
+      "target_id": "8fba017b-ce79-4542-8776-ba1f5602597b",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "5dd85855-1633-47e4-9c5d-5d739915f71d",
+      "target_id": "1d43880e-8a77-41e9-aac0-c90fd9fb6ed0",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "5dd85855-1633-47e4-9c5d-5d739915f71d",
+      "target_id": "04a15ef8-9dec-4ead-a5e1-4afd20a3d9cf",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "50fdd2be-6439-4533-a5b3-84d2c151fde1",
+      "target_id": "731438c8-01a6-4020-941b-e29a5e7b2e59",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "50fdd2be-6439-4533-a5b3-84d2c151fde1",
+      "target_id": "e77ee548-bb7f-4d69-81df-e7dbe7c5b41a",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "50fdd2be-6439-4533-a5b3-84d2c151fde1",
+      "target_id": "d03c49be-3e48-4569-acbd-7fa2ad69f302",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "1d43880e-8a77-41e9-aac0-c90fd9fb6ed0",
+      "target_id": "04a15ef8-9dec-4ead-a5e1-4afd20a3d9cf",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "1d43880e-8a77-41e9-aac0-c90fd9fb6ed0",
+      "target_id": "d03c49be-3e48-4569-acbd-7fa2ad69f302",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "31b914bf-a647-4ce8-89f8-8ce9855845a5",
+      "target_id": "170fee22-069b-4978-91df-fddd4fcdc279",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "544d171c-d40c-41a7-ad1d-feca195ca898",
+      "target_id": "2bba6c26-dfc6-4eed-ac9a-52489b93046f",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "544d171c-d40c-41a7-ad1d-feca195ca898",
+      "target_id": "cb60e666-c97c-4518-b2e6-df0625126c81",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "6d4e7769-6f46-4872-9e40-d09728dcf9f8",
+      "target_id": "e77ee548-bb7f-4d69-81df-e7dbe7c5b41a",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "6d4e7769-6f46-4872-9e40-d09728dcf9f8",
+      "target_id": "8e6b6d4c-056e-41e6-9e4a-c1add0608d62",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "086f972c-0956-4e78-b4bb-bae4f33905b6",
+      "target_id": "b2d450b4-568f-4d94-bd61-aa39f265ebeb",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "086f972c-0956-4e78-b4bb-bae4f33905b6",
+      "target_id": "79ab156d-986d-47a8-bccd-aec2bf0c0bb2",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "086f972c-0956-4e78-b4bb-bae4f33905b6",
+      "target_id": "895a17fd-627b-43da-9041-2d9eff4c4990",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "79ab156d-986d-47a8-bccd-aec2bf0c0bb2",
+      "target_id": "895a17fd-627b-43da-9041-2d9eff4c4990",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "04a15ef8-9dec-4ead-a5e1-4afd20a3d9cf",
+      "target_id": "d03c49be-3e48-4569-acbd-7fa2ad69f302",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "04a15ef8-9dec-4ead-a5e1-4afd20a3d9cf",
+      "target_id": "d59300ab-899b-4e90-9057-f98e44f24cf7",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "d03c49be-3e48-4569-acbd-7fa2ad69f302",
+      "target_id": "d59300ab-899b-4e90-9057-f98e44f24cf7",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "d03c49be-3e48-4569-acbd-7fa2ad69f302",
+      "target_id": "e77ee548-bb7f-4d69-81df-e7dbe7c5b41a",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "d59300ab-899b-4e90-9057-f98e44f24cf7",
+      "target_id": "5520d93a-d32d-49a7-a367-19055201e85e",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "d59300ab-899b-4e90-9057-f98e44f24cf7",
+      "target_id": "dcb1548a-80a4-4c15-a178-af68c1b1263b",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "490825f9-9b30-40b2-89a3-9e2acffc94c5",
+      "target_id": "e1832dbf-775a-4264-a96a-eb4a98c19f0b",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "490825f9-9b30-40b2-89a3-9e2acffc94c5",
+      "target_id": "04a15ef8-9dec-4ead-a5e1-4afd20a3d9cf",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "8e6b6d4c-056e-41e6-9e4a-c1add0608d62",
+      "target_id": "7361ddd8-2152-4a65-ac47-4ecb8993a431",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "8e6b6d4c-056e-41e6-9e4a-c1add0608d62",
+      "target_id": "79ab156d-986d-47a8-bccd-aec2bf0c0bb2",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "7361ddd8-2152-4a65-ac47-4ecb8993a431",
+      "target_id": "e77ee548-bb7f-4d69-81df-e7dbe7c5b41a",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "7361ddd8-2152-4a65-ac47-4ecb8993a431",
+      "target_id": "d03c49be-3e48-4569-acbd-7fa2ad69f302",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "e1832dbf-775a-4264-a96a-eb4a98c19f0b",
+      "target_id": "04a15ef8-9dec-4ead-a5e1-4afd20a3d9cf",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "7e0691d8-54ba-4405-a09e-802a3412a5ef",
+      "target_id": "6befbd67-7447-40ab-94a6-f0e4dc8655fb",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "7e0691d8-54ba-4405-a09e-802a3412a5ef",
+      "target_id": "e77ee548-bb7f-4d69-81df-e7dbe7c5b41a",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "7e0691d8-54ba-4405-a09e-802a3412a5ef",
+      "target_id": "7361ddd8-2152-4a65-ac47-4ecb8993a431",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "1d03b633-6917-40e8-b806-fd518a026efe",
+      "target_id": "b4729a7e-819d-4010-95d9-1c8cbe30d883",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "1d03b633-6917-40e8-b806-fd518a026efe",
+      "target_id": "6befbd67-7447-40ab-94a6-f0e4dc8655fb",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "6befbd67-7447-40ab-94a6-f0e4dc8655fb",
+      "target_id": "e77ee548-bb7f-4d69-81df-e7dbe7c5b41a",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "6befbd67-7447-40ab-94a6-f0e4dc8655fb",
+      "target_id": "7b3e3279-733c-423f-a25a-56acdb31ac88",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "dcb1548a-80a4-4c15-a178-af68c1b1263b",
+      "target_id": "e77ee548-bb7f-4d69-81df-e7dbe7c5b41a",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "19a7721f-9589-4111-a98d-94d62791b99f",
+      "target_id": "1d03b633-6917-40e8-b806-fd518a026efe",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "19a7721f-9589-4111-a98d-94d62791b99f",
+      "target_id": "6befbd67-7447-40ab-94a6-f0e4dc8655fb",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "258ad861-c35a-4326-a0b2-fdec1d62b77b",
+      "target_id": "9c7f4288-bfb3-43b6-8ad5-969ef7a2073e",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "258ad861-c35a-4326-a0b2-fdec1d62b77b",
+      "target_id": "f22fd3e9-b9ab-49ef-aaef-0fe38189a593",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "2dbbc179-719e-4d3a-be53-3cf488e1ea7b",
+      "target_id": "f22fd3e9-b9ab-49ef-aaef-0fe38189a593",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "9c7f4288-bfb3-43b6-8ad5-969ef7a2073e",
+      "target_id": "967d0470-dbde-42d5-a2c5-599935083959",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "c0d12f6b-eb40-45df-a77a-06448042af75",
+      "target_id": "731438c8-01a6-4020-941b-e29a5e7b2e59",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "c0d12f6b-eb40-45df-a77a-06448042af75",
+      "target_id": "7b3e3279-733c-423f-a25a-56acdb31ac88",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "c0d12f6b-eb40-45df-a77a-06448042af75",
+      "target_id": "e77ee548-bb7f-4d69-81df-e7dbe7c5b41a",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "75149444-07d9-49c9-9f91-89970dd28340",
+      "target_id": "5520d93a-d32d-49a7-a367-19055201e85e",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "b2d450b4-568f-4d94-bd61-aa39f265ebeb",
+      "target_id": "79ab156d-986d-47a8-bccd-aec2bf0c0bb2",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "731438c8-01a6-4020-941b-e29a5e7b2e59",
+      "target_id": "7b3e3279-733c-423f-a25a-56acdb31ac88",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "731438c8-01a6-4020-941b-e29a5e7b2e59",
+      "target_id": "6befbd67-7447-40ab-94a6-f0e4dc8655fb",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "2bba6c26-dfc6-4eed-ac9a-52489b93046f",
+      "target_id": "cb60e666-c97c-4518-b2e6-df0625126c81",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "a58843d4-47ff-498f-a88d-a3ffc9ed52f6",
+      "target_id": "8be04c46-caf1-4e56-89a5-cae8138102e4",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "895a17fd-627b-43da-9041-2d9eff4c4990",
+      "target_id": "35645d68-926f-4e52-9b30-2d958a57bdff",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "b402a846-140f-4fa4-87e1-525f1f6b8a9f",
+      "target_id": "1c6507f2-30a9-4ecc-8abe-d7d3b71528fa",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "b402a846-140f-4fa4-87e1-525f1f6b8a9f",
+      "target_id": "26838589-546d-4800-9fba-aa6df696e757",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "5f1ad09b-ae54-49d5-8c13-9568c780f8b7",
+      "target_id": "6e8e4480-04cf-485a-8c7f-f0bc36cbd18a",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "26838589-546d-4800-9fba-aa6df696e757",
+      "target_id": "1c6507f2-30a9-4ecc-8abe-d7d3b71528fa",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "5fe57666-f9c8-4c13-8713-dd385dfcd7d2",
+      "target_id": "59f28d6d-c1ac-4223-9a3c-b12266def8cd",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "59f28d6d-c1ac-4223-9a3c-b12266def8cd",
+      "target_id": "6befbd67-7447-40ab-94a6-f0e4dc8655fb",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "0e88c2d0-6758-4be5-83b1-a84b3d2f7bad",
+      "target_id": "7b3e3279-733c-423f-a25a-56acdb31ac88",
+      "link_type": "similar"
+    },
+    {
+      "source_id": "0e88c2d0-6758-4be5-83b1-a84b3d2f7bad",
+      "target_id": "6befbd67-7447-40ab-94a6-f0e4dc8655fb",
+      "link_type": "similar"
+    }
+  ]
+}

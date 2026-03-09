@@ -46,12 +46,15 @@ def determine_context(update: Update, config: BotConfig) -> str:
     return "group"
 
 
-def make_message_handler(config: BotConfig, memory_client: MemoryClient):
+def make_message_handler(config: BotConfig, memory_client: MemoryClient, persona_dir=None):
     """Create a message handler closure for a specific bot/persona."""
     tenant = memory_client.for_tenant(config.tenant_id)
 
     export_fn = make_export_handler(config, memory_client)
     privacy_fn = make_privacy_handler(config)
+    forget_fn = make_forget_handler(config, memory_client)
+    import_fn = make_import_handler(config, memory_client)
+    insights_fn = make_insights_handler(config, persona_dir) if persona_dir else None
 
     async def handler(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         question = update.message.text
@@ -63,6 +66,22 @@ def make_message_handler(config: BotConfig, memory_client: MemoryClient):
         # Catch /privacy as text fallback
         if question and question.strip().lower().startswith("/privacy"):
             return await privacy_fn(update, ctx)
+
+        # Catch /forget as text fallback
+        if question and question.strip().lower().startswith("/forget"):
+            return await forget_fn(update, ctx)
+
+        # Catch /import as text fallback
+        if question and question.strip().lower().startswith("/import"):
+            return await import_fn(update, ctx)
+
+        # Catch /insights as text fallback
+        if question and question.strip().lower().startswith("/insights"):
+            if insights_fn:
+                return await insights_fn(update, ctx)
+            else:
+                await update.message.reply_text("No persona data available for insights on this bot.")
+                return
 
         context = determine_context(update, config)
 
